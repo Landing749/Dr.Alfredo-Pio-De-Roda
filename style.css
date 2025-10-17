@@ -342,4 +342,13 @@ hr,
   height: 0 !important;
 }
 
+.announcements, 
+.faculty, 
+.slideshow-container,
+section, 
+div {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
 
