@@ -461,6 +461,65 @@ hr, .section-divider, .line, .divider {
   background: none !important;
 }
 
+/* === FACULTY & ANNOUNCEMENTS FIX === */
+#faculty, 
+#announcements {
+  border: none;
+  box-shadow: none;
+  background: none;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* Real card style but clean — no lines */
+.card.small {
+  background: #ffffff; /* white card */
+  border-radius: 14px;
+  padding: 20px;
+  width: 260px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* subtle floating shadow */
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: none;
+}
+
+.card.small:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+/* Titles — no lines under them */
+#faculty h2,
+#announcements h2 {
+  border: none;
+  box-shadow: none;
+  margin-bottom: 30px;
+  color: #2c5e2e; /* green accent */
+  font-size: 2rem;
+  font-weight: 700;
+  position: relative;
+}
+
+/* Optional: soft fade-in animation */
+.card.small {
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
 
 
 
