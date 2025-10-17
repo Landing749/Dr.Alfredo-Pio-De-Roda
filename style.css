@@ -351,4 +351,72 @@ div {
   box-shadow: none !important;
 }
 
+/* === HERO SECTION (REPLACES SLIDESHOW) === */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: url("school-bg1.jpg") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Dark overlay for readability */
+.hero-section .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1;
+}
+
+/* Content layer */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 30px;
+  animation: fadeIn 2s ease-in;
+}
+
+/* Logo */
+.school-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+}
+
+/* Title and text */
+.hero-content h1 {
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.hero-content p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #f1f1f1;
+}
+
+/* Optional smooth fade-in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Remove all ugly lines (for real this time) */
+hr, .section-divider, .line, .divider {
+  display: none !important;
+}
+
+
 
