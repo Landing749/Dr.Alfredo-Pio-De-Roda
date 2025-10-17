@@ -418,5 +418,49 @@ hr, .section-divider, .line, .divider {
   display: none !important;
 }
 
+/* 💣 Remove the faint dividing lines from Faculty & Announcements */
+#faculty, 
+#announcements {
+  border: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+/* Remove any grid gaps or fake lines between cards */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px; /* spacing without lines */
+  border: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+/* Fix the cards themselves */
+.card.small {
+  border: none !important;
+  box-shadow: none !important;
+  background: rgba(255,255,255,0.1); /* soft background if needed */
+  backdrop-filter: blur(6px);
+  padding: 15px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+/* Optional hover effect (for polish) */
+.card.small:hover {
+  transform: translateY(-5px);
+}
+
+/* Optional: ensure h2 titles don’t have lines or borders */
+#faculty h2,
+#announcements h2 {
+  border: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+
 
 
