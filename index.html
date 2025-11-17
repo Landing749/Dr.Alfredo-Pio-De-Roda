@@ -211,6 +211,78 @@
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
         }
+
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .announcement-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .announcement-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.12);
+        }
+
+        .announcement-urgent {
+            border-left: 4px solid #ef4444;
+        }
+
+        .announcement-important {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .announcement-general {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .announcement-event {
+            border-left: 4px solid #10b981;
+        }
+
+        .announcement-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-urgent {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-important {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-general {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-event {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
     </style>
   <style>@view-transition { navigation: auto; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
@@ -232,7 +304,7 @@
       </div>
      </div>
      <div class="hidden md:block">
-      <div class="ml-10 flex items-baseline space-x-8"><a href="#home" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a> <a href="#about" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">About</a> <a href="#programs" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Programs</a> <a href="#admissions" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Admissions</a> <a href="#contact" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contact</a>
+      <div class="ml-10 flex items-baseline space-x-8"><a href="#home" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a> <a href="#about" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">About</a> <a href="#programs" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Programs</a> <a href="#announcements" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Announcements</a> <a href="#admissions" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Admissions</a> <a href="#contact" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contact</a>
       </div>
      </div>
      <div class="md:hidden"><button id="mobile-menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none">
@@ -242,7 +314,7 @@
     </div>
    </div><!-- Mobile menu -->
    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
-    <div class="px-2 pt-2 pb-3 space-y-1"><a href="#home" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Home</a> <a href="#about" class="block px-3 py-2 text-gray-700 hover:text-blue-600">About</a> <a href="#programs" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Programs</a> <a href="#admissions" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Admissions</a> <a href="#contact" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Contact</a>
+    <div class="px-2 pt-2 pb-3 space-y-1"><a href="#home" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Home</a> <a href="#about" class="block px-3 py-2 text-gray-700 hover:text-blue-600">About</a> <a href="#programs" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Programs</a> <a href="#announcements" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Announcements</a> <a href="#admissions" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Admissions</a> <a href="#contact" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Contact</a>
     </div>
    </div>
   </nav><!-- Hero Section -->
@@ -370,8 +442,32 @@
      </div>
     </div>
    </div>
+  </section><!-- Announcements Section -->
+  <section id="announcements" class="py-24 premium-section">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20">
+     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-semibold"> 📢 Latest Updates </span>
+     </div>
+     <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in tracking-tight">School Announcements</h2>
+     <p class="text-xl text-gray-600 fade-in max-w-3xl mx-auto leading-relaxed">Stay informed with the latest news, events, and important updates from our school community</p>
+    </div><!-- Loading State -->
+    <div id="announcements-loading" class="text-center py-12">
+     <div class="loading-spinner mx-auto mb-4"></div>
+     <p class="text-gray-600">Loading announcements...</p>
+    </div><!-- Announcements Container -->
+    <div id="announcements-container" class="hidden">
+     <div id="announcements-list" class="space-y-8"><!-- Announcements will be inserted here -->
+     </div>
+    </div><!-- No Announcements State -->
+    <div id="no-announcements" class="text-center py-12 hidden">
+     <svg class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+     </svg>
+     <h3 class="text-lg font-semibold text-gray-800 mb-2">No Announcements</h3>
+     <p class="text-gray-600">Check back later for school updates and announcements.</p>
+    </div>
+   </div>
   </section><!-- Admissions Section -->
-  <section id="admissions" class="py-24 premium-section">
+  <section id="admissions" class="py-24 bg-white">
    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-20">
      <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold"> Join Our Family </span>
@@ -500,8 +596,8 @@
        </svg>
       </div>
       <h3 class="text-2xl font-bold mb-3">Visit Us</h3>
-      <p id="contact-address" class="text-blue-100 text-lg">6V68+R8F<br>
-       Indang-Naic Road, Indang, Cavite</p>
+      <p id="contact-address" class="text-blue-100 text-lg">123 Education Street<br>
+       Learning City, LC 12345</p>
       <p class="text-blue-200 text-sm mt-2">School tours available by appointment</p>
      </div>
     </div><!-- Office Hours -->
@@ -540,6 +636,7 @@
        <li><a href="#home" class="text-gray-400 hover:text-white transition duration-300">Home</a></li>
        <li><a href="#about" class="text-gray-400 hover:text-white transition duration-300">About</a></li>
        <li><a href="#programs" class="text-gray-400 hover:text-white transition duration-300">Programs</a></li>
+       <li><a href="#announcements" class="text-gray-400 hover:text-white transition duration-300">Announcements</a></li>
        <li><a href="#admissions" class="text-gray-400 hover:text-white transition duration-300">Admissions</a></li>
       </ul>
      </div>
@@ -572,14 +669,14 @@
   <script>
         // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
         const firebaseConfig = {
-            apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
-            authDomain: "clinique-parfum.firebaseapp.com",
-            databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
-            projectId: "clinique-parfum",
-            storageBucket: "clinique-parfum.firebasestorage.app",
-            messagingSenderId: "569473208892",
-            appId: "1:569473208892:web:f009390a8631fc164ce939",
-            measurementId: "G-XW3R3D64PR"
+           apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
+           authDomain: "clinique-parfum.firebaseapp.com",
+           databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
+           projectId: "clinique-parfum",
+           storageBucket: "clinique-parfum.firebasestorage.app",
+           messagingSenderId: "569473208892",
+           appId: "1:569473208892:web:f009390a8631fc164ce939",
+           measurementId: "G-XW3R3D64PR"
         };
 
         // Initialize Firebase
@@ -663,6 +760,151 @@
                 console.error("Error saving enrollment:", error);
                 return { success: false, error: error.message };
             }
+        }
+
+        // Announcements functions
+        async function loadAnnouncements() {
+            if (!isFirebaseInitialized) {
+                // Demo mode - show sample announcements
+                setTimeout(() => {
+                    displayDemoAnnouncements();
+                }, 1000);
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('announcements').orderByChild('announcement_date').once('value');
+                const data = snapshot.val();
+                
+                if (data) {
+                    const announcements = Object.keys(data)
+                        .map(key => ({ id: key, ...data[key] }))
+                        .filter(announcement => announcement.announcement_active)
+                        .sort((a, b) => {
+                            // Sort by priority first, then by date
+                            const priorityOrder = { urgent: 0, important: 1, general: 2, event: 3 };
+                            const priorityDiff = priorityOrder[a.announcement_priority] - priorityOrder[b.announcement_priority];
+                            if (priorityDiff !== 0) return priorityDiff;
+                            return new Date(b.announcement_date) - new Date(a.announcement_date);
+                        });
+                    
+                    displayAnnouncements(announcements);
+                } else {
+                    showNoAnnouncements();
+                }
+            } catch (error) {
+                console.error("Error loading announcements:", error);
+                showNoAnnouncements();
+            }
+        }
+
+        function displayDemoAnnouncements() {
+            const demoAnnouncements = [
+                {
+                    id: 'demo1',
+                    announcement_title: 'Welcome Back to School!',
+                    announcement_content: 'We are excited to welcome all our students back for the new academic year. Classes begin on Monday, August 28th. Please ensure all enrollment forms are completed.',
+                    announcement_type: 'general',
+                    announcement_priority: 'important',
+                    announcement_date: new Date(Date.now() - 86400000).toISOString(),
+                    announcement_active: true
+                },
+                {
+                    id: 'demo2',
+                    announcement_title: 'Parent-Teacher Conference',
+                    announcement_content: 'Parent-Teacher conferences are scheduled for October 15-16. Please sign up for your preferred time slot through the school portal.',
+                    announcement_type: 'event',
+                    announcement_priority: 'general',
+                    announcement_date: new Date(Date.now() - 172800000).toISOString(),
+                    announcement_active: true
+                },
+                {
+                    id: 'demo3',
+                    announcement_title: 'School Closure - Weather Alert',
+                    announcement_content: 'Due to severe weather conditions, the school will be closed tomorrow, December 15th. All after-school activities are also cancelled.',
+                    announcement_type: 'urgent',
+                    announcement_priority: 'urgent',
+                    announcement_date: new Date().toISOString(),
+                    announcement_active: true
+                }
+            ];
+            
+            displayAnnouncements(demoAnnouncements);
+        }
+
+        function displayAnnouncements(announcements) {
+            const container = document.getElementById('announcements-container');
+            const list = document.getElementById('announcements-list');
+            const loading = document.getElementById('announcements-loading');
+            const noAnnouncements = document.getElementById('no-announcements');
+            
+            loading.classList.add('hidden');
+            noAnnouncements.classList.add('hidden');
+            container.classList.remove('hidden');
+            
+            list.innerHTML = announcements.map(announcement => `
+                <div class="announcement-card announcement-${announcement.announcement_priority} p-8 rounded-2xl fade-in">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="announcement-badge badge-${announcement.announcement_priority}">
+                                ${announcement.announcement_priority}
+                            </span>
+                            <span class="text-sm text-gray-500">
+                                ${formatAnnouncementDate(announcement.announcement_date)}
+                            </span>
+                        </div>
+                        <div class="announcement-icon">
+                            ${getAnnouncementIcon(announcement.announcement_priority)}
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">${announcement.announcement_title}</h3>
+                    <p class="text-gray-600 leading-relaxed">${announcement.announcement_content}</p>
+                </div>
+            `).join('');
+            
+            // Trigger fade-in animation
+            setTimeout(() => {
+                document.querySelectorAll('.announcement-card.fade-in').forEach(el => {
+                    el.classList.add('visible');
+                });
+            }, 100);
+        }
+
+        function showNoAnnouncements() {
+            document.getElementById('announcements-loading').classList.add('hidden');
+            document.getElementById('announcements-container').classList.add('hidden');
+            document.getElementById('no-announcements').classList.remove('hidden');
+        }
+
+        function formatAnnouncementDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) {
+                return 'Today';
+            } else if (diffDays === 2) {
+                return 'Yesterday';
+            } else if (diffDays <= 7) {
+                return `${diffDays - 1} days ago`;
+            } else {
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+        }
+
+        function getAnnouncementIcon(priority) {
+            const icons = {
+                urgent: '<svg class="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V19H11V17M11,5H13V15H11V5Z"/></svg>',
+                important: '<svg class="h-6 w-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+                general: '<svg class="h-6 w-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/></svg>',
+                event: '<svg class="h-6 w-6 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>'
+            };
+            return icons[priority] || icons.general;
         }
 
         // Mobile menu functionality
@@ -908,6 +1150,9 @@
                 mapToEditPanelValues
             });
         }
+
+        // Initialize the application
+        loadAnnouncements();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99ffc55ca717ec6b',t:'MTc2MzM4ODIwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99fff0fe07f770b5',t:'MTc2MzM4OTk4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
