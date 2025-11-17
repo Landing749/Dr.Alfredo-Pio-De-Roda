@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enrollment Admin Dashboard</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script><!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        }
+        
+        .admin-gradient {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #64748b 75%, #94a3b8 100%);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-approved {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-contacted {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .action-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-approve {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background-color: #059669;
+        }
+        
+        .btn-reject {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-contact {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-contact:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-view {
+            background-color: #6b7280;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background-color: #4b5563;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+        
+        .filter-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+        }
+        
+        .filter-button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .filter-button:hover {
+            border-color: #3b82f6;
+        }
+        
+        .search-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .table-row {
+            transition: all 0.2s;
+        }
+        
+        .table-row:hover {
+            background-color: #f9fafb;
+        }
+        
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .export-button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .export-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="bg-gray-50"><!-- Header -->
+  <header class="admin-gradient text-white shadow-lg">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="flex items-center justify-between">
+     <div class="flex items-center">
+      <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
+       <svg class="h-7 w-7 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+       </svg>
+      </div>
+      <div>
+       <h1 id="dashboard-title" class="text-2xl font-bold">Enrollment Admin Dashboard</h1>
+       <p id="school-name" class="text-blue-100">Dr. Alfredo Pio De Roda Elementary School</p>
+      </div>
+     </div>
+     <div class="flex items-center space-x-4"><button id="refresh-btn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg font-medium transition-all duration-200">
+       <svg class="h-5 w-5 inline mr-2" fill="currentColor" viewbox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+       </svg> Refresh </button> <button id="export-btn" class="export-button">
+       <svg class="h-5 w-5 inline mr-2" fill="currentColor" viewbox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+       </svg> Export CSV </button>
+     </div>
+    </div>
+   </div>
+  </header><!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><!-- Stats Cards -->
+   <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="stats-card">
+     <div class="flex items-center justify-between">
+      <div>
+       <p class="text-blue-100 text-sm font-medium">Total Enrollments</p>
+       <p id="total-count" class="text-3xl font-bold">0</p>
+      </div>
+      <svg class="h-8 w-8 text-blue-200" fill="currentColor" viewbox="0 0 24 24"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-4h3v4h2v-7.5c0-.83.67-1.5 1.5-1.5S12 9.67 12 10.5V11h2v-.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18h2v-7.5c0-1.93-1.57-3.5-3.5-3.5S12 8.57 12 10.5V11h-2v-.5C10 8.57 8.43 7 6.5 7S3 8.57 3 10.5V18h1z" />
+      </svg>
+     </div>
+    </div>
+    <div class="glass-card p-6 rounded-xl">
+     <div class="flex items-center justify-between">
+      <div>
+       <p class="text-gray-600 text-sm font-medium">Pending Review</p>
+       <p id="pending-count" class="text-3xl font-bold text-yellow-600">0</p>
+      </div>
+      <svg class="h-8 w-8 text-yellow-500" fill="currentColor" viewbox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V19H11V17M11,5H13V15H11V5Z" />
+      </svg>
+     </div>
+    </div>
+    <div class="glass-card p-6 rounded-xl">
+     <div class="flex items-center justify-between">
+      <div>
+       <p class="text-gray-600 text-sm font-medium">Approved</p>
+       <p id="approved-count" class="text-3xl font-bold text-green-600">0</p>
+      </div>
+      <svg class="h-8 w-8 text-green-500" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+      </svg>
+     </div>
+    </div>
+    <div class="glass-card p-6 rounded-xl">
+     <div class="flex items-center justify-between">
+      <div>
+       <p class="text-gray-600 text-sm font-medium">This Week</p>
+       <p id="week-count" class="text-3xl font-bold text-blue-600">0</p>
+      </div>
+      <svg class="h-8 w-8 text-blue-500" fill="currentColor" viewbox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+      </svg>
+     </div>
+    </div>
+   </div><!-- Filters and Search -->
+   <div class="glass-card p-6 rounded-xl mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+     <div class="flex flex-wrap gap-2"><button class="filter-button active" data-status="all">All</button> <button class="filter-button" data-status="pending">Pending</button> <button class="filter-button" data-status="approved">Approved</button> <button class="filter-button" data-status="contacted">Contacted</button> <button class="filter-button" data-status="rejected">Rejected</button>
+     </div>
+     <div class="flex gap-4"><input type="text" id="search-input" class="search-input" placeholder="Search by name, email, or control number..."> <select id="grade-filter" class="search-input"> <option value="">All Grades</option> <option value="kindergarten">Kindergarten</option> <option value="1st">1st Grade</option> <option value="2nd">2nd Grade</option> <option value="3rd">3rd Grade</option> <option value="4th">4th Grade</option> <option value="5th">5th Grade</option> <option value="6th">6th Grade</option> </select>
+     </div>
+    </div>
+   </div><!-- Loading State -->
+   <div id="loading-state" class="glass-card p-12 rounded-xl text-center">
+    <div class="loading-spinner mx-auto mb-4"></div>
+    <p class="text-gray-600">Loading enrollments...</p>
+   </div><!-- Enrollments Table -->
+   <div id="enrollments-container" class="glass-card rounded-xl overflow-hidden hidden">
+    <div class="overflow-x-auto">
+     <table class="w-full">
+      <thead class="bg-gray-50 border-b border-gray-200">
+       <tr>
+        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Student</th>
+        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Parent/Guardian</th>
+        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Grade</th>
+        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Control #</th>
+        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Queue</th>
+        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+       </tr>
+      </thead>
+      <tbody id="enrollments-tbody" class="bg-white divide-y divide-gray-200"><!-- Enrollment rows will be inserted here -->
+      </tbody>
+     </table>
+    </div>
+   </div><!-- Empty State -->
+   <div id="empty-state" class="glass-card p-12 rounded-xl text-center hidden">
+    <svg class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="currentColor" viewbox="0 0 24 24"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-4h3v4h2v-7.5c0-.83.67-1.5 1.5-1.5S12 9.67 12 10.5V11h2v-.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18h2v-7.5c0-1.93-1.57-3.5-3.5-3.5S12 8.57 12 10.5V11h-2v-.5C10 8.57 8.43 7 6.5 7S3 8.57 3 10.5V18h1z" />
+    </svg>
+    <h3 class="text-lg font-semibold text-gray-800 mb-2">No Enrollments Found</h3>
+    <p class="text-gray-600">No enrollment applications match your current filters.</p>
+   </div>
+  </main><!-- Enrollment Detail Modal -->
+  <div id="detail-modal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 hidden">
+   <div class="modal-content rounded-2xl p-8 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-6">
+     <h3 class="text-2xl font-bold text-gray-800">Enrollment Details</h3><button id="close-detail-modal" class="text-gray-400 hover:text-gray-600">
+      <svg class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+      </svg></button>
+    </div>
+    <div id="modal-content" class="space-y-6"><!-- Content will be populated dynamically -->
+    </div>
+    <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200"><button id="modal-approve" class="action-button btn-approve">Approve</button> <button id="modal-contact" class="action-button btn-contact">Mark as Contacted</button> <button id="modal-reject" class="action-button btn-reject">Reject</button>
+    </div>
+   </div>
+  </div>
+  <script>
+        // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+           apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
+           authDomain: "clinique-parfum.firebaseapp.com",
+           databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
+           projectId: "clinique-parfum",
+           storageBucket: "clinique-parfum.firebasestorage.app",
+           messagingSenderId: "569473208892",
+           appId: "1:569473208892:web:f009390a8631fc164ce939",
+           measurementId: "G-XW3R3D64PR"
+        };
+
+        // Initialize Firebase
+        let database;
+        let isFirebaseInitialized = false;
+        let enrollmentsData = [];
+        let filteredData = [];
+        let currentFilter = 'all';
+        let currentEnrollment = null;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            isFirebaseInitialized = true;
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.log("Firebase initialization failed - using demo mode:", error.message);
+            isFirebaseInitialized = false;
+            // Load demo data for testing
+            loadDemoData();
+        }
+
+        // Configuration object
+        const defaultConfig = {
+            dashboard_title: "Enrollment Admin Dashboard",
+            school_name: "Dr. Alfredo Pio De Roda Elementary School",
+            admin_email: "admin@drpioderoda.edu",
+            primary_color: "#3b82f6",
+            background_color: "#f9fafb",
+            text_color: "#1f2937",
+            surface_color: "#ffffff",
+            accent_color: "#2563eb"
+        };
+
+        // Demo data for testing
+        function loadDemoData() {
+            enrollmentsData = [
+                {
+                    id: 'demo1',
+                    student_name: 'Maria Santos',
+                    parent_name: 'Juan Santos',
+                    email: 'juan.santos@email.com',
+                    phone: '(555) 123-4567',
+                    grade: 'kindergarten',
+                    message: 'My daughter is excited to start school!',
+                    control_number: '20241201-0001',
+                    queue_number: 1,
+                    enrollment_date: new Date(Date.now() - 86400000).toISOString(),
+                    status: 'pending'
+                },
+                {
+                    id: 'demo2',
+                    student_name: 'Carlos Rodriguez',
+                    parent_name: 'Ana Rodriguez',
+                    email: 'ana.rodriguez@email.com',
+                    phone: '(555) 234-5678',
+                    grade: '2nd',
+                    message: 'Looking forward to joining your school.',
+                    control_number: '20241201-0002',
+                    queue_number: 2,
+                    enrollment_date: new Date(Date.now() - 172800000).toISOString(),
+                    status: 'approved'
+                },
+                {
+                    id: 'demo3',
+                    student_name: 'Sofia Chen',
+                    parent_name: 'Li Chen',
+                    email: 'li.chen@email.com',
+                    phone: '(555) 345-6789',
+                    grade: '1st',
+                    message: 'Sofia loves learning and reading.',
+                    control_number: '20241201-0003',
+                    queue_number: 3,
+                    enrollment_date: new Date(Date.now() - 259200000).toISOString(),
+                    status: 'contacted'
+                }
+            ];
+            
+            setTimeout(() => {
+                hideLoading();
+                updateStats();
+                renderEnrollments();
+            }, 1000);
+        }
+
+        // Firebase functions
+        async function loadEnrollments() {
+            if (!isFirebaseInitialized) {
+                return; // Demo data already loaded
+            }
+
+            try {
+                const snapshot = await database.ref('enrollments').once('value');
+                const data = snapshot.val();
+                
+                if (data) {
+                    enrollmentsData = Object.keys(data).map(key => ({
+                        id: key,
+                        ...data[key]
+                    }));
+                } else {
+                    enrollmentsData = [];
+                }
+                
+                hideLoading();
+                updateStats();
+                renderEnrollments();
+            } catch (error) {
+                console.error("Error loading enrollments:", error);
+                showNotification("Error loading enrollments", "error");
+                hideLoading();
+            }
+        }
+
+        async function updateEnrollmentStatus(enrollmentId, newStatus) {
+            if (!isFirebaseInitialized) {
+                // Demo mode - update local data
+                const enrollment = enrollmentsData.find(e => e.id === enrollmentId);
+                if (enrollment) {
+                    enrollment.status = newStatus;
+                    updateStats();
+                    renderEnrollments();
+                    showNotification(`Status updated to ${newStatus}`, "success");
+                }
+                return;
+            }
+
+            try {
+                await database.ref(`enrollments/${enrollmentId}/status`).set(newStatus);
+                
+                // Update local data
+                const enrollment = enrollmentsData.find(e => e.id === enrollmentId);
+                if (enrollment) {
+                    enrollment.status = newStatus;
+                }
+                
+                updateStats();
+                renderEnrollments();
+                showNotification(`Status updated to ${newStatus}`, "success");
+            } catch (error) {
+                console.error("Error updating status:", error);
+                showNotification("Error updating status", "error");
+            }
+        }
+
+        // UI Functions
+        function hideLoading() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('enrollments-container').classList.remove('hidden');
+        }
+
+        function updateStats() {
+            const total = enrollmentsData.length;
+            const pending = enrollmentsData.filter(e => e.status === 'pending').length;
+            const approved = enrollmentsData.filter(e => e.status === 'approved').length;
+            
+            // Calculate this week's enrollments
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const thisWeek = enrollmentsData.filter(e => new Date(e.enrollment_date) >= oneWeekAgo).length;
+            
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('pending-count').textContent = pending;
+            document.getElementById('approved-count').textContent = approved;
+            document.getElementById('week-count').textContent = thisWeek;
+        }
+
+        function renderEnrollments() {
+            const tbody = document.getElementById('enrollments-tbody');
+            const emptyState = document.getElementById('empty-state');
+            const container = document.getElementById('enrollments-container');
+            
+            // Apply filters
+            applyFilters();
+            
+            if (filteredData.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            
+            tbody.innerHTML = filteredData.map(enrollment => `
+                <tr class="table-row" data-id="${enrollment.id}">
+                    <td class="px-6 py-4">
+                        <div class="font-semibold text-gray-800">${enrollment.student_name}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-gray-800">${enrollment.parent_name}</div>
+                        <div class="text-sm text-gray-500">${enrollment.email}</div>
+                        <div class="text-sm text-gray-500">${enrollment.phone}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-gray-800 capitalize">${enrollment.grade}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">${enrollment.control_number}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="font-bold text-blue-600">#${enrollment.queue_number}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-800">${formatDate(enrollment.enrollment_date)}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="status-badge status-${enrollment.status}">${enrollment.status}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                            <button class="action-button btn-view" onclick="viewEnrollment('${enrollment.id}')">View</button>
+                            ${enrollment.status === 'pending' ? `
+                                <button class="action-button btn-approve" onclick="updateStatus('${enrollment.id}', 'approved')">Approve</button>
+                                <button class="action-button btn-reject" onclick="updateStatus('${enrollment.id}', 'rejected')">Reject</button>
+                            ` : ''}
+                            ${enrollment.status !== 'contacted' ? `
+                                <button class="action-button btn-contact" onclick="updateStatus('${enrollment.id}', 'contacted')">Contact</button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function applyFilters() {
+            let filtered = [...enrollmentsData];
+            
+            // Status filter
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(e => e.status === currentFilter);
+            }
+            
+            // Search filter
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(e => 
+                    e.student_name.toLowerCase().includes(searchTerm) ||
+                    e.parent_name.toLowerCase().includes(searchTerm) ||
+                    e.email.toLowerCase().includes(searchTerm) ||
+                    e.control_number.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Grade filter
+            const gradeFilter = document.getElementById('grade-filter').value;
+            if (gradeFilter) {
+                filtered = filtered.filter(e => e.grade === gradeFilter);
+            }
+            
+            filteredData = filtered;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function viewEnrollment(enrollmentId) {
+            const enrollment = enrollmentsData.find(e => e.id === enrollmentId);
+            if (!enrollment) return;
+            
+            currentEnrollment = enrollment;
+            
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Student Information</h4>
+                        <div class="space-y-2 text-sm">
+                            <p><span class="font-medium">Name:</span> ${enrollment.student_name}</p>
+                            <p><span class="font-medium">Grade:</span> ${enrollment.grade}</p>
+                            <p><span class="font-medium">Control Number:</span> ${enrollment.control_number}</p>
+                            <p><span class="font-medium">Queue Position:</span> #${enrollment.queue_number}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Parent/Guardian</h4>
+                        <div class="space-y-2 text-sm">
+                            <p><span class="font-medium">Name:</span> ${enrollment.parent_name}</p>
+                            <p><span class="font-medium">Email:</span> ${enrollment.email}</p>
+                            <p><span class="font-medium">Phone:</span> ${enrollment.phone}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-2">Application Details</h4>
+                    <div class="space-y-2 text-sm">
+                        <p><span class="font-medium">Enrollment Date:</span> ${formatDate(enrollment.enrollment_date)}</p>
+                        <p><span class="font-medium">Status:</span> <span class="status-badge status-${enrollment.status}">${enrollment.status}</span></p>
+                    </div>
+                </div>
+                
+                ${enrollment.message ? `
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Additional Information</h4>
+                        <p class="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg">${enrollment.message}</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function updateStatus(enrollmentId, newStatus) {
+            updateEnrollmentStatus(enrollmentId, newStatus);
+        }
+
+        function exportToCSV() {
+            const headers = ['Student Name', 'Parent Name', 'Email', 'Phone', 'Grade', 'Control Number', 'Queue Number', 'Enrollment Date', 'Status', 'Message'];
+            const csvContent = [
+                headers.join(','),
+                ...enrollmentsData.map(e => [
+                    `"${e.student_name}"`,
+                    `"${e.parent_name}"`,
+                    `"${e.email}"`,
+                    `"${e.phone}"`,
+                    `"${e.grade}"`,
+                    `"${e.control_number}"`,
+                    e.queue_number,
+                    `"${formatDate(e.enrollment_date)}"`,
+                    `"${e.status}"`,
+                    `"${e.message || ''}"`
+                ].join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `enrollments_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showNotification("CSV exported successfully", "success");
+        }
+
+        function showNotification(message, type = "info") {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Event Listeners
+        document.getElementById('refresh-btn').addEventListener('click', () => {
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('enrollments-container').classList.add('hidden');
+            loadEnrollments();
+        });
+
+        document.getElementById('export-btn').addEventListener('click', exportToCSV);
+
+        document.querySelectorAll('.filter-button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.status;
+                renderEnrollments();
+            });
+        });
+
+        document.getElementById('search-input').addEventListener('input', renderEnrollments);
+        document.getElementById('grade-filter').addEventListener('change', renderEnrollments);
+
+        document.getElementById('close-detail-modal').addEventListener('click', () => {
+            document.getElementById('detail-modal').classList.add('hidden');
+        });
+
+        document.getElementById('detail-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('detail-modal')) {
+                document.getElementById('detail-modal').classList.add('hidden');
+            }
+        });
+
+        // Modal action buttons
+        document.getElementById('modal-approve').addEventListener('click', () => {
+            if (currentEnrollment) {
+                updateStatus(currentEnrollment.id, 'approved');
+                document.getElementById('detail-modal').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('modal-contact').addEventListener('click', () => {
+            if (currentEnrollment) {
+                updateStatus(currentEnrollment.id, 'contacted');
+                document.getElementById('detail-modal').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('modal-reject').addEventListener('click', () => {
+            if (currentEnrollment) {
+                updateStatus(currentEnrollment.id, 'rejected');
+                document.getElementById('detail-modal').classList.add('hidden');
+            }
+        });
+
+        // Element SDK implementation
+        async function onConfigChange(config) {
+            document.getElementById('dashboard-title').textContent = config.dashboard_title || defaultConfig.dashboard_title;
+            document.getElementById('school-name').textContent = config.school_name || defaultConfig.school_name;
+
+            // Update colors
+            const primaryColor = config.primary_color || defaultConfig.primary_color;
+            const backgroundColor = config.background_color || defaultConfig.background_color;
+            const textColor = config.text_color || defaultConfig.text_color;
+            const surfaceColor = config.surface_color || defaultConfig.surface_color;
+
+            document.body.style.backgroundColor = backgroundColor;
+            document.body.style.color = textColor;
+            
+            // Update primary color elements
+            document.querySelectorAll('.stats-card').forEach(el => {
+                el.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${config.accent_color || defaultConfig.accent_color} 100%)`;
+            });
+        }
+
+        function mapToCapabilities(config) {
+            return {
+                recolorables: [
+                    {
+                        get: () => config.background_color || defaultConfig.background_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ background_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.surface_color || defaultConfig.surface_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ surface_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.text_color || defaultConfig.text_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ text_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.primary_color || defaultConfig.primary_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ primary_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.accent_color || defaultConfig.accent_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ accent_color: value });
+                            }
+                        }
+                    }
+                ],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            };
+        }
+
+        function mapToEditPanelValues(config) {
+            return new Map([
+                ["dashboard_title", config.dashboard_title || defaultConfig.dashboard_title],
+                ["school_name", config.school_name || defaultConfig.school_name],
+                ["admin_email", config.admin_email || defaultConfig.admin_email]
+            ]);
+        }
+
+        // Initialize Element SDK
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities,
+                mapToEditPanelValues
+            });
+        }
+
+        // Initialize the application
+        loadEnrollments();
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99ffde3140c44044',t:'MTc2MzM4OTIxNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
