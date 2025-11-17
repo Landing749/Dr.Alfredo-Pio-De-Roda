@@ -326,14 +326,14 @@
   <script>
         // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
         const firebaseConfig = {
-             apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
-             authDomain: "clinique-parfum.firebaseapp.com",
-             databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
-             projectId: "clinique-parfum",
-             storageBucket: "clinique-parfum.firebasestorage.app",
-             messagingSenderId: "569473208892",
-             appId: "1:569473208892:web:f009390a8631fc164ce939",
-             measurementId: "G-XW3R3D64PR"
+            apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
+            authDomain: "clinique-parfum.firebaseapp.com",
+            databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
+            projectId: "clinique-parfum",
+            storageBucket: "clinique-parfum.firebasestorage.app",
+            messagingSenderId: "569473208892",
+            appId: "1:569473208892:web:f009390a8631fc164ce939",
+            measurementId: "G-XW3R3D64PR"
         };
 
         // Initialize Firebase
@@ -366,6 +366,12 @@
         // Initialize Data SDK
         async function initializeApp() {
             try {
+                // Wait for SDK to be available
+                if (!window.dataSdk) {
+                    showMessage('Data SDK not available. Please refresh the page.', 'error');
+                    return;
+                }
+                
                 const result = await window.dataSdk.init(dataHandler);
                 if (!result.isOk) {
                     showMessage('Failed to initialize app: ' + result.error.message, 'error');
@@ -395,6 +401,12 @@
                     announcement_date: new Date().toISOString(),
                     announcement_active: formData.has('active')
                 };
+
+                // Check SDK availability
+                if (!window.dataSdk) {
+                    showMessage('Data SDK not available. Please refresh the page.', 'error');
+                    return;
+                }
 
                 // Check data limit
                 if (currentData.length >= 999) {
@@ -446,6 +458,12 @@
             updateBtn.disabled = true;
             
             try {
+                // Check SDK availability
+                if (!window.dataSdk) {
+                    showMessage('Data SDK not available. Please refresh the page.', 'error');
+                    return;
+                }
+
                 const formData = new FormData(e.target);
                 const announcement = currentData.find(item => item.__backendId === editingId);
                 
@@ -507,6 +525,13 @@
                 deleteBtn.disabled = true;
                 
                 try {
+                    // Check SDK availability
+                    if (!window.dataSdk) {
+                        showMessage('Data SDK not available. Please refresh the page.', 'error');
+                        resetDeleteButton();
+                        return;
+                    }
+
                     const result = await window.dataSdk.delete(announcement);
                     
                     if (result.isOk) {
@@ -541,6 +566,12 @@
         async function toggleStatus(id) {
             const announcement = currentData.find(item => item.__backendId === id);
             if (!announcement) return;
+
+            // Check SDK availability
+            if (!window.dataSdk) {
+                showMessage('Data SDK not available. Please refresh the page.', 'error');
+                return;
+            }
             
             const updatedAnnouncement = {
                 ...announcement,
@@ -773,8 +804,20 @@
             });
         }
 
-        // Initialize the application
-        initializeApp();
+        // Initialize the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure SDK is loaded
+            setTimeout(initializeApp, 100);
+        });
+
+        // Also try immediate initialization in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initializeApp, 100);
+            });
+        } else {
+            setTimeout(initializeApp, 100);
+        }
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99fff9f4817870b5',t:'MTc2MzM5MDM1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a000178452c81c0',t:'MTc2MzM5MDY2Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
