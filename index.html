@@ -1,137 +1,913 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+ <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dr. Alfredo Pio De Roda Elementary School</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body>
-  <header>
-    <h1>Dr. Alfredo Pio De Roda Elementary School</h1>
-    <p class="slogan">"Building Young Minds for a Brighter Future"</p>
-    <nav>
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#faculty">Faculty</a>
-      <a href="#announcements">News</a>
-      <a href="#enroll">Enroll</a>
-      <a href="#gallery">Gallery</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
+  <title>Dr. Alfredo Pio De Roda School</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script><!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(37, 99, 235, 0.8) 100%);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .premium-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .premium-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(59, 130, 246, 0.1);
+        }
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .premium-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -5px rgba(59, 130, 246, 0.5);
+        }
+        
+        .premium-button-outline {
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .premium-button-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+        
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        
+        .nav-link {
+            position: relative;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 2px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .grade-icon {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .grade-icon:hover {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transform: scale(1.1);
+        }
+        
+        .grade-icon:hover svg {
+            color: white;
+        }
+        
+        .premium-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        .floating-elements::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-elements::after {
+            content: '';
+            position: absolute;
+            bottom: 20%;
+            left: 5%;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(37, 99, 235, 0.03) 100%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .premium-input {
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .premium-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 8px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+        
+        .contact-icon {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+        }
 
-  <main>
-    <!-- HERO / SLIDESHOW -->
-    <section id="home" class="hero-section">
-  <div class="overlay"></div>
-  <div class="hero-content">
-    <img src="school-logo.png" alt="School Logo" class="school-logo" />
-    <h1>Dr. Alfredo Pio De Roda Elementary School</h1>
-    <p>
-      Welcome to Dr. Alfredo Pio De Roda Elementary School — a place where young minds are nurtured, values are instilled, and futures are built. Established with a mission to provide quality education for all, our school stands as a beacon of learning, integrity, and excellence.  
-      <br><br>
-      Through the years, our teachers and students have worked hand-in-hand to foster an environment of respect, curiosity, and continuous growth. We believe that every child deserves an opportunity to shine, and we are committed to helping them reach their full potential.  
-      <br><br>
-      We take pride in our rich history, dedicated faculty, and our ever-evolving programs designed to meet the needs of a modern world — all while staying true to the Filipino values that define us.  
-      <br><br>
-      Together, we build not just knowledge — but character, compassion, and community.
-    </p>
-  </div>
-</section>
+        .success-modal {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
 
-    <!-- ABOUT -->
-    <section id="about" class="card">
-      <h2>About Us</h2>
-      <p><strong>History:</strong> Founded to serve the heart of the community, Dr. Alfredo Pio De Roda Elementary School has been a pillar of quality education for generations.</p>
-      <p><strong>Mission:</strong> To provide accessible, inclusive, and values-based learning to every child.</p>
-      <p><strong>Vision:</strong> A community of learners who embody integrity, compassion, and knowledge.</p>
-    </section>
+        .success-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
 
-    <!-- FACULTY -->
-    <section id="faculty" class="card-grid">
-      <h2>Faculty & Staff</h2>
-      <div class="card small">
-        <h3>Mrs. Maria Santos</h3>
-        <p>Principal</p>
-      </div>
-      <div class="card small">
-        <h3>Mr. Juan Dela Cruz</h3>
-        <p>Grade 1 Teacher</p>
-      </div>
-      <div class="card small">
-        <h3>Ms. Ana Ramos</h3>
-        <p>Grade 6 Teacher</p>
-      </div>
-    </section>
+        .control-number {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
 
-    <!-- ANNOUNCEMENTS -->
-    <section id="announcements" class="card-grid">
-      <h2>Announcements</h2>
-      <div class="card small">
-        <h3>Upcoming Foundation Day</h3>
-        <p>Join us for our 25th Foundation Celebration next month!</p>
+        .queue-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="smooth-scroll"><!-- Navigation -->
+  <nav class="glass-nav fixed w-full top-0 z-50">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+     <div class="flex items-center">
+      <div class="flex-shrink-0">
+       <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+        <svg class="h-7 w-7 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
+        </svg>
+       </div>
       </div>
-      <div class="card small">
-        <h3>PTA Meeting</h3>
-        <p>Parent–Teacher Assembly on November 20, 2025, 2 PM at the school hall.</p>
+      <div class="ml-4">
+       <h1 id="nav-school-name" class="text-xl font-bold text-gray-800 tracking-tight">Dr. Alfredo Pio De Roda</h1>
+       <p id="nav-school-motto" class="text-sm text-blue-600 font-medium">Excellence in Elementary Education</p>
       </div>
-      <div class="card small">
-        <h3>No Announcements Yet</h3>
-        <p>Stay tuned for future updates.</p>
+     </div>
+     <div class="hidden md:block">
+      <div class="ml-10 flex items-baseline space-x-8"><a href="#home" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a> <a href="#about" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">About</a> <a href="#programs" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Programs</a> <a href="#admissions" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Admissions</a> <a href="#contact" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contact</a>
       </div>
-    </section>
-
-    <!-- ENROLL -->
-    <section id="enroll" class="card">
-      <h2>Enrollment Form</h2>
-      <form id="enrollForm">
-        <input type="text" id="parentName" placeholder="Parent's Name" required>
-        <input type="text" id="studentName" placeholder="Student's Name" required>
-        <input type="text" id="contactNumber" placeholder="Contact Number" required>
-        <input type="email" id="email" placeholder="E-Mail" required>
-        <input type="text" id="lrn" placeholder="LRN" required>
-        <select id="gradeLevel" required>
-          <option value="">Select Grade</option>
-          <option value="Kinder">Kinder</option>
-          <option value="Grade 1">Grade 1</option>
-          <option value="Grade 2">Grade 2</option>
-          <option value="Grade 3">Grade 3</option>
-          <option value="Grade 4">Grade 4</option>
-          <option value="Grade 5">Grade 5</option>
-          <option value="Grade 6">Grade 6</option>
-        </select>
-        <a class="upload-link" href="#" target="_blank">Upload Requirements Form</a>
-        <button type="submit">Submit Enrollment</button>
+     </div>
+     <div class="md:hidden"><button id="mobile-menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none">
+       <svg class="h-6 w-6" fill="none" viewbox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+       </svg></button>
+     </div>
+    </div>
+   </div><!-- Mobile menu -->
+   <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+    <div class="px-2 pt-2 pb-3 space-y-1"><a href="#home" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Home</a> <a href="#about" class="block px-3 py-2 text-gray-700 hover:text-blue-600">About</a> <a href="#programs" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Programs</a> <a href="#admissions" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Admissions</a> <a href="#contact" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Contact</a>
+    </div>
+   </div>
+  </nav><!-- Hero Section -->
+  <section id="home" class="hero-gradient text-white pt-20 floating-elements">
+   <div class="hero-content">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+     <div class="text-center">
+      <div class="fade-in mb-8"><span class="inline-block px-6 py-2 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full text-sm font-medium border border-white border-opacity-30"> 🎓 Elementary Excellence • Kindergarten to Grade 6 </span>
+      </div>
+      <h1 id="hero-title" class="text-5xl md:text-7xl font-bold mb-8 fade-in tracking-tight leading-tight">Welcome to Excellence</h1>
+      <p id="hero-subtitle" class="text-xl md:text-2xl mb-12 fade-in max-w-4xl mx-auto leading-relaxed font-light">Nurturing young minds from Kindergarten to Grade 6, building strong foundations for lifelong learning and success</p>
+      <div class="fade-in flex flex-col sm:flex-row gap-4 justify-center items-center"><a href="#about" class="premium-button text-white px-10 py-4 rounded-xl font-semibold text-lg">Discover Our School</a> <a href="#admissions" class="premium-button-outline text-white px-10 py-4 rounded-xl font-semibold text-lg">Start Enrollment</a>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- About Section -->
+  <section id="about" class="py-24 premium-section">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20">
+     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold"> Why Choose Us </span>
+     </div>
+     <h2 id="about-title" class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in tracking-tight">About Our Elementary School</h2>
+     <p id="about-description" class="text-xl text-gray-600 max-w-4xl mx-auto fade-in leading-relaxed">Dr. Alfredo Pio De Roda Elementary School is dedicated to nurturing young learners from Kindergarten through Grade 6. We provide a foundation of excellence that prepares students for their educational journey ahead.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-10">
+     <div class="premium-card p-10 rounded-2xl fade-in text-center">
+      <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-4">Academic Excellence</h3>
+      <p class="text-gray-600 leading-relaxed">Age-appropriate curriculum designed to build strong foundations in literacy, numeracy, and critical thinking skills for elementary learners.</p>
+     </div>
+     <div class="premium-card p-10 rounded-2xl fade-in text-center">
+      <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-4h3v4h2v-7.5c0-.83.67-1.5 1.5-1.5S12 9.67 12 10.5V11h2v-.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18h2v-7.5c0-1.93-1.57-3.5-3.5-3.5S12 8.57 12 10.5V11h-2v-.5C10 8.57 8.43 7 6.5 7S3 8.57 3 10.5V18h1z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-4">Caring Teachers</h3>
+      <p class="text-gray-600 leading-relaxed">Passionate elementary educators who understand child development and create nurturing environments where young learners flourish.</p>
+     </div>
+     <div class="premium-card p-10 rounded-2xl fade-in text-center">
+      <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-4">Character Building</h3>
+      <p class="text-gray-600 leading-relaxed">Focus on developing values, social skills, and emotional intelligence that prepare children for success in school and life.</p>
+     </div>
+    </div>
+   </div>
+  </section><!-- Programs Section -->
+  <section id="programs" class="py-24 bg-white">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20">
+     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold"> Grade Levels </span>
+     </div>
+     <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in tracking-tight">Elementary Programs</h2>
+     <p class="text-xl text-gray-600 fade-in max-w-3xl mx-auto leading-relaxed">Comprehensive educational programs designed specifically for young learners from Kindergarten through Grade 6</p>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+     <div class="text-center fade-in group">
+      <div class="grade-icon w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+       <svg class="h-12 w-12 text-blue-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-3">Kindergarten</h3>
+      <p class="text-gray-600 leading-relaxed">Play-based learning that introduces basic literacy, numeracy, and social skills in a nurturing environment</p>
+     </div>
+     <div class="text-center fade-in group">
+      <div class="grade-icon w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+       <svg class="h-12 w-12 text-blue-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewbox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-3">Grades 1-2</h3>
+      <p class="text-gray-600 leading-relaxed">Building fundamental reading, writing, and math skills with hands-on learning experiences</p>
+     </div>
+     <div class="text-center fade-in group">
+      <div class="grade-icon w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+       <svg class="h-12 w-12 text-blue-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-3">Grades 3-4</h3>
+      <p class="text-gray-600 leading-relaxed">Developing critical thinking and problem-solving skills across all subject areas with increased independence</p>
+     </div>
+     <div class="text-center fade-in group">
+      <div class="grade-icon w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+       <svg class="h-12 w-12 text-blue-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewbox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-3">Grades 5-6</h3>
+      <p class="text-gray-600 leading-relaxed">Advanced elementary curriculum preparing students for middle school with leadership opportunities</p>
+     </div>
+    </div><!-- Additional Programs -->
+    <div class="mt-20">
+     <div class="text-center mb-12">
+      <h3 class="text-3xl font-bold text-gray-800 mb-4 fade-in">Enrichment Programs</h3>
+     </div>
+     <div class="grid md:grid-cols-3 gap-8">
+      <div class="premium-card p-8 rounded-2xl fade-in text-center">
+       <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+        <svg class="h-8 w-8 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+        </svg>
+       </div>
+       <h4 class="text-xl font-bold text-gray-800 mb-3">Arts &amp; Creativity</h4>
+       <p class="text-gray-600">Music, visual arts, and creative expression programs that nurture artistic talents</p>
+      </div>
+      <div class="premium-card p-8 rounded-2xl fade-in text-center">
+       <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+        <svg class="h-8 w-8 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z" />
+        </svg>
+       </div>
+       <h4 class="text-xl font-bold text-gray-800 mb-3">Sports &amp; Fitness</h4>
+       <p class="text-gray-600">Physical education and sports programs promoting healthy lifestyle and teamwork</p>
+      </div>
+      <div class="premium-card p-8 rounded-2xl fade-in text-center">
+       <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center">
+        <svg class="h-8 w-8 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
+        </svg>
+       </div>
+       <h4 class="text-xl font-bold text-gray-800 mb-3">STEM Learning</h4>
+       <p class="text-gray-600">Science, technology, engineering, and math programs that encourage exploration and discovery</p>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- Admissions Section -->
+  <section id="admissions" class="py-24 premium-section">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20">
+     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold"> Join Our Family </span>
+     </div>
+     <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in tracking-tight">Elementary Admissions</h2>
+     <p class="text-xl text-gray-600 fade-in max-w-3xl mx-auto leading-relaxed">Begin your child's educational journey with us. We welcome students from Kindergarten through Grade 6.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-16 items-start">
+     <div class="fade-in">
+      <h3 class="text-3xl font-bold text-gray-800 mb-8">Simple Application Process</h3>
+      <div class="space-y-6">
+       <div class="flex items-start group">
+        <div class="step-number text-white rounded-xl w-12 h-12 flex items-center justify-center mr-6 mt-1 font-bold text-lg">
+         1
+        </div>
+        <div class="flex-1">
+         <h4 class="font-bold text-gray-800 text-lg mb-2">Submit Application</h4>
+         <p class="text-gray-600 leading-relaxed">Complete our simple online application form with your child's information and required documents</p>
+        </div>
+       </div>
+       <div class="flex items-start group">
+        <div class="step-number text-white rounded-xl w-12 h-12 flex items-center justify-center mr-6 mt-1 font-bold text-lg">
+         2
+        </div>
+        <div class="flex-1">
+         <h4 class="font-bold text-gray-800 text-lg mb-2">School Visit</h4>
+         <p class="text-gray-600 leading-relaxed">Schedule a visit to meet our teachers and see our learning environment firsthand</p>
+        </div>
+       </div>
+       <div class="flex items-start group">
+        <div class="step-number text-white rounded-xl w-12 h-12 flex items-center justify-center mr-6 mt-1 font-bold text-lg">
+         3
+        </div>
+        <div class="flex-1">
+         <h4 class="font-bold text-gray-800 text-lg mb-2">Assessment</h4>
+         <p class="text-gray-600 leading-relaxed">Age-appropriate assessment to understand your child's learning needs and readiness</p>
+        </div>
+       </div>
+       <div class="flex items-start group">
+        <div class="step-number text-white rounded-xl w-12 h-12 flex items-center justify-center mr-6 mt-1 font-bold text-lg">
+         4
+        </div>
+        <div class="flex-1">
+         <h4 class="font-bold text-gray-800 text-lg mb-2">Welcome to Our Family</h4>
+         <p class="text-gray-600 leading-relaxed">Receive admission decision and begin the exciting journey of elementary education</p>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="premium-card p-10 rounded-2xl fade-in">
+      <h3 class="text-3xl font-bold text-gray-800 mb-8 text-center">Enrollment Application</h3>
+      <form id="enrollment-form" class="space-y-6">
+       <div><label for="student-name" class="block text-sm font-semibold text-gray-700 mb-2">Student Name *</label> <input type="text" id="student-name" name="student-name" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required>
+       </div>
+       <div><label for="parent-name" class="block text-sm font-semibold text-gray-700 mb-2">Parent/Guardian Name *</label> <input type="text" id="parent-name" name="parent-name" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required>
+       </div>
+       <div><label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label> <input type="email" id="email" name="email" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required>
+       </div>
+       <div><label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label> <input type="tel" id="phone" name="phone" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required>
+       </div>
+       <div><label for="grade" class="block text-sm font-semibold text-gray-700 mb-2">Grade Level *</label> <select id="grade" name="grade" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required> <option value="">Select Grade</option> <option value="kindergarten">Kindergarten</option> <option value="1st">1st Grade</option> <option value="2nd">2nd Grade</option> <option value="3rd">3rd Grade</option> <option value="4th">4th Grade</option> <option value="5th">5th Grade</option> <option value="6th">6th Grade</option> </select>
+       </div>
+       <div><label for="message" class="block text-sm font-semibold text-gray-700 mb-2">Additional Information</label> <textarea id="message" name="message" rows="4" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" placeholder="Tell us about your child's interests, learning style, or any questions you have..."></textarea>
+       </div><button type="submit" id="submit-btn" class="premium-button w-full text-white py-4 px-6 rounded-xl font-bold text-lg"> Submit Enrollment Application </button>
       </form>
-      <p id="enrollMessage"></p>
-    </section>
-
-    <!-- GALLERY -->
-    <section id="gallery" class="card">
-      <h2>Gallery</h2>
-      <div class="gallery-grid">
-        <img src="images/gallery1.jpg" alt="">
-        <img src="images/gallery2.jpg" alt="">
-        <img src="images/gallery3.jpg" alt="">
+     </div>
+    </div>
+   </div>
+  </section><!-- Success Modal -->
+  <div id="success-modal" class="fixed inset-0 success-modal flex items-center justify-center z-50 hidden">
+   <div class="success-card rounded-2xl p-8 max-w-md mx-4 text-center">
+    <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
+     <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+     </svg>
+    </div>
+    <h3 class="text-2xl font-bold text-gray-800 mb-4">Enrollment Submitted!</h3>
+    <p class="text-gray-600 mb-6">Thank you for your enrollment application. Here are your details:</p>
+    <div class="bg-gray-50 rounded-xl p-6 mb-6 space-y-4">
+     <div>
+      <p class="text-sm text-gray-500 mb-1">Control Number</p>
+      <div id="control-number-display" class="control-number px-4 py-2 rounded-lg text-lg font-bold"></div>
+     </div>
+     <div>
+      <p class="text-sm text-gray-500 mb-1">Queue Position</p>
+      <div id="queue-number-display" class="queue-badge px-4 py-2 rounded-lg text-lg font-bold inline-block"></div>
+     </div>
+     <div>
+      <p class="text-sm text-gray-500 mb-1">Student Name</p>
+      <p id="student-name-display" class="font-semibold text-gray-800"></p>
+     </div>
+    </div>
+    <p class="text-sm text-gray-600 mb-6">Please save your control number for future reference. We will contact you within 2-3 business days.</p><button id="close-modal" class="premium-button text-white px-8 py-3 rounded-xl font-semibold"> Close </button>
+   </div>
+  </div><!-- Contact Section -->
+  <section id="contact" class="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white relative overflow-hidden">
+   <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20">
+     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full text-sm font-semibold border border-white border-opacity-30"> Get In Touch </span>
+     </div>
+     <h2 class="text-4xl md:text-5xl font-bold mb-6 fade-in tracking-tight">Contact Our School</h2>
+     <p class="text-xl text-blue-100 fade-in max-w-3xl mx-auto leading-relaxed">We're here to answer your questions and help you learn more about our elementary programs</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-10">
+     <div class="text-center fade-in group">
+      <div class="contact-icon w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+       </svg>
       </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="card">
-      <h2>Contact Us</h2>
-      <p><strong>Address:</strong> Dr. Alfredo Pio De Roda Elementary School, Manila, Philippines</p>
-      <p><strong>Email:</strong> dralfredopioderodaes@gmail.com</p>
-      <p><strong>Phone:</strong> (02) 123-4567</p>
-      <iframe src="https://www.google.com/maps?q=Dr+Alfredo+Pio+De+Roda+Elementary+School&output=embed" width="100%" height="250" style="border:0;" allowfullscreen loading="lazy"></iframe>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Dr. Alfredo Pio De Roda Elementary School</p>
+      <h3 class="text-2xl font-bold mb-3">Phone</h3>
+      <p id="contact-phone" class="text-blue-100 text-lg">(555) 123-4567</p>
+      <p class="text-blue-200 text-sm mt-2">Monday - Friday, 8:00 AM - 4:00 PM</p>
+     </div>
+     <div class="text-center fade-in group">
+      <div class="contact-icon w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold mb-3">Email</h3>
+      <p id="contact-email" class="text-blue-100 text-lg">info@drpioderoda.edu</p>
+      <p class="text-blue-200 text-sm mt-2">We respond within 24 hours</p>
+     </div>
+     <div class="text-center fade-in group">
+      <div class="contact-icon w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+       </svg>
+      </div>
+      <h3 class="text-2xl font-bold mb-3">Visit Us</h3>
+      <p id="contact-address" class="text-blue-100 text-lg">123 Education Street<br>
+       Learning City, LC 12345</p>
+      <p class="text-blue-200 text-sm mt-2">School tours available by appointment</p>
+     </div>
+    </div><!-- Office Hours -->
+    <div class="mt-20 text-center fade-in">
+     <div class="premium-card p-8 rounded-2xl max-w-2xl mx-auto">
+      <h3 class="text-2xl font-bold text-gray-800 mb-6">School Office Hours</h3>
+      <div class="grid md:grid-cols-2 gap-6 text-gray-600">
+       <div>
+        <h4 class="font-semibold text-gray-800 mb-2">School Days</h4>
+        <p>Monday - Friday<br>
+         7:30 AM - 3:30 PM</p>
+       </div>
+       <div>
+        <h4 class="font-semibold text-gray-800 mb-2">Office Hours</h4>
+        <p>Monday - Friday<br>
+         8:00 AM - 4:00 PM</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </section><!-- Footer -->
+  <footer class="bg-gray-900 text-white py-12">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid md:grid-cols-4 gap-8">
+     <div>
+      <div class="flex items-center mb-4">
+       <svg class="h-8 w-8 text-blue-400 mr-2" fill="currentColor" viewbox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
+       </svg><span class="text-lg font-semibold">Dr. Alfredo Pio De Roda</span>
+      </div>
+      <p class="text-gray-400">Committed to excellence in education and character development.</p>
+     </div>
+     <div>
+      <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+      <ul class="space-y-2">
+       <li><a href="#home" class="text-gray-400 hover:text-white transition duration-300">Home</a></li>
+       <li><a href="#about" class="text-gray-400 hover:text-white transition duration-300">About</a></li>
+       <li><a href="#programs" class="text-gray-400 hover:text-white transition duration-300">Programs</a></li>
+       <li><a href="#admissions" class="text-gray-400 hover:text-white transition duration-300">Admissions</a></li>
+      </ul>
+     </div>
+     <div>
+      <h4 class="text-lg font-semibold mb-4">Programs</h4>
+      <ul class="space-y-2">
+       <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Elementary</a></li>
+       <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Middle School</a></li>
+       <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">High School</a></li>
+       <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Extracurricular</a></li>
+      </ul>
+     </div>
+     <div>
+      <h4 class="text-lg font-semibold mb-4">Connect</h4>
+      <div class="flex space-x-4"><a href="#" class="text-gray-400 hover:text-white transition duration-300">
+        <svg class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+        </svg></a> <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+        <svg class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z" />
+        </svg></a> <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+        <svg class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.097.118.112.221.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.748-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z" />
+        </svg></a>
+      </div>
+     </div>
+    </div>
+    <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+     <p class="text-gray-400">© 2024 Dr. Alfredo Pio De Roda School. All rights reserved.</p>
+    </div>
+   </div>
   </footer>
+  <script>
+        // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
+            authDomain: "clinique-parfum.firebaseapp.com",
+            databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
+            projectId: "clinique-parfum",
+            storageBucket: "clinique-parfum.firebasestorage.app",
+            messagingSenderId: "569473208892",
+            appId: "1:569473208892:web:f009390a8631fc164ce939",
+            measurementId: "G-XW3R3D64PR"
+        };
 
-  <script type="module" src="script.js"></script>
-</body>
+        // Initialize Firebase
+        let database;
+        let isFirebaseInitialized = false;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            isFirebaseInitialized = true;
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.log("Firebase initialization failed - using demo mode:", error.message);
+            isFirebaseInitialized = false;
+        }
+
+        // Configuration object
+        const defaultConfig = {
+            school_name: "Dr. Alfredo Pio De Roda",
+            school_motto: "Excellence in Elementary Education",
+            hero_title: "Welcome to Excellence",
+            hero_subtitle: "Nurturing young minds from Kindergarten to Grade 6, building strong foundations for lifelong learning and success",
+            about_title: "About Our Elementary School",
+            about_description: "Dr. Alfredo Pio De Roda Elementary School is dedicated to nurturing young learners from Kindergarten through Grade 6. We provide a foundation of excellence that prepares students for their educational journey ahead.",
+            contact_phone: "(555) 123-4567",
+            contact_email: "info@drpioderoda.edu",
+            contact_address: "123 Education Street<br>Learning City, LC 12345",
+            background_color: "#f8fafc",
+            primary_color: "#1e40af",
+            text_color: "#1f2937",
+            surface_color: "#ffffff",
+            accent_color: "#3b82f6"
+        };
+
+        // Utility functions
+        function generateControlNumber() {
+            const year = new Date().getFullYear();
+            const month = String(new Date().getMonth() + 1).padStart(2, '0');
+            const day = String(new Date().getDate()).padStart(2, '0');
+            const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+            return `${year}${month}${day}-${random}`;
+        }
+
+        async function getNextQueueNumber() {
+            if (!isFirebaseInitialized) {
+                // Demo mode - return random queue number
+                return Math.floor(Math.random() * 50) + 1;
+            }
+
+            try {
+                const snapshot = await database.ref('enrollments').once('value');
+                const enrollments = snapshot.val();
+                
+                if (!enrollments) {
+                    return 1; // First enrollment
+                }
+                
+                // Count existing enrollments and add 1
+                const count = Object.keys(enrollments).length;
+                return count + 1;
+            } catch (error) {
+                console.error("Error getting queue number:", error);
+                return Math.floor(Math.random() * 50) + 1; // Fallback
+            }
+        }
+
+        async function saveEnrollment(enrollmentData) {
+            if (!isFirebaseInitialized) {
+                // Demo mode - simulate successful save
+                console.log("Demo mode - enrollment data:", enrollmentData);
+                return { success: true, data: enrollmentData };
+            }
+
+            try {
+                const enrollmentRef = database.ref('enrollments').push();
+                await enrollmentRef.set(enrollmentData);
+                
+                console.log("Enrollment saved successfully:", enrollmentData);
+                return { success: true, data: enrollmentData };
+            } catch (error) {
+                console.error("Error saving enrollment:", error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Mobile menu functionality
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                // Close mobile menu if open
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Enrollment form submission
+        document.getElementById('enrollment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.textContent = 'Processing...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Get form data
+                const formData = new FormData(e.target);
+                const studentName = formData.get('student-name');
+                const parentName = formData.get('parent-name');
+                const email = formData.get('email');
+                const phone = formData.get('phone');
+                const grade = formData.get('grade');
+                const message = formData.get('message');
+                
+                // Generate control number and queue number
+                const controlNumber = generateControlNumber();
+                const queueNumber = await getNextQueueNumber();
+                
+                // Create enrollment object
+                const enrollmentData = {
+                    student_name: studentName,
+                    parent_name: parentName,
+                    email: email,
+                    phone: phone,
+                    grade: grade,
+                    message: message || '',
+                    control_number: controlNumber,
+                    queue_number: queueNumber,
+                    enrollment_date: new Date().toISOString(),
+                    status: 'pending'
+                };
+                
+                // Save to Firebase
+                const result = await saveEnrollment(enrollmentData);
+                
+                if (result.success) {
+                    // Show success modal
+                    document.getElementById('control-number-display').textContent = controlNumber;
+                    document.getElementById('queue-number-display').textContent = `#${queueNumber}`;
+                    document.getElementById('student-name-display').textContent = studentName;
+                    document.getElementById('success-modal').classList.remove('hidden');
+                    
+                    // Reset form
+                    e.target.reset();
+                } else {
+                    // Show error message
+                    showErrorMessage('Failed to submit enrollment. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('Enrollment submission error:', error);
+                showErrorMessage('An error occurred. Please try again.');
+            } finally {
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Close modal functionality
+        document.getElementById('close-modal').addEventListener('click', function() {
+            document.getElementById('success-modal').classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('success-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+
+        function showErrorMessage(message) {
+            // Create and show error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl z-50';
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // Element SDK implementation
+        async function onConfigChange(config) {
+            // Update text content
+            document.getElementById('nav-school-name').textContent = config.school_name || defaultConfig.school_name;
+            document.getElementById('nav-school-motto').textContent = config.school_motto || defaultConfig.school_motto;
+            document.getElementById('hero-title').textContent = config.hero_title || defaultConfig.hero_title;
+            document.getElementById('hero-subtitle').textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+            document.getElementById('about-title').textContent = config.about_title || defaultConfig.about_title;
+            document.getElementById('about-description').textContent = config.about_description || defaultConfig.about_description;
+            document.getElementById('contact-phone').textContent = config.contact_phone || defaultConfig.contact_phone;
+            document.getElementById('contact-email').textContent = config.contact_email || defaultConfig.contact_email;
+            document.getElementById('contact-address').innerHTML = config.contact_address || defaultConfig.contact_address;
+
+            // Update colors
+            const backgroundColor = config.background_color || defaultConfig.background_color;
+            const primaryColor = config.primary_color || defaultConfig.primary_color;
+            const textColor = config.text_color || defaultConfig.text_color;
+            const surfaceColor = config.surface_color || defaultConfig.surface_color;
+            const accentColor = config.accent_color || defaultConfig.accent_color;
+
+            document.body.style.backgroundColor = backgroundColor;
+            document.body.style.color = textColor;
+            
+            // Update primary color elements
+            document.querySelectorAll('.hero-gradient').forEach(el => {
+                el.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`;
+            });
+            
+            // Update surface colors
+            document.querySelectorAll('.bg-white').forEach(el => {
+                el.style.backgroundColor = surfaceColor;
+            });
+            
+            // Update text colors
+            document.querySelectorAll('.text-gray-800').forEach(el => {
+                el.style.color = textColor;
+            });
+        }
+
+        function mapToCapabilities(config) {
+            return {
+                recolorables: [
+                    {
+                        get: () => config.background_color || defaultConfig.background_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ background_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.surface_color || defaultConfig.surface_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ surface_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.text_color || defaultConfig.text_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ text_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.primary_color || defaultConfig.primary_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ primary_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.accent_color || defaultConfig.accent_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ accent_color: value });
+                            }
+                        }
+                    }
+                ],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            };
+        }
+
+        function mapToEditPanelValues(config) {
+            return new Map([
+                ["school_name", config.school_name || defaultConfig.school_name],
+                ["school_motto", config.school_motto || defaultConfig.school_motto],
+                ["hero_title", config.hero_title || defaultConfig.hero_title],
+                ["hero_subtitle", config.hero_subtitle || defaultConfig.hero_subtitle],
+                ["about_title", config.about_title || defaultConfig.about_title],
+                ["about_description", config.about_description || defaultConfig.about_description],
+                ["contact_phone", config.contact_phone || defaultConfig.contact_phone],
+                ["contact_email", config.contact_email || defaultConfig.contact_email],
+                ["contact_address", config.contact_address || defaultConfig.contact_address]
+            ]);
+        }
+
+        // Initialize Element SDK
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities,
+                mapToEditPanelValues
+            });
+        }
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99ffc55ca717ec6b',t:'MTc2MzM4ODIwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
