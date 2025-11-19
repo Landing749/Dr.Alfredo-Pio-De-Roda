@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e57c2 100%);
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: moveGrid 20s linear infinite;
+      opacity: 0.3;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(50px, 50px);
+      }
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      max-width: 700px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      margin: auto;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 50px 35px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      max-width: 100%;
+    }
+
+    .error-code {
+      font-size: 120px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+      line-height: 1;
+      text-shadow: 0 0 80px rgba(255, 255, 255, 0.5);
+      animation: float 3s ease-in-out infinite, glow 2s ease-in-out infinite alternate;
+      letter-spacing: -5px;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    @keyframes glow {
+      0% {
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+      }
+      100% {
+        filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.6));
+      }
+    }
+
+    .icon-wrapper {
+      margin: 30px 0;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .book-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+    }
+
+    .main-heading {
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 25px 0 18px 0;
+      text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      letter-spacing: -1px;
+    }
+
+    .description {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.95);
+      margin: 0 0 30px 0;
+      line-height: 1.6;
+    }
+
+    .error-details {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      padding: 28px 36px;
+      margin: 0 0 40px 0;
+      text-align: left;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .error-details:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .error-details h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 12px 0;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .error-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .error-details p {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.9);
+      margin: 0 0 12px 0;
+      line-height: 1.8;
+    }
+
+    .error-details p:last-child {
+      margin: 0;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.75);
+      font-style: italic;
+    }
+
+    .home-button {
+      display: inline-block;
+      padding: 18px 56px;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+      color: #1e3c72;
+      text-decoration: none;
+      border-radius: 50px;
+      font-size: 17px;
+      font-weight: 700;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25),
+                  inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.5px;
+    }
+
+    .home-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .home-button:hover::before {
+      left: 100%;
+    }
+
+    .home-button:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35),
+                  inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .home-button:active {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .decorative-elements {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .floating-shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      animation: floatRandom 20s ease-in-out infinite;
+    }
+
+    .shape1 {
+      width: 300px;
+      height: 300px;
+      top: -150px;
+      left: -150px;
+      animation-delay: 0s;
+    }
+
+    .shape2 {
+      width: 200px;
+      height: 200px;
+      bottom: -100px;
+      right: -100px;
+      animation-delay: 3s;
+    }
+
+    .shape3 {
+      width: 150px;
+      height: 150px;
+      top: 50%;
+      right: -75px;
+      animation-delay: 6s;
+    }
+
+    @keyframes floatRandom {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      25% {
+        transform: translate(30px, -30px) scale(1.1);
+      }
+      50% {
+        transform: translate(-20px, 20px) scale(0.9);
+      }
+      75% {
+        transform: translate(20px, 30px) scale(1.05);
+      }
+    }
+
+    .decorative-dots {
+      margin-top: 50px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      animation: dotPulse 1.5s ease-in-out infinite;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.3);
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      .container {
+        padding: 10px;
+      }
+
+      .glass-card {
+        padding: 35px 25px;
+        border-radius: 20px;
+      }
+
+      .error-code {
+        font-size: 80px;
+        letter-spacing: -3px;
+      }
+
+      .main-heading {
+        font-size: 28px;
+        margin: 20px 0 15px 0;
+      }
+
+      .description {
+        font-size: 16px;
+        margin: 0 0 25px 0;
+      }
+
+      .book-icon {
+        width: 70px;
+        height: 70px;
+      }
+
+      .icon-wrapper {
+        margin: 20px 0;
+      }
+
+      .error-details {
+        padding: 20px 20px;
+        margin: 0 0 30px 0;
+      }
+
+      .home-button {
+        padding: 15px 35px;
+        font-size: 15px;
+      }
+
+      .decorative-dots {
+        margin-top: 35px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .glass-card {
+        padding: 30px 20px;
+      }
+
+      .error-code {
+        font-size: 64px;
+      }
+
+      .main-heading {
+        font-size: 24px;
+      }
+
+      .description {
+        font-size: 15px;
+      }
+
+      .error-details {
+        padding: 18px;
+      }
+
+      .error-details h3 {
+        font-size: 13px;
+        letter-spacing: 1px;
+      }
+
+      .error-details p {
+        font-size: 13px;
+      }
+
+      .home-button {
+        padding: 14px 30px;
+        font-size: 14px;
+      }
+
+      .book-icon {
+        width: 60px;
+        height: 60px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="decorative-elements">
+   <div class="floating-shape shape1"></div>
+   <div class="floating-shape shape2"></div>
+   <div class="floating-shape shape3"></div>
+  </div>
+  <div class="container">
+   <div class="glass-card">
+    <h1 class="error-code" id="error-code">404</h1>
+    <div class="icon-wrapper">
+     <svg class="book-icon" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /> <path d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /> <path d="M8 7H16" stroke="white" stroke-width="2.5" stroke-linecap="round" /> <path d="M8 11H16" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+     </svg>
+    </div>
+    <h2 class="main-heading" id="main-heading">Page Not Found</h2>
+    <p class="description" id="description">The page you're looking for doesn't exist or has been moved.</p>
+    <div class="error-details">
+     <h3>
+      <svg class="error-icon" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" /> <path d="M12 8V12" stroke="white" stroke-width="2" stroke-linecap="round" /> <circle cx="12" cy="16" r="1" fill="white" />
+      </svg><span id="error-title">File not found</span></h3>
+     <p id="error-message">The site configured at this address does not contain the requested file.</p>
+     <p id="error-suggestion">If this is your site, make sure that the filename case matches the URL as well as any file permissions.</p>
+    </div><a href="https://landing749.github.io/Dr.Alfredo-Pio-De-Roda/" class="home-button" id="home-button" target="_blank" rel="noopener noreferrer">Return to Homepage</a>
+    <div class="decorative-dots">
+     <div class="dot"></div>
+     <div class="dot"></div>
+     <div class="dot"></div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_gradient_start: "#1e3c72",
+      background_gradient_mid: "#2a5298",
+      background_gradient_end: "#7e57c2",
+      text_color: "#ffffff",
+      button_background: "#ffffff",
+      button_text_color: "#1e3c72",
+      error_code: "404",
+      main_heading: "Page Not Found",
+      description: "The page you're looking for doesn't exist or has been moved.",
+      error_title: "File not found",
+      error_message: "The site configured at this address does not contain the requested file.",
+      error_suggestion: "If this is your site, make sure that the filename case matches the URL as well as any file permissions.",
+      button_text: "Return to Homepage",
+      font_family: "sans-serif",
+      font_size: 16
+    };
+
+    async function onConfigChange(config) {
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif';
+      
+      document.body.style.fontFamily = `${fontFamily}, ${baseFontStack}`;
+      document.body.style.background = `linear-gradient(135deg, ${config.background_gradient_start || defaultConfig.background_gradient_start} 0%, ${config.background_gradient_mid || defaultConfig.background_gradient_mid} 50%, ${config.background_gradient_end || defaultConfig.background_gradient_end} 100%)`;
+      
+      const errorCode = document.getElementById('error-code');
+      errorCode.textContent = config.error_code || defaultConfig.error_code;
+      errorCode.style.fontSize = `${(fontSize || defaultConfig.font_size) * 8.75}px`;
+      
+      const mainHeading = document.getElementById('main-heading');
+      mainHeading.textContent = config.main_heading || defaultConfig.main_heading;
+      mainHeading.style.color = config.text_color || defaultConfig.text_color;
+      mainHeading.style.fontSize = `${(fontSize || defaultConfig.font_size) * 2.625}px`;
+      
+      const description = document.getElementById('description');
+      description.textContent = config.description || defaultConfig.description;
+      description.style.color = config.text_color || defaultConfig.text_color;
+      description.style.fontSize = `${(fontSize || defaultConfig.font_size) * 1.125}px`;
+
+      const errorTitle = document.getElementById('error-title');
+      errorTitle.textContent = config.error_title || defaultConfig.error_title;
+      errorTitle.style.fontSize = `${fontSize || defaultConfig.font_size}px`;
+
+      const errorMessage = document.getElementById('error-message');
+      errorMessage.textContent = config.error_message || defaultConfig.error_message;
+      errorMessage.style.fontSize = `${(fontSize || defaultConfig.font_size) * 0.9375}px`;
+
+      const errorSuggestion = document.getElementById('error-suggestion');
+      errorSuggestion.textContent = config.error_suggestion || defaultConfig.error_suggestion;
+      errorSuggestion.style.fontSize = `${(fontSize || defaultConfig.font_size) * 0.875}px`;
+      
+      const homeButton = document.getElementById('home-button');
+      homeButton.textContent = config.button_text || defaultConfig.button_text;
+      homeButton.style.background = `linear-gradient(135deg, ${config.button_background || defaultConfig.button_background} 0%, #f0f4ff 100%)`;
+      homeButton.style.color = config.button_text_color || defaultConfig.button_text_color;
+      homeButton.style.fontSize = `${(fontSize || defaultConfig.font_size) * 1.0625}px`;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_gradient_start || defaultConfig.background_gradient_start,
+              set: (value) => {
+                config.background_gradient_start = value;
+                window.elementSdk.setConfig({ background_gradient_start: value });
+              }
+            },
+            {
+              get: () => config.background_gradient_mid || defaultConfig.background_gradient_mid,
+              set: (value) => {
+                config.background_gradient_mid = value;
+                window.elementSdk.setConfig({ background_gradient_mid: value });
+              }
+            },
+            {
+              get: () => config.background_gradient_end || defaultConfig.background_gradient_end,
+              set: (value) => {
+                config.background_gradient_end = value;
+                window.elementSdk.setConfig({ background_gradient_end: value });
+              }
+            },
+            {
+              get: () => config.button_background || defaultConfig.button_background,
+              set: (value) => {
+                config.button_background = value;
+                window.elementSdk.setConfig({ button_background: value });
+              }
+            },
+            {
+              get: () => config.button_text_color || defaultConfig.button_text_color,
+              set: (value) => {
+                config.button_text_color = value;
+                window.elementSdk.setConfig({ button_text_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["error_code", config.error_code || defaultConfig.error_code],
+          ["main_heading", config.main_heading || defaultConfig.main_heading],
+          ["description", config.description || defaultConfig.description],
+          ["error_title", config.error_title || defaultConfig.error_title],
+          ["error_message", config.error_message || defaultConfig.error_message],
+          ["button_text", config.button_text || defaultConfig.button_text]
+        ])
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a0fbdea313d1f0b',t:'MTc2MzU1NTY2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
