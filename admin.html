@@ -763,28 +763,16 @@
                     if(errData.code === 'invalid_parameter') {
                          showNotification("Error: Sender email not verified in Brevo.", "error");
                     } else {
-                        showNotification("API Error. Opening default mail client...", "error");
-                        const plainTextBody = editorContent.replace(/<[^>]+>/g, '\n').trim();
-                        const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
-                        window.open(mailtoLink, '_blank');
+                         // API Failure (e.g., 401, 400)
+                        showNotification(`API Error ${response.status}: Email could not be sent.`, "error");
                     }
                     
-                    if(state.currentEnrollment) {
-                        updateStatus(state.currentEnrollment.id, state.emailAction);
-                    }
-                    closeEmailModal();
+                    // Keep modal open so the user can debug the key/sender email
                 }
             } catch (error) {
                 console.error("Network Error:", error);
-                showNotification("Network Error. Opening default mail client...", "error");
-                const plainTextBody = editorContent.replace(/<[^>]+>/g, '\n').trim();
-                const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
-                window.open(mailtoLink, '_blank');
-                
-                if(state.currentEnrollment) {
-                    updateStatus(state.currentEnrollment.id, state.emailAction);
-                }
-                closeEmailModal();
+                 // Network/CORS Failure
+                showNotification("Network Error: Could not connect to Brevo API. Check Console.", "error");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
