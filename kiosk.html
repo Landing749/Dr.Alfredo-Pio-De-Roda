@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Election 2024 | Secure Kiosk</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --accent: #F59E0B;
+            --bg: #F1F5F9;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --success: #10B981;
+            --radius: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); height: 100vh; overflow: hidden; }
+
+        #app { display: flex; flex-direction: column; height: 100vh; position: relative; }
+        
+        header { 
+            background: white; padding: 15px 40px; border-bottom: 1px solid #E2E8F0; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            z-index: 10;
+        }
+        header h1 { font-weight: 800; font-size: 1.2rem; color: var(--primary); letter-spacing: -0.5px; }
+        .header-tag { background: var(--primary-light); color: var(--primary); padding: 4px 12px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; }
+
+        .main-container { flex: 1; overflow-y: auto; padding: 30px 40px; display: flex; justify-content: center; }
+
+        /* Ballot Layout */
+        .ballot-wrapper { width: 100%; max-width: 1400px; }
+        .position-section { margin-bottom: 60px; }
+        .position-header { 
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+        }
+        .position-header h2 { font-size: 1.6rem; font-weight: 800; color: var(--text-main); white-space: nowrap; }
+        .position-header::after { content: ''; flex: 1; height: 2px; background: #E2E8F0; border-radius: 2px; }
+
+        /* Party Columns */
+        .party-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; 
+            align-items: start;
+        }
+        
+        .party-column { 
+            background: rgba(255, 255, 255, 0.5); 
+            border-radius: var(--radius); 
+            padding: 10px; 
+            border: 1px dashed #CBD5E1;
+        }
+        .party-name { 
+            padding: 10px; 
+            font-weight: 800; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            color: var(--text-muted); 
+            text-align: center;
+            letter-spacing: 1.5px;
+        }
+        
+        /* Candidate Card */
+        .candidate-card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 16px; 
+            margin-bottom: 12px;
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .candidate-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #E2E8F0; }
+        .candidate-card.selected { border-color: var(--primary); background: var(--primary-light); }
+
+        .candidate-photo { 
+            width: 60px; height: 60px; 
+            border-radius: 12px; 
+            background: #F1F5F9; 
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #E2E8F0;
+        }
+
+        .candidate-info { flex: 1; }
+        .candidate-info h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 2px; }
+        .candidate-info p { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+
+        .select-indicator { 
+            width: 24px; height: 24px; 
+            border: 2px solid #CBD5E1; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .selected .select-indicator { border-color: var(--primary); background: var(--primary); }
+        .selected .select-indicator::after { content: '✓'; color: white; font-size: 14px; font-weight: 800; }
+
+        /* Action Bar */
+        footer { 
+            background: white; padding: 20px 40px; border-top: 1px solid #E2E8F0; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 10;
+        }
+        .selection-status { font-weight: 600; color: var(--text-muted); font-size: 0.95rem; }
+        .selection-count { color: var(--primary); font-weight: 800; }
+
+        button#review-btn { 
+            padding: 16px 40px; border-radius: 100px; font-weight: 800; cursor: pointer; transition: 0.2s; 
+            border: none; font-size: 1.1rem; background: var(--primary); color: white;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+        button#review-btn:hover:not(:disabled) { transform: translateY(-2px); scale: 1.02; }
+        button#review-btn:disabled { background: #E2E8F0; color: #94A3B8; box-shadow: none; cursor: not-allowed; }
+
+        /* Modals */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000;
+            display: none; justify-content: center; align-items: center; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); padding: 20px;
+        }
+        .modal { background: white; border-radius: 30px; padding: 40px; width: 100%; max-width: 550px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        
+        .review-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F1F5F9; font-weight: 600; text-align: left; }
+        .review-pos { color: var(--text-muted); font-size: 0.85rem; }
+
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <header>
+        <div>
+            <h1>2024 STUDENT COUNCIL ELECTION</h1>
+            <span class="header-tag">OFFICIAL VOTING TERMINAL</span>
+        </div>
+        <div id="clock" style="font-weight: 800; color: var(--text-muted); font-size: 0.9rem;">12:00 PM</div>
+    </header>
+
+    <div class="main-container">
+        <div class="ballot-wrapper" id="ballot-container">
+            <!-- Rendered via JavaScript -->
+            <div style="text-align:center; margin-top:100px; color:var(--text-muted)">
+                <p>Initializing secure ballot connection...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="selection-status">
+            Completed <span class="selection-count" id="count-display">0</span> out of <span id="total-pos">0</span> positions
+        </div>
+        <button id="review-btn" onclick="openReview()" disabled>Review & Confirm</button>
+    </footer>
+</div>
+
+<!-- Review Overlay -->
+<div id="review-overlay" class="overlay">
+    <div class="modal animate-pop">
+        <h2 style="font-weight: 800; margin-bottom: 10px;">Review Ballot</h2>
+        <p style="color: var(--text-muted); margin-bottom: 25px;">Ensure your selections are correct before submitting.</p>
+        <div id="review-list" style="margin-bottom: 30px;"></div>
+        <div style="display:flex; gap: 12px;">
+            <button onclick="closeModal('review-overlay')" style="flex:1; background:#F1F5F9; color:var(--text-main); padding:15px; border-radius:15px; border:none; font-weight:700; cursor:pointer;">Back to Edit</button>
+            <button onclick="castVote()" style="flex:1; background:var(--primary); color:white; padding:15px; border-radius:15px; border:none; font-weight:800; cursor:pointer;">Submit My Vote</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Overlay -->
+<div id="success-overlay" class="overlay">
+    <div class="modal animate-pop">
+        <div style="font-size: 6rem; margin-bottom: 10px;">🗳️</div>
+        <h1 style="color: var(--success); font-weight: 800; font-size: 2.5rem;">Vote Submitted</h1>
+        <p style="color: var(--text-muted); font-weight: 600; margin-bottom: 30px;">Your ballot has been securely counted.</p>
+        <div style="background: var(--primary-light); padding: 20px; border-radius: 20px; font-weight: 800; color: var(--primary); font-size: 1.4rem;">
+            Ready for next voter in <span id="timer">3</span>s
+        </div>
+    </div>
+</div>
+
+<script>
+    // Firebase Setup
+    const firebaseConfig = {
+        apiKey: "AIzaSyCVp6fW915-phMWrNTJjRgmjT2qeb24nIY",
+        authDomain: "news-672f6.firebaseapp.com",
+        databaseURL: "https://news-672f6-default-rtdb.firebaseio.com",
+        projectId: "news-672f6",
+        storageBucket: "news-672f6.firebasestorage.app",
+        messagingSenderId: "864345289952",
+        appId: "1:864345289952:web:c3f628b007e95625b7cc85"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let positions = [];
+    let candidates = [];
+    let selections = {};
+
+    // Helper: Format Google Drive Link to direct image URL
+    function getDriveImageUrl(url) {
+        if (!url || !url.includes('drive.google.com')) return url || 'https://via.placeholder.com/150?text=No+Photo';
+        try {
+            const parts = url.split('/d/');
+            if (parts.length > 1) {
+                const id = parts[1].split('/')[0];
+                return `https://drive.google.com/uc?export=view&id=${id}`;
+            }
+        } catch (e) { console.error("Drive URL error", e); }
+        return url;
+    }
+
+    // Load Data
+    db.ref('ballot').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        positions = data.positions ? Object.entries(data.positions).map(([id, d]) => ({id, ...d})) : [];
+        candidates = data.candidates ? Object.entries(data.candidates).map(([id, d]) => ({id, ...d})) : [];
+        renderBallot();
+    });
+
+    function renderBallot() {
+        const container = document.getElementById('ballot-container');
+        container.innerHTML = "";
+        
+        document.getElementById('total-pos').innerText = positions.length;
+
+        positions.forEach(pos => {
+            const section = document.createElement('section');
+            section.className = "position-section";
+            section.innerHTML = `<div class="position-header"><h2>${pos.title}</h2></div>`;
+
+            const grid = document.createElement('div');
+            grid.className = "party-grid";
+
+            // Group candidates by Party
+            const posCandidates = candidates.filter(c => c.positionId === pos.id);
+            const parties = [...new Set(posCandidates.map(c => c.party || "Independent"))];
+
+            parties.forEach(partyName => {
+                const col = document.createElement('div');
+                col.className = "party-column";
+                col.innerHTML = `<div class="party-name">${partyName}</div>`;
+
+                posCandidates.filter(c => (c.party || "Independent") === partyName).forEach(cand => {
+                    const card = document.createElement('div');
+                    card.className = "candidate-card" + (selections[pos.id]?.id === cand.id ? " selected" : "");
+                    card.innerHTML = `
+                        <img class="candidate-photo" src="${getDriveImageUrl(cand.imageUrl)}" alt="">
+                        <div class="candidate-info">
+                            <h3>${cand.name}</h3>
+                            <p>${cand.motto || 'Official Candidate'}</p>
+                        </div>
+                        <div class="select-indicator"></div>
+                    `;
+                    card.onclick = () => selectCandidate(pos.id, cand);
+                    col.appendChild(card);
+                });
+                grid.appendChild(col);
+            });
+
+            section.appendChild(grid);
+            container.appendChild(section);
+        });
+        updateFooter();
+    }
+
+    function selectCandidate(posId, cand) {
+        // Enforce mutual exclusivity per position
+        selections[posId] = cand;
+        renderBallot();
+    }
+
+    function updateFooter() {
+        const count = Object.keys(selections).length;
+        document.getElementById('count-display').innerText = count;
+        document.getElementById('review-btn').disabled = count === 0;
+    }
+
+    function openReview() {
+        const list = document.getElementById('review-list');
+        list.innerHTML = "";
+        positions.forEach(pos => {
+            const sel = selections[pos.id];
+            if (sel) {
+                const row = document.createElement('div');
+                row.className = "review-row";
+                row.innerHTML = `<span class="review-pos">${pos.title}</span> <span>${sel.name}</span>`;
+                list.appendChild(row);
+            }
+        });
+        document.getElementById('review-overlay').style.display = 'flex';
+    }
+
+    async function castVote() {
+        const btn = document.querySelector('#review-overlay button:last-child');
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        try {
+            const voteId = Date.now() + "_" + Math.floor(Math.random() * 1000);
+            await db.ref('votes/' + voteId).set({
+                choices: selections,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+            closeModal('review-overlay');
+            showSuccess();
+        } catch (e) {
+            alert("Vote Error. Please notify a supervisor.");
+            btn.disabled = false;
+        }
+    }
+
+    function showSuccess() {
+        document.getElementById('success-overlay').style.display = 'flex';
+        let timeLeft = 3;
+        const timer = document.getElementById('timer');
+        const itv = setInterval(() => {
+            timeLeft--;
+            timer.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(itv);
+                resetKiosk();
+            }
+        }, 1000);
+    }
+
+    function resetKiosk() {
+        selections = {};
+        renderBallot();
+        document.getElementById('success-overlay').style.display = 'none';
+        document.getElementById('ballot-container').scrollTop = 0;
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Clock Utility
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }, 1000);
+</script>
+</body>
+</html>
