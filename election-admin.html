@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Admin | Manage Ballot</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --text: #1E293B;
+            --danger: #EF4444;
+            --success: #10B981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 40px; }
+
+        .admin-container { max-width: 1200px; margin: 0 auto; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-weight: 800; font-size: 2rem; color: var(--primary); }
+
+        .grid { display: grid; grid-template-columns: 350px 1fr; gap: 40px; }
+
+        /* Form Styling */
+        .card { background: var(--card); border-radius: 20px; padding: 30px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        h2 { font-weight: 700; margin-bottom: 20px; font-size: 1.2rem; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #64748B; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 0.95rem; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); }
+
+        button { 
+            width: 100%; padding: 14px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
+        th { background: #F1F5F9; text-align: left; padding: 15px; font-size: 0.75rem; text-transform: uppercase; color: #64748B; }
+        td { padding: 15px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+        
+        .cand-img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; background: #EEE; }
+        .party-badge { background: #EEF2FF; color: var(--primary); padding: 4px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; }
+        
+        .delete-btn { background: #FEE2E2; color: var(--danger); width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .delete-btn:hover { background: var(--danger); color: white; }
+
+        .danger-zone { margin-top: 60px; padding: 30px; background: #FFF1F2; border: 1px solid #FECDD3; border-radius: 20px; }
+        .btn-danger { background: var(--danger); color: white; max-width: 300px; }
+
+        /* Sync Status */
+        #sync-status { font-size: 0.8rem; font-weight: 600; color: var(--success); display: flex; align-items: center; gap: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <header>
+        <div>
+            <h1>Election Admin</h1>
+            <p style="color: #64748B">Manage ballot candidates and positions</p>
+        </div>
+        <div id="sync-status">● Database Connected</div>
+    </header>
+
+    <div class="grid">
+        <!-- Add Candidate Column -->
+        <aside>
+            <div class="card">
+                <h2>Add Candidate</h2>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="cand-name" placeholder="Enter name">
+                </div>
+                <div class="form-group">
+                    <label>Position</label>
+                    <select id="cand-pos">
+                        <option>President</option>
+                        <option>Vice President</option>
+                        <option>Secretary</option>
+                        <option>Treasurer</option>
+                        <option>Auditor</option>
+                        <option>Public Information Officer (PIO)</option>
+                        <option>Protocol Officer</option>
+                        <option>Grade Level Representatives</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Party List Name</label>
+                    <input type="text" id="cand-party" placeholder="e.g. Dream Team">
+                </div>
+                <div class="form-group">
+                    <label>Image URL (Optional)</label>
+                    <input type="text" id="cand-image" placeholder="Google Drive Link">
+                </div>
+                <div class="form-group">
+                    <label>Platform / Motto</label>
+                    <textarea id="cand-motto" rows="2" placeholder="Short slogan"></textarea>
+                </div>
+                <button class="btn-primary" onclick="addCandidate()">Add to Ballot</button>
+            </div>
+        </aside>
+
+        <!-- List Column -->
+        <main>
+            <div class="card" style="padding: 0;">
+                <div style="padding: 20px 30px; border-bottom: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin:0;">Current Candidates</h2>
+                    <span id="cand-count" style="font-size: 0.8rem; font-weight: 700; background: #F1F5F9; padding: 5px 12px; border-radius: 20px;">0 Total</span>
+                </div>
+                <table id="candidates-table">
+                    <thead>
+                        <tr>
+                            <th>Img</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Party</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Content loaded from Firebase -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="danger-zone">
+                <h3 style="color: var(--danger); font-weight: 800; margin-bottom: 10px;">Danger Zone</h3>
+                <p style="font-size: 0.85rem; color: #991B1B; margin-bottom: 20px;">Use these buttons to reset the election database. This cannot be undone.</p>
+                <div style="display:flex; gap: 10px;">
+                    <button class="btn-danger" onclick="resetVotes()">Reset All Votes (Wipe Tallies)</button>
+                    <button class="btn-danger" style="background:none; border: 2px solid var(--danger); color: var(--danger)" onclick="clearBallot()">Clear All Candidates</button>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Firebase Config (Same as Kiosk)
+    const firebaseConfig = {
+        apiKey: "AIzaSyCVp6fW915-phMWrNTJjRgmjT2qeb24nIY",
+        authDomain: "news-672f6.firebaseapp.com",
+        databaseURL: "https://news-672f6-default-rtdb.firebaseio.com",
+        projectId: "news-672f6",
+        storageBucket: "news-672f6.firebasestorage.app",
+        messagingSenderId: "864345289952",
+        appId: "1:864345289952:web:c3f628b007e95625b7cc85"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Utility: Pre-populate positions if not exist
+    const defaultPositions = [
+        "President", "Vice President", "Secretary", "Treasurer", 
+        "Auditor", "Public Information Officer (PIO)", "Protocol Officer", 
+        "Grade Level Representatives"
+    ];
+
+    async function initPositions() {
+        const snap = await db.ref('ballot/positions').once('value');
+        if (!snap.exists()) {
+            const updates = {};
+            defaultPositions.forEach((title, index) => {
+                const id = 'pos_' + index;
+                updates[id] = { title };
+            });
+            await db.ref('ballot/positions').set(updates);
+        }
+    }
+    initPositions();
+
+    // Helper: Drive Image Converter
+    function getDriveImageUrl(url) {
+        if (!url || !url.includes('drive.google.com')) return url || '';
+        try {
+            const parts = url.split('/d/');
+            if (parts.length > 1) {
+                const id = parts[1].split('/')[0];
+                return `https://drive.google.com/uc?export=view&id=${id}`;
+            }
+        } catch (e) {}
+        return url;
+    }
+
+    // Add Candidate
+    async function addCandidate() {
+        const name = document.getElementById('cand-name').value;
+        const party = document.getElementById('cand-party').value || 'Independent';
+        const posTitle = document.getElementById('cand-pos').value;
+        const imageUrl = document.getElementById('cand-image').value;
+        const motto = document.getElementById('cand-motto').value;
+
+        if (!name) return alert("Candidate Name is required!");
+
+        // Find the position ID based on title
+        const posSnap = await db.ref('ballot/positions').once('value');
+        let posId = "";
+        posSnap.forEach(s => {
+            if (s.val().title === posTitle) posId = s.key;
+        });
+
+        db.ref('ballot/candidates').push({
+            name,
+            party,
+            positionId: posId,
+            imageUrl,
+            motto
+        }).then(() => {
+            // Clear inputs
+            document.getElementById('cand-name').value = "";
+            document.getElementById('cand-image').value = "";
+            document.getElementById('cand-motto').value = "";
+            console.log("Candidate Added");
+        });
+    }
+
+    // Load and Sync Table
+    db.ref('ballot').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        const posData = data.positions || {};
+        const candData = data.candidates || {};
+        
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = "";
+        
+        const candidates = Object.entries(candData);
+        document.getElementById('cand-count').innerText = `${candidates.length} Total`;
+
+        candidates.forEach(([id, cand]) => {
+            const posTitle = posData[cand.positionId]?.title || "Unknown";
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><img class="cand-img" src="${getDriveImageUrl(cand.imageUrl)}" onerror="this.src='https://via.placeholder.com/40'"></td>
+                <td style="font-weight:700;">${cand.name}</td>
+                <td style="color:#64748B; font-weight:600;">${posTitle}</td>
+                <td><span class="party-badge">${cand.party}</span></td>
+                <td>
+                    <div class="delete-btn" onclick="deleteCand('${id}')">🗑️</div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    });
+
+    function deleteCand(id) {
+        if (confirm("Remove this candidate from the ballot?")) {
+            db.ref(`ballot/candidates/${id}`).remove();
+        }
+    }
+
+    function resetVotes() {
+        if (confirm("ARE YOU SURE? This will delete all votes already cast in the database.")) {
+            db.ref('votes').remove().then(() => alert("All votes wiped."));
+        }
+    }
+
+    function clearBallot() {
+        if (confirm("DANGER! This will delete all candidates. Reset the whole ballot?")) {
+            db.ref('ballot/candidates').remove();
+        }
+    }
+</script>
+
+</body>
+</html>
