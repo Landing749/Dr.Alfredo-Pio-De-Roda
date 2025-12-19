@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Dashboard | Election 2024</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366F1;
+            --bg: #0F172A; 
+            --card: #1E293B;
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            --accent: #10B981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            padding: 20px; 
+            height: 100vh; 
+            overflow: hidden; /* Prevent scrolling */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container { 
+            width: 100%;
+            height: 100%;
+            max-width: 100%; 
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            border-bottom: 1px solid #334155; 
+            padding-bottom: 10px;
+            flex-shrink: 0;
+        }
+        
+        h1 { font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; }
+        .turnout-box { display: flex; align-items: center; gap: 15px; }
+        .turnout-count { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+        .turnout-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+
+        /* Fixed 4-Column Grid */
+        .results-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(2, 1fr); /* Assuming 8 positions, 2 rows of 4 */
+            gap: 12px; 
+            flex: 1;
+            min-height: 0; /* Important for grid items to shrink */
+        }
+
+        .position-card { 
+            background: var(--card); 
+            border-radius: 16px; 
+            padding: 15px; 
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .position-title { 
+            font-weight: 800; 
+            font-size: 0.9rem; 
+            margin-bottom: 10px; 
+            color: var(--primary); 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        .candidate-list {
+            flex: 1;
+            overflow-y: auto; /* Just in case there are many candidates in one pos */
+            padding-right: 4px;
+        }
+
+        .candidate-row { margin-bottom: 10px; }
+        .candidate-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 700; font-size: 0.8rem; }
+        .candidate-party { font-size: 0.65rem; color: var(--text-muted); font-weight: 500; display: block; }
+        
+        /* Compact Bars */
+        .bar-container { width: 100%; height: 8px; background: #334155; border-radius: 100px; overflow: hidden; position: relative; }
+        .bar-fill { height: 100%; background: var(--primary); border-radius: 100px; transition: width 0.8s ease-out; }
+        .leading .bar-fill { background: var(--accent); }
+
+        .vote-count { font-weight: 800; color: var(--text); font-size: 0.8rem; }
+        .percentage { font-size: 0.7rem; color: var(--text-muted); margin-left: 4px; }
+
+        .winner-tag { 
+            color: var(--accent); 
+            font-size: 0.6rem; 
+            font-weight: 800;
+            text-transform: uppercase; 
+            margin-left: 5px;
+        }
+
+        /* Loading State */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        
+        /* Hide scrollbars for a clean look */
+        .candidate-list::-webkit-scrollbar { width: 4px; }
+        .candidate-list::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <h2 style="font-weight: 800; letter-spacing: 2px;">SYNCING LIVE DATA...</h2>
+</div>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>LIVE ELECTION STANDINGS</h1>
+        </div>
+        <div class="turnout-box">
+            <div class="turnout-label">Total Ballots</div>
+            <div class="turnout-count" id="total-votes">0</div>
+        </div>
+    </header>
+
+    <div class="results-grid" id="results-display">
+        <!-- Results will be injected here per position -->
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCVp6fW915-phMWrNTJjRgmjT2qeb24nIY",
+        authDomain: "news-672f6.firebaseapp.com",
+        databaseURL: "https://news-672f6-default-rtdb.firebaseio.com",
+        projectId: "news-672f6",
+        storageBucket: "news-672f6.firebasestorage.app",
+        messagingSenderId: "864345289952",
+        appId: "1:864345289952:web:c3f628b007e95625b7cc85"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let candidates = {};
+    let positions = {};
+    let votes = {};
+
+    db.ref().on('value', snapshot => {
+        const data = snapshot.val() || {};
+        candidates = data.ballot?.candidates || {};
+        positions = data.ballot?.positions || {};
+        votes = data.votes || {};
+        
+        processAndRender();
+        document.getElementById('loader').style.display = 'none';
+    });
+
+    function processAndRender() {
+        const resultsContainer = document.getElementById('results-display');
+        resultsContainer.innerHTML = "";
+
+        const allVotes = Object.values(votes);
+        document.getElementById('total-votes').innerText = allVotes.length;
+
+        // Group by Position
+        Object.entries(positions).forEach(([posId, posInfo]) => {
+            const posCard = document.createElement('div');
+            posCard.className = "position-card";
+            
+            const titleEl = document.createElement('div');
+            titleEl.className = "position-title";
+            titleEl.innerHTML = `${posInfo.title}`;
+            posCard.appendChild(titleEl);
+
+            const candList = document.createElement('div');
+            candList.className = "candidate-list";
+
+            const posCandidates = Object.entries(candidates)
+                .filter(([id, c]) => c.positionId === posId)
+                .map(([id, c]) => {
+                    const count = allVotes.filter(v => 
+                        v.choices && v.choices[posId] && v.choices[posId].id === id
+                    ).length;
+                    return { id, ...c, votes: count };
+                });
+
+            posCandidates.sort((a, b) => b.votes - a.votes);
+            
+            const maxVotes = posCandidates.length > 0 ? posCandidates[0].votes : 0;
+            const totalPosVotes = posCandidates.reduce((sum, c) => sum + c.votes, 0);
+
+            posCandidates.forEach((cand) => {
+                const isLeading = cand.votes > 0 && cand.votes === maxVotes;
+                const percent = totalPosVotes > 0 ? Math.round((cand.votes / totalPosVotes) * 100) : 0;
+                
+                const row = document.createElement('div');
+                row.className = `candidate-row ${isLeading ? 'leading' : ''}`;
+                row.innerHTML = `
+                    <div class="candidate-header">
+                        <div>
+                            ${cand.name} 
+                            <span class="candidate-party">${cand.party || 'IND'}</span>
+                        </div>
+                        <div class="vote-count">
+                            ${cand.votes} <span class="percentage">${percent}%</span>
+                        </div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: ${percent}%"></div>
+                    </div>
+                `;
+                candList.appendChild(row);
+            });
+
+            posCard.appendChild(candList);
+            resultsContainer.appendChild(posCard);
+        });
+    }
+</script>
+
+</body>
+</html>
