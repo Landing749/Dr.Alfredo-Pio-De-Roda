@@ -772,19 +772,22 @@
             }
 
             try {
-                const snapshot = await database.ref('announcements').orderByChild('announcement_date').once('value');
+                const snapshot = await database.ref('announcements').orderByChild('createdAt').once('value');
                 const data = snapshot.val();
                 
                 if (data) {
                     const announcements = Object.keys(data)
                         .map(key => ({ id: key, ...data[key] }))
-                        .filter(announcement => announcement.announcement_active)
+                        .filter(announcement => announcement.isActive)
                         .sort((a, b) => {
                             // Sort by priority first, then by date
                             const priorityOrder = { urgent: 0, important: 1, general: 2, event: 3 };
-                            const priorityDiff = priorityOrder[a.announcement_priority] - priorityOrder[b.announcement_priority];
+                            const pA = (a.priority || 'general').toLowerCase();
+                            const pB = (b.priority || 'general').toLowerCase();
+                            const priorityDiff = (priorityOrder[pA] ?? 2) - (priorityOrder[pB] ?? 2);
+                            
                             if (priorityDiff !== 0) return priorityDiff;
-                            return new Date(b.announcement_date) - new Date(a.announcement_date);
+                            return new Date(b.createdAt) - new Date(a.createdAt);
                         });
                     
                     displayAnnouncements(announcements);
@@ -801,30 +804,27 @@
             const demoAnnouncements = [
                 {
                     id: 'demo1',
-                    announcement_title: 'Welcome Back to School!',
-                    announcement_content: 'We are excited to welcome all our students back for the new academic year. Classes begin on Monday, August 28th. Please ensure all enrollment forms are completed.',
-                    announcement_type: 'general',
-                    announcement_priority: 'important',
-                    announcement_date: new Date(Date.now() - 86400000).toISOString(),
-                    announcement_active: true
+                    title: 'Welcome Back to School!',
+                    content: 'We are excited to welcome all our students back for the new academic year. Classes begin on Monday, August 28th. Please ensure all enrollment forms are completed.',
+                    priority: 'important',
+                    createdAt: new Date(Date.now() - 86400000).toISOString(),
+                    isActive: true
                 },
                 {
                     id: 'demo2',
-                    announcement_title: 'Parent-Teacher Conference',
-                    announcement_content: 'Parent-Teacher conferences are scheduled for October 15-16. Please sign up for your preferred time slot through the school portal.',
-                    announcement_type: 'event',
-                    announcement_priority: 'general',
-                    announcement_date: new Date(Date.now() - 172800000).toISOString(),
-                    announcement_active: true
+                    title: 'Parent-Teacher Conference',
+                    content: 'Parent-Teacher conferences are scheduled for October 15-16. Please sign up for your preferred time slot through the school portal.',
+                    priority: 'general',
+                    createdAt: new Date(Date.now() - 172800000).toISOString(),
+                    isActive: true
                 },
                 {
                     id: 'demo3',
-                    announcement_title: 'School Closure - Weather Alert',
-                    announcement_content: 'Due to severe weather conditions, the school will be closed tomorrow, December 15th. All after-school activities are also cancelled.',
-                    announcement_type: 'urgent',
-                    announcement_priority: 'urgent',
-                    announcement_date: new Date().toISOString(),
-                    announcement_active: true
+                    title: 'School Closure - Weather Alert',
+                    content: 'Due to severe weather conditions, the school will be closed tomorrow, December 15th. All after-school activities are also cancelled.',
+                    priority: 'urgent',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
                 }
             ];
             
@@ -841,25 +841,27 @@
             noAnnouncements.classList.add('hidden');
             container.classList.remove('hidden');
             
-            list.innerHTML = announcements.map(announcement => `
-                <div class="announcement-card announcement-${announcement.announcement_priority} p-8 rounded-2xl fade-in">
+            list.innerHTML = announcements.map(announcement => {
+                const priority = (announcement.priority || 'general').toLowerCase();
+                return `
+                <div class="announcement-card announcement-${priority} p-8 rounded-2xl fade-in">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <span class="announcement-badge badge-${announcement.announcement_priority}">
-                                ${announcement.announcement_priority}
+                            <span class="announcement-badge badge-${priority}">
+                                ${priority}
                             </span>
                             <span class="text-sm text-gray-500">
-                                ${formatAnnouncementDate(announcement.announcement_date)}
+                                ${formatAnnouncementDate(announcement.createdAt)}
                             </span>
                         </div>
                         <div class="announcement-icon">
-                            ${getAnnouncementIcon(announcement.announcement_priority)}
+                            ${getAnnouncementIcon(priority)}
                         </div>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">${announcement.announcement_title}</h3>
-                    <p class="text-gray-600 leading-relaxed">${announcement.announcement_content}</p>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">${announcement.title}</h3>
+                    <p class="text-gray-600 leading-relaxed">${announcement.content}</p>
                 </div>
-            `).join('');
+            `}).join('');
             
             // Trigger fade-in animation
             setTimeout(() => {
