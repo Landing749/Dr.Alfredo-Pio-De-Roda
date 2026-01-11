@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AcademiaJS | Apex Pro v12.0</title>
+    <title>AcademiaJS | Apex Pro v13.0</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -163,7 +163,7 @@
         .stat-card {
             background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05);
             border-radius: 16px; padding: 1.5rem; transition: transform 0.2s;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; cursor: pointer;
         }
         .stat-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.1); }
         .stat-card::after {
@@ -204,7 +204,9 @@
 
         .id-card-container {
             background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            border: 2px solid #444; border-radius: 20px; padding: 30px; width: 340px; text-align: center; margin: 0 auto;
+            border: 2px solid #444; border-radius: 20px; padding: 30px; 
+            width: 90%; max-width: 340px; /* Improved scaling for mobile */
+            text-align: center; margin: 0 auto;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; overflow: hidden;
         }
         .id-card-photo { width: 100px; height: 100px; background: #555; border-radius: 50%; margin: 0 auto 15px; background-size: cover; background-position: center; border: 3px solid var(--primary-color); }
@@ -218,6 +220,12 @@
         
         .swal2-container { z-index: 9999 !important; }
         .nav-avatar { width: 40px; height: 40px; border-radius: 50%; background-size: cover; background-position: center; background-color: #475569; border: 2px solid var(--primary-color); cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .calendar-day { min-height: 80px; }
+            .calendar-event { display: none; }
+            .calendar-day.has-event::after { content: ''; width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; display: block; margin: 4px auto 0; }
+        }
     </style>
 </head>
 <body>
@@ -237,7 +245,7 @@
                 <i class="bi bi-mortarboard-fill"></i>
             </div>
             <h2 class="fw-bold text-white mb-0">AcademiaJS</h2>
-            <p class="text-white-50 mb-4">Apex Pro v12.0</p>
+            <p class="text-white-50 mb-4">Apex Pro v13.0</p>
             
             <ul class="nav nav-pills nav-fill mb-4 bg-black bg-opacity-25 rounded-pill p-1 border border-secondary border-opacity-25" role="tablist">
                 <li class="nav-item"><button class="nav-link active rounded-pill" id="login-tab-btn" data-bs-toggle="tab" data-bs-target="#login-pane">Login</button></li>
@@ -262,8 +270,10 @@
                 <div class="tab-pane fade" id="register-pane">
                     <div class="form-floating mb-2"><input type="text" class="form-control" id="reg-username" placeholder="Full Name"><label>Full Name</label></div>
                     <div class="form-floating mb-2"><input type="email" class="form-control" id="reg-email" placeholder="name@example.com"><label>Email address</label></div>
-                    <div class="form-floating mb-4"><input type="password" class="form-control" id="reg-password" placeholder="Password"><label>Password (Min 6)</label></div>
-                    <button type="button" class="btn btn-success w-100 fw-bold py-3 rounded-xl" id="btn-register" onclick="app.auth.register()">Create Account</button>
+                    <div class="form-floating mb-4"><input type="password" class="form-control" id="reg-password" placeholder="Password (Min 6)"><label>Password (Min 6)</label></div>
+                    <button type="button" class="btn btn-success w-100 fw-bold py-3 rounded-xl" id="btn-register" onclick="app.auth.register()">
+                        <span class="d-none spinner-border spinner-border-sm me-2"></span> Create Account
+                    </button>
                 </div>
             </div>
         </div>
@@ -306,11 +316,11 @@
                 <li class="nav-item admin-only"><a href="#" class="nav-link text-warning" onclick="app.ui.showTab('admin')"><i class="bi bi-shield-fill-check"></i> Admin Panel</a></li>
                 <li class="nav-item teacher-only"><a href="#" class="nav-link text-info" onclick="app.ui.showTab('teachernet')"><i class="bi bi-chat-quote-fill"></i> TeacherNet</a></li>
                 <li class="nav-item mb-1"><a href="#" class="nav-link" onclick="app.ui.showTab('messages')"><i class="bi bi-megaphone-fill"></i> Announcements</a></li>
-                <li class="nav-item mb-1"><a href="#" class="nav-link" onclick="app.ui.showTab('calendar')"><i class="bi bi-calendar-week-fill"></i> Calendar</a></li>
+                <li class="nav-item mb-1 not-student"><a href="#" class="nav-link" onclick="app.ui.showTab('calendar')"><i class="bi bi-calendar-week-fill"></i> Calendar</a></li>
                 <li class="nav-item teacher-only"><a href="#" class="nav-link" onclick="app.ui.showTab('attendance')"><i class="bi bi-qr-code"></i> Attendance</a></li>
                 <li class="nav-item teacher-only"><a href="#" class="nav-link" onclick="app.ui.showTab('discipline')"><i class="bi bi-exclamation-octagon-fill"></i> Discipline</a></li>
                 <li class="nav-item teacher-only"><a href="#" class="nav-link" onclick="app.ui.showTab('students')"><i class="bi bi-people-fill"></i> Students</a></li>
-                <li class="nav-item mb-1"><a href="#" class="nav-link" onclick="app.ui.showTab('excuses')"><i class="bi bi-file-medical-fill"></i> Excuses</a></li>
+                <li class="nav-item mb-1 not-student"><a href="#" class="nav-link" onclick="app.ui.showTab('excuses')"><i class="bi bi-file-medical-fill"></i> Excuses</a></li>
                 <li class="nav-item mb-1"><a href="#" class="nav-link" onclick="app.ui.showTab('gamification')"><i class="bi bi-trophy-fill"></i> Gamification</a></li>
                 <li class="nav-item mb-1"><a href="#" class="nav-link" onclick="app.ui.showTab('reports')"><i class="bi bi-bar-chart-line-fill"></i> Analytics</a></li>
                 <li class="nav-item mt-4 border-top border-secondary border-opacity-25 pt-3"><a href="#" class="nav-link text-muted" onclick="app.ui.showTab('settings')"><i class="bi bi-gear-fill"></i> Settings</a></li>
@@ -323,7 +333,7 @@
             <div id="tab-dashboard" class="content-tab active-tab">
                 <div class="d-flex justify-content-between align-items-end mb-4">
                     <div><h2 class="fw-bold mb-0 text-white">Overview</h2><p class="text-white-50 mb-0">System Dashboard</p></div>
-                    <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2">Apex 12.0</span>
+                    <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2">Apex 13.0</span>
                 </div>
                 
                 <!-- PARENT DASHBOARD -->
@@ -343,18 +353,11 @@
 
                 <!-- TEACHER/ADMIN DASHBOARD -->
                 <div id="dashboard-teacher-view">
-                    <div class="glass-panel p-3 mb-4">
-                        <div class="d-flex gap-2 flex-wrap">
-                            <button type="button" class="btn btn-outline-light btn-sm rounded-pill" onclick="app.ui.showTab('attendance')"><i class="bi bi-upc-scan"></i> Scan</button>
-                            <button type="button" class="btn btn-outline-light btn-sm rounded-pill" onclick="app.ui.showTab('discipline')"><i class="bi bi-flag"></i> Report</button>
-                            <button type="button" class="btn btn-outline-light btn-sm rounded-pill" onclick="app.classroom.createSection()"><i class="bi bi-plus"></i> Class</button>
-                        </div>
-                    </div>
                     <div class="row g-4 mb-4">
-                        <div class="col-md-3"><div class="stat-card h-100"><h6 class="text-muted text-uppercase small">Students</h6><h2 class="fw-bold counter-anim" id="stat-students">0</h2></div></div>
-                        <div class="col-md-3"><div class="stat-card h-100"><h6 class="text-muted text-uppercase small">Attendance</h6><h2 class="fw-bold text-success counter-anim" id="stat-attendance">0%</h2></div></div>
-                        <div class="col-md-3"><div class="stat-card h-100"><h6 class="text-muted text-uppercase small">Incidents</h6><h2 class="fw-bold text-warning counter-anim" id="stat-incidents">0</h2></div></div>
-                        <div class="col-md-3"><div class="stat-card h-100"><h6 class="text-muted text-uppercase small">Alerts</h6><h2 class="fw-bold text-danger counter-anim" id="stat-alerts">0</h2></div></div>
+                        <div class="col-md-3"><div class="stat-card h-100" onclick="app.ui.showTab('students')"><h6 class="text-muted text-uppercase small">Students</h6><h2 class="fw-bold counter-anim" id="stat-students">0</h2></div></div>
+                        <div class="col-md-3"><div class="stat-card h-100" onclick="app.ui.showTab('attendance')"><h6 class="text-muted text-uppercase small">Attendance</h6><h2 class="fw-bold text-success counter-anim" id="stat-attendance">0%</h2></div></div>
+                        <div class="col-md-3"><div class="stat-card h-100" onclick="app.ui.showTab('discipline')"><h6 class="text-muted text-uppercase small">Incidents</h6><h2 class="fw-bold text-warning counter-anim" id="stat-incidents">0</h2></div></div>
+                        <div class="col-md-3"><div class="stat-card h-100" onclick="app.ui.showTab('reports')"><h6 class="text-muted text-uppercase small">Alerts</h6><h2 class="fw-bold text-danger counter-anim" id="stat-alerts">0</h2></div></div>
                     </div>
                     <div class="glass-panel p-4"><canvas id="attendanceChart" height="80"></canvas></div>
                 </div>
@@ -451,8 +454,8 @@
             <!-- OTHER TABS -->
             <div id="tab-messages" class="content-tab"><div class="row"><div class="col-md-4 mb-3 teacher-only"><div class="glass-panel p-3"><h5>Post Announcement</h5><input id="msg-title" class="form-control mb-2" placeholder="Title"><textarea id="msg-body" class="form-control mb-2" placeholder="Body"></textarea><button type="button" class="btn btn-primary w-100" onclick="app.messages.post()">Post</button></div></div><div class="col-md-8" id="messages-list"></div></div></div>
             <div id="tab-discipline" class="content-tab"><div class="row"><div class="col-md-4 teacher-only"><div class="glass-panel p-3 mb-3"><h5>Report</h5><select id="inc-severity" class="form-select mb-2"><option>Minor</option><option>Major</option><option>Critical</option></select><input id="inc-student-email" class="form-control mb-2" placeholder="Student Email"><textarea id="inc-desc" class="form-control mb-2" placeholder="Desc"></textarea><button type="button" class="btn btn-danger w-100" onclick="app.discipline.submitReport()">Submit</button></div></div><div class="col-md-8"><div id="incident-list"></div></div></div></div>
-            <div id="tab-students" class="content-tab"><div class="row"><div class="col-md-4"><div class="glass-panel p-3 mb-3"><h5>Create Class</h5><input id="new-section-name" class="form-control mb-2"><button type="button" class="btn btn-success w-100" onclick="app.classroom.createSection()">Create</button></div><div class="glass-panel p-3"><h5>My Classes</h5><ul id="my-sections-list" class="list-group list-group-flush"></ul></div></div><div class="col-md-8"><div class="glass-panel p-3"><h5>Unassigned</h5><div class="input-group mb-2"><span class="input-group-text">Assign:</span><select id="select-target-section" class="form-select"></select></div><table class="table table-dark"><tbody id="unassigned-list"></tbody></table></div></div></div></div>
-            <div id="tab-gamification" class="content-tab"><div class="row"><div class="col-md-8"><table class="table table-dark table-striped"><thead><tr><th>Rank</th><th>Name</th><th>Pts</th><th>Badge</th></tr></thead><tbody id="leaderboard-list"></tbody></table></div><div class="col-md-4 teacher-only"><div class="glass-panel p-3"><h5>Give Points</h5><input id="award-email" class="form-control mb-2" placeholder="Student Email"><input type="number" id="award-amount" class="form-control mb-2" placeholder="Points"><button type="button" class="btn btn-primary w-100" onclick="app.gamification.givePoints()">Award</button></div></div></div></div>
+            <div id="tab-students" class="content-tab"><div class="row"><div class="col-md-4"><div class="glass-panel p-3 mb-3"><h5>Create Class</h5><input id="new-section-name" class="form-control mb-2"><button type="button" class="btn btn-success w-100" onclick="app.classroom.createSection()">Create</button></div><div class="glass-panel p-3"><h5>My Classes</h5><ul id="my-sections-list" class="list-group list-group-flush"></ul></div></div><div class="col-md-8"><div class="glass-panel p-3"><h5>Unassigned</h5><div class="input-group mb-2"><span class="input-group-text">Assign:</span><select id="select-target-section" class="form-select"></select></div><div class="table-responsive"><table class="table table-dark"><tbody id="unassigned-list"></tbody></table></div></div></div></div></div>
+            <div id="tab-gamification" class="content-tab"><div class="row"><div class="col-md-8"><div class="table-responsive"><table class="table table-dark table-striped"><thead><tr><th>Rank</th><th>Name</th><th>Pts</th><th>Badge</th></tr></thead><tbody id="leaderboard-list"></tbody></table></div></div><div class="col-md-4 teacher-only"><div class="glass-panel p-3"><h5>Give Points</h5><input id="award-email" class="form-control mb-2" placeholder="Student Email"><input type="number" id="award-amount" class="form-control mb-2" placeholder="Points"><button type="button" class="btn btn-primary w-100" onclick="app.gamification.givePoints()">Award</button></div></div></div></div>
             <div id="tab-reports" class="content-tab"><div class="row"><div class="col-md-6"><div class="glass-panel p-3 border-danger mb-3"><h5>At-Risk</h5><ul id="ai-risk-list" class="list-group"></ul></div></div><div class="col-md-6"><button type="button" class="btn btn-success w-100 p-4" onclick="app.reports.exportCSV()">Download CSV Report</button></div></div></div>
             <div id="tab-policies" class="content-tab"><div class="glass-panel p-4"><h2>Policies</h2><p>1. Attendance Mandatory.<br>2. Respect All.</p><hr><button type="button" class="btn btn-outline-success" onclick="Swal.fire('Signed','','success')">Acknowledge</button></div></div>
             <div id="tab-settings" class="content-tab"><div class="glass-panel p-4"><h2>Settings</h2>
@@ -488,6 +491,7 @@
 
         let currentUser = null, currentRole = null, linkedChildEmail = null;
         let calDate = new Date();
+        let appStartTime = Date.now(); // Track when the app started
         let sessionTimer;
         const resetSession = () => { clearTimeout(sessionTimer); if(currentUser) sessionTimer = setTimeout(() => { Swal.fire('Timeout', 'Session expired', 'warning').then(()=>app.auth.logout()); }, 1800000); };
         window.onclick = resetSession; window.onkeypress = resetSession;
@@ -546,6 +550,8 @@
                     document.querySelectorAll('.teacher-only').forEach(e => e.classList.toggle('d-none', isS || isP));
                     document.querySelectorAll('.student-only').forEach(e => e.classList.toggle('d-none', !isS));
                     document.querySelectorAll('.admin-only').forEach(e => e.classList.toggle('d-none', !isA));
+                    // Hide elements not for students
+                    document.querySelectorAll('.not-student').forEach(e => e.classList.toggle('d-none', isS));
 
                     const exInput = document.getElementById('excuse-email-input'); const exSelect = document.getElementById('excuse-student-select');
                     if(isT || isA) { exInput.classList.add('d-none'); exSelect.classList.remove('d-none'); app.classroom.loadStudentDropdown(); } 
@@ -556,7 +562,7 @@
                     toggleView(true); animateCounters();
                     
                     app.charts.init(); app.calendar.render(); app.messages.load();
-                    if(isT||isA) { app.attendance.loadRecent(); app.discipline.loadIncidents(); app.teachernet.load(); app.classroom.loadSections(); }
+                    if(isT||isA) { app.attendance.loadRecent(); app.discipline.loadIncidents(); app.teachernet.load(); app.classroom.loadSections(); app.dashboard.load(); }
                     if(isA) { app.admin.loadUsers(); app.admin.loadAudit(); }
                     if(isS) app.student.genID(d);
                     app.excuses.load(); app.gamification.loadLeaderboard(); app.reports.runAI(); app.notifications.listen(user.uid);
@@ -577,7 +583,100 @@
                 openSidebar: () => { document.querySelector('.sidebar').classList.add('show'); document.querySelector('.sidebar-backdrop').classList.add('show'); }, 
                 closeSidebar: () => { document.querySelector('.sidebar').classList.remove('show'); document.querySelector('.sidebar-backdrop').classList.remove('show'); } 
             },
+            dashboard: {
+                load: () => {
+                    // Listen to users for student count
+                    onValue(ref(db, 'users'), s => {
+                        let count = 0;
+                        s.forEach(c => { 
+                            if(String(c.val().role).toLowerCase() === 'student') count++; 
+                        });
+                        // Directly update text to avoid animation conflict
+                        const el = document.getElementById('stat-students');
+                        el.innerText = count;
+                        el.classList.remove('counter-anim'); // Stop conflicting animation
+                        
+                        app.dashboard.totalStudents = count;
+                        app.dashboard.recalcAttendance();
+                    });
+
+                    // Listen to incidents
+                    onValue(ref(db, 'incidents'), s => {
+                        const el = document.getElementById('stat-incidents');
+                        el.innerText = s.size;
+                        el.classList.remove('counter-anim');
+
+                        // Count critical for alerts
+                        let crit = 0;
+                        s.forEach(c => { if(c.val().severity === 'Critical') crit++; });
+                        const elAlert = document.getElementById('stat-alerts');
+                        elAlert.innerText = crit;
+                        elAlert.classList.remove('counter-anim');
+                    });
+
+                    // Listen to attendance for today & chart
+                    onValue(ref(db, 'attendance'), s => {
+                        const logs = [];
+                        s.forEach(c => logs.push(c.val()));
+                        app.dashboard.processAttendance(logs);
+                    });
+                },
+                totalStudents: 0,
+                todayCount: 0,
+                recalcAttendance: () => {
+                    if (app.dashboard.totalStudents > 0) {
+                        const pct = Math.round((app.dashboard.todayCount / app.dashboard.totalStudents) * 100);
+                        const el = document.getElementById('stat-attendance');
+                        el.innerText = pct + '%';
+                        el.classList.remove('counter-anim');
+                    }
+                },
+                processAttendance: (logs) => {
+                    const today = new Date().toISOString().split('T')[0];
+                    const days = {};
+                    
+                    // Init last 5 days
+                    for(let i=4; i>=0; i--) {
+                        const d = new Date(); d.setDate(d.getDate() - i);
+                        days[d.toISOString().split('T')[0]] = 0;
+                    }
+
+                    const todaySet = new Set();
+
+                    logs.forEach(l => {
+                        const dateStr = new Date(l.timestamp).toISOString().split('T')[0];
+                        if (days.hasOwnProperty(dateStr)) {
+                            // Simple count or unique? Let's do unique students per day for accuracy
+                            // Note: Simple increment for demo if uniqueness is hard to track without map
+                            // We will assume logs are unique per student per day or just count logs
+                            days[dateStr]++;
+                        }
+                        if (dateStr === today) {
+                            todaySet.add(l.email);
+                        }
+                    });
+
+                    app.dashboard.todayCount = todaySet.size;
+                    app.dashboard.recalcAttendance();
+
+                    // Update Chart
+                    const labels = Object.keys(days).map(d => new Date(d).toLocaleDateString(undefined, {weekday:'short'}));
+                    const data = Object.values(days);
+                    app.charts.update(labels, data);
+                }
+            },
             classroom: {
+                createSectionFromDash: async () => {
+                    const { value: name } = await Swal.fire({
+                        title: 'New Class Name',
+                        input: 'text',
+                        showCancelButton: true
+                    });
+                    if (name) {
+                        await set(push(ref(db,'sections')), { name: sanitize(name), teacherId: currentUser.uid });
+                        Swal.fire('Created','Class created successfully','success');
+                    }
+                },
                 createSection: async () => { await set(push(ref(db,'sections')), { name: sanitize(document.getElementById('new-section-name').value), teacherId: currentUser.uid }); Swal.fire('Created','','success'); },
                 loadSections: () => onValue(ref(db,'sections'), s => { const e=document.getElementById('select-target-section'); const l=document.getElementById('my-sections-list'); e.innerHTML=''; if(l) l.innerHTML=''; s.forEach(c => { const v=c.val(); if(currentRole==='admin'||v.teacherId===currentUser.uid){ e.innerHTML+=`<option value="${c.key}">${v.name}</option>`; if(l && v.teacherId===currentUser.uid) l.innerHTML+=`<li class="list-group-item bg-dark text-white border-0">${v.name}</li>`; }}); }),
                 loadStudentDropdown: () => { onValue(ref(db,'users'), s=>{ const sel = document.getElementById('excuse-student-select'); sel.innerHTML='<option value="">Select Student...</option>'; s.forEach(c=>{ const u=c.val(); if(u.role==='student') sel.innerHTML+=`<option value="${u.email}">${u.username||u.email}</option>`; }); }); },
@@ -588,18 +687,52 @@
             attendance: {
                 scanner: null,
                 startScanner: () => { 
-                    const r=document.getElementById('reader'); if(!r||app.attendance.scanner) return; 
+                    const r = document.getElementById('reader'); 
+                    if(!r) return;
+                    
+                    // Cleanup existing scanner if any
+                    if(app.attendance.scanner) {
+                         app.attendance.scanner.stop().then(() => {
+                             app.attendance.scanner.clear();
+                             app.attendance.initScannerInternal();
+                         }).catch(err => {
+                             console.error("Failed to stop scanner", err);
+                             app.attendance.initScannerInternal(); // Try anyway
+                         });
+                    } else {
+                        app.attendance.initScannerInternal();
+                    }
+                },
+                initScannerInternal: () => {
                     try {
                         app.attendance.scanner = new Html5Qrcode("reader"); 
                         app.attendance.scanner.start({facingMode:"environment"}, {fps:10, qrbox:{width:250,height:250}}, (t)=>{ 
                             document.getElementById('scan-result').innerHTML=`<span class="text-success">✅ ${t}</span>`; 
                             new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(()=>{}); 
-                            app.attendance.manualLogInternal(t); app.attendance.scanner.pause(); setTimeout(()=>app.attendance.scanner.resume(),2000); 
-                        }, (e)=>{}).catch(()=>{Swal.fire('Error','Camera fail','error')}); 
-                        document.getElementById('btn-start-scan').classList.add('d-none'); document.getElementById('btn-stop-scan').classList.remove('d-none'); 
-                    } catch(e) { Swal.fire('Error', 'Library Error', 'error'); }
+                            app.attendance.manualLogInternal(t); 
+                            app.attendance.scanner.pause(); 
+                            setTimeout(()=>app.attendance.scanner.resume(), 2000); 
+                        }, (e)=>{}).catch((err)=>{
+                            console.error(err);
+                            Swal.fire('Error','Camera permission denied or not found','error');
+                        }); 
+                        document.getElementById('btn-start-scan').classList.add('d-none'); 
+                        document.getElementById('btn-stop-scan').classList.remove('d-none'); 
+                    } catch(e) { 
+                        Swal.fire('Error', 'Library Error: ' + e.message, 'error'); 
+                    }
                 },
-                stopScanner: async () => { if(app.attendance.scanner) { await app.attendance.scanner.stop(); app.attendance.scanner.clear(); app.attendance.scanner=null; document.getElementById('btn-start-scan').classList.remove('d-none'); document.getElementById('btn-stop-scan').classList.add('d-none'); } },
+                stopScanner: async () => { 
+                    if(app.attendance.scanner) { 
+                        try {
+                            await app.attendance.scanner.stop(); 
+                            app.attendance.scanner.clear(); 
+                        } catch(e) { console.log(e); }
+                        app.attendance.scanner=null; 
+                    }
+                    document.getElementById('btn-start-scan').classList.remove('d-none'); 
+                    document.getElementById('btn-stop-scan').classList.add('d-none'); 
+                },
                 processScan: async () => { const i=document.getElementById('scanner-input'); const v=i.value.trim(); if(!v) return; const q=query(ref(db,'users'),orderByChild('email'),equalTo(v)); const s=await get(q); let e=v; if(!s.exists()) { const u=await get(ref(db,'users/'+v)); if(u.exists()) e=u.val().email; else { document.getElementById('scan-result').innerHTML='<span class="text-danger">Not Found</span>'; return; } } const d=document.getElementById('manual-date').value; const t=d?new Date(d).getTime():Date.now(); await push(ref(db,'attendance'),{email:e, timestamp:t, status:new Date(t).getHours()>=8?'Late':'Present', recordedBy:currentUser.uid}); document.getElementById('scan-result').innerHTML=`<span class="text-success">Log: ${e}</span>`; i.value=''; i.focus(); },
                 manualLogInternal: async (e) => { if(!isOnline) { addToQueue('attendance',{email:e,timestamp:Date.now(),status:'Pending',recordedBy:currentUser.uid}); return; } await push(ref(db,'attendance'), { email:e, timestamp:Date.now(), status: new Date().getHours()>=8?'Late':'Present', recordedBy:currentUser.uid }); },
                 loadRecent: () => onValue(query(ref(db,'attendance'), orderByChild('timestamp')), s => { const l=document.getElementById('recent-attendance'); l.innerHTML=''; const d=[]; s.forEach(c=>d.push(c.val())); d.reverse().slice(0,20).forEach(i=>l.innerHTML+=`<li class="list-group-item bg-transparent text-white border-bottom border-secondary small d-flex justify-content-between"><span>${i.email}</span><span class="badge ${i.status==='Late'?'bg-warning':'bg-success'}">${i.status}</span></li>`); }),
@@ -647,13 +780,94 @@
                 callUser: async (tid, tname) => { const uSnap = await get(ref(db, 'users/' + currentUser.uid)); await push(ref(db, 'notifications/' + tid), { type: 'call', from: uSnap.val().username||'Admin', timestamp: Date.now() }); Swal.fire('Calling...', `Notifying ${tname}`, 'success'); },
                 loadAudit: () => onValue(query(ref(db,'auditLogs'), orderByChild('timestamp')), s=>{ const l=document.getElementById('admin-audit-list'); if(l){l.innerHTML=''; const lg=[]; s.forEach(c=>lg.push(c.val())); lg.reverse().slice(0,20).forEach(x=>l.innerHTML+=`<li class="list-group-item bg-transparent text-white border-bottom border-secondary small py-2"><span class="text-info">${new Date(x.timestamp).toLocaleTimeString()}</span> <strong>${x.action}</strong> ${x.details}</li>`); } }) 
             },
-            calendar: { render: () => { /* Logic same as v9 */ const m=calDate.getMonth(), y=calDate.getFullYear(); document.getElementById('calendar-month-display').innerText = new Date(y,m).toLocaleString('default',{month:'long',year:'numeric'}); const fd=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate(); onValue(ref(db,'events'), s=>{ const evs=[]; s.forEach(c=>evs.push(c.val())); const g=document.getElementById('calendar-grid'); g.innerHTML=''; for(let i=0;i<fd;i++) g.innerHTML+=`<div class="col"></div>`; for(let i=1;i<=dim;i++) { const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; let h=''; evs.forEach(e=>{ if(e.dateStr===ds) h+=`<div class="calendar-event ${e.type==='Exam'?'evt-exam':(e.type==='Holiday'?'evt-holiday':'evt-activity')}">${e.title}</div>`; }); g.innerHTML+=`<div class="col calendar-day" onclick="app.calendar.expand('${ds}')"><span class="calendar-day-num">${i}</span>${h}</div>`; } }); }, expand: async (ds) => { if(currentRole==='student'){Swal.fire('Events','View Only','info');return;} const {value:t} = await Swal.fire({input:'text',title:`Add: ${ds}`}); if(t) { const {value:ty} = await Swal.fire({input:'select',inputOptions:{'Activity':'Activity','Exam':'Exam','Holiday':'Holiday'}}); await push(ref(db,'events'),{title:sanitize(t),dateStr:ds,type:ty}); app.calendar.render(); } }, nextMonth: () => { calDate.setMonth(calDate.getMonth()+1); app.calendar.render(); }, prevMonth: () => { calDate.setMonth(calDate.getMonth()-1); app.calendar.render(); } },
+            calendar: { 
+                render: () => { 
+                    /* Logic same as v9 */ 
+                    const m=calDate.getMonth(), y=calDate.getFullYear(); 
+                    document.getElementById('calendar-month-display').innerText = new Date(y,m).toLocaleString('default',{month:'long',year:'numeric'}); 
+                    const fd=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate(); 
+                    
+                    onValue(ref(db,'events'), s=>{ 
+                        const evs=[]; 
+                        s.forEach(c=>evs.push(c.val())); 
+                        const g=document.getElementById('calendar-grid'); 
+                        g.innerHTML=''; 
+                        for(let i=0;i<fd;i++) g.innerHTML+=`<div class="col"></div>`; 
+                        for(let i=1;i<=dim;i++) { 
+                            const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; 
+                            let h=''; 
+                            let hasEvent = false;
+                            evs.forEach(e=>{ 
+                                if(e.dateStr===ds) {
+                                    h+=`<div class="calendar-event ${e.type==='Exam'?'evt-exam':(e.type==='Holiday'?'evt-holiday':'evt-activity')}">${e.title}</div>`; 
+                                    hasEvent = true;
+                                }
+                            }); 
+                            g.innerHTML+=`<div class="col calendar-day ${hasEvent ? 'has-event' : ''}" onclick="app.calendar.expand('${ds}')"><span class="calendar-day-num">${i}</span>${h}</div>`; 
+                        } 
+                    }); 
+                }, 
+                expandDay: (ds) => app.calendar.expand(ds),
+                expand: async (ds) => { 
+                    if(currentRole==='student'){Swal.fire('Events','View Only','info');return;} 
+                    const {value:t} = await Swal.fire({input:'text',title:`Add: ${ds}`}); 
+                    if(t) { 
+                        const {value:ty} = await Swal.fire({input:'select',inputOptions:{'Activity':'Activity','Exam':'Exam','Holiday':'Holiday'}}); 
+                        await push(ref(db,'events'),{title:sanitize(t),dateStr:ds,type:ty}); 
+                        app.calendar.render(); 
+                    } 
+                }, 
+                nextMonth: () => { calDate.setMonth(calDate.getMonth()+1); app.calendar.render(); }, 
+                prevMonth: () => { calDate.setMonth(calDate.getMonth()-1); app.calendar.render(); } 
+            },
             teachernet: { send: async () => { const i=document.getElementById('teachernet-input'); if(i.value) { await push(ref(db,'teachernet_messages'), { text:sanitize(i.value), sender:currentUser.username||currentUser.email, uid:currentUser.uid, timestamp:Date.now(), avatar:currentUser.avatar||'' }); i.value=''; } }, load: () => onValue(query(ref(db,'teachernet_messages'), orderByChild('timestamp')), s=>{ const c=document.getElementById('teachernet-chat'); c.innerHTML=''; const m=[]; s.forEach(x=>m.push(x.val())); m.slice(-50).forEach(x=>{ const me=x.uid===currentUser.uid; c.innerHTML+=`<div class="chat-msg ${me?'mine':'theirs'} animate-in">${!me?`<div class="chat-avatar" style="background-image:url('${x.avatar||''}')"></div>`:''}<div class="chat-bubble"><small class="d-block text-white-50" style="font-size:0.7em">${x.sender}</small>${x.text}</div></div>`; }); c.scrollTop=c.scrollHeight; }) },
-            student: { genID: (u) => { document.getElementById('my-id-name').innerText=u.username||'Student'; document.getElementById('my-id-email').innerText=u.email; new QRCode(document.getElementById('my-id-qrcode'), {text:currentUser.uid, width:120, height:120}); }, downloadID: () => { const c=document.querySelector('#my-id-qrcode canvas'); if(c) { const l=document.createElement('a'); l.download='ID.png'; l.href=c.toDataURL(); l.click(); } }, viewID: () => document.getElementById('student-id-view').classList.remove('d-none') },
+            student: { 
+                genID: (u) => { 
+                    document.getElementById('my-id-name').innerText=u.username||'Student'; 
+                    document.getElementById('my-id-email').innerText=u.email; 
+                    // Defer QR generation to viewID
+                }, 
+                downloadID: () => { const c=document.querySelector('#my-id-qrcode canvas'); if(c) { const l=document.createElement('a'); l.download='ID.png'; l.href=c.toDataURL(); l.click(); } }, 
+                viewID: () => {
+                    const el = document.getElementById('student-id-view');
+                    el.classList.remove('d-none');
+                    // Generate QR here to ensure visibility
+                    const qrContainer = document.getElementById('my-id-qrcode');
+                    qrContainer.innerHTML = ''; // Clear previous
+                    if (currentUser && currentUser.email) {
+                        new QRCode(qrContainer, {
+                            text: currentUser.email,
+                            width: 128,
+                            height: 128
+                        });
+                    }
+                }
+            },
             gamification: { loadLeaderboard: () => onValue(query(ref(db,'users'), orderByChild('points')), s=>{ const l=document.getElementById('leaderboard-list'); l.innerHTML=''; const a=[]; s.forEach(x=>a.push(x.val())); a.reverse().forEach((u,i)=>{ if(u.role==='student') l.innerHTML+=`<tr class="animate-in"><td><span class="badge bg-dark border">${i+1}</span></td><td>${u.email}</td><td class="text-info fw-bold">${u.points||0}</td><td>${u.points>100?'🏆':''}</td></tr>`; }) }), givePoints: async () => { const e=document.getElementById('award-email').value; const p=+document.getElementById('award-amount').value; const s=await get(ref(db,'users')); let t=null; s.forEach(c=>{if(c.val().email===e)t=c.key}); if(t) { const o=s.val()[t].points||0; await update(ref(db,'users/'+t),{points:o+p}); Swal.fire('Sent','','success'); } } },
             messages: { post: async () => { await push(ref(db,'messages'), { title:document.getElementById('msg-title').value, body:sanitize(document.getElementById('msg-body').value), sender:currentUser.email, timestamp:Date.now() }); Swal.fire('Posted','','success'); }, load: () => onValue(ref(db,'messages'), s=>{ const l=document.getElementById('messages-list'); l.innerHTML=''; s.forEach(c=>{ const m=c.val(); l.innerHTML+=`<div class="card p-3 message-card animate-in"><h5>${m.title}</h5><p class="text-white-50">${m.body}</p><small class="text-muted">${new Date(m.timestamp).toLocaleDateString()}</small></div>`; }) }) },
             reports: { runAI: () => { /* Logic */ }, loadHeatmap: async () => { const s=await get(ref(db,'incidents')); const m=document.getElementById('behavior-heatmap'); if(m&&s.val()) { m.innerHTML=''; Object.values(s.val()).forEach(i=>{ m.innerHTML+=`<div class="heatmap-cell" style="background:${i.severity==='Critical'?'#ef4444':'#f59e0b'}" title="${i.description}"></div>`; }); } }, exportCSV: () => Swal.fire('Exporting...','','info') },
-            charts: { init: () => { new Chart(document.getElementById('attendanceChart'), {type:'line', data:{labels:['M','T','W','T','F'], datasets:[{label:'Trend',data:[90,95,88,92,96],borderColor:'#6366f1',tension:0.4}]}}); } },
+            charts: { 
+                instance: null,
+                init: () => { 
+                    const ctx = document.getElementById('attendanceChart');
+                    if (ctx) {
+                        app.charts.instance = new Chart(ctx, {
+                            type:'line', 
+                            data:{
+                                labels:['M','T','W','T','F'], 
+                                datasets:[{label:'Trend',data:[0,0,0,0,0],borderColor:'#6366f1',tension:0.4}]
+                            }
+                        }); 
+                    }
+                },
+                update: (labels, data) => {
+                    if (app.charts.instance) {
+                        app.charts.instance.data.labels = labels;
+                        app.charts.instance.data.datasets[0].data = data;
+                        app.charts.instance.update();
+                    }
+                }
+            },
             settings: { 
                 uploadAvatar: async () => { const f=document.getElementById('settings-avatar-file').files[0]; if(!f) return; const fd=new FormData(); fd.append('file',f); fd.append('upload_preset',CLOUDINARY_PRESET); try { Swal.fire({title:'Uploading...',didOpen:()=>Swal.showLoading()}); const r=await fetch(CLOUDINARY_URL,{method:'POST',body:fd}); const d=await r.json(); await update(ref(db,'users/'+currentUser.uid),{avatar:d.secure_url}); document.getElementById('nav-user-avatar').style.backgroundImage=`url(${d.secure_url})`; Swal.fire('Success','','success'); } catch(e){Swal.fire('Error','Upload fail','error')} }, 
                 setLang: () => {}, 
@@ -665,12 +879,27 @@
                     }
                 }
             },
-            notifications: { listen: (uid) => onValue(ref(db,'notifications/'+uid), s=>{ const d=s.val(); if(d) Object.entries(d).forEach(([k,v]) => { 
-                const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); audio.play().catch(()=>{}); 
-                if (Notification.permission === "granted") { new Notification("Incoming Call", { body: `Admin ${v.from} is calling you.` }); }
-                Swal.fire({title:'Incoming Call',text:`${v.from} is calling`,icon:'info',backdrop:`rgba(0,0,0,0.8)`}); 
-                remove(ref(db,'notifications/'+uid+'/'+k)); 
-            }) }) },
+            notifications: { 
+                listen: (uid) => onValue(ref(db,'notifications/'+uid), s=>{ 
+                    const d=s.val(); 
+                    if(d) Object.entries(d).forEach(([k,v]) => { 
+                        // Only ring if the notification is newer than when the app started (minus small buffer)
+                        // Or if it's very recent (< 1 minute old)
+                        const isRecent = (Date.now() - v.timestamp) < 60000; // 60 seconds
+                        
+                        if (v.timestamp > appStartTime || isRecent) {
+                            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); 
+                            audio.play().catch(()=>{}); 
+                            if (Notification.permission === "granted") { 
+                                new Notification("Incoming Call", { body: `Admin ${v.from} is calling you.` }); 
+                            }
+                            Swal.fire({title:'Incoming Call',text:`${v.from} is calling`,icon:'info',backdrop:`rgba(0,0,0,0.8)`}); 
+                        }
+                        // Remove it from DB so it doesn't trigger again next time
+                        remove(ref(db,'notifications/'+uid+'/'+k)); 
+                    }) 
+                }) 
+            },
             utils: { logAudit: (a,d) => push(ref(db,'auditLogs'),{action:a,details:d,user:currentUser.email,timestamp:Date.now()}), linkParentInternal: async (se, pe) => { const q=query(ref(db,'users'),orderByChild('email'),equalTo(pe)); const s=await get(q); if(!s.exists()) { Swal.fire('Error','Parent not found','error'); return; } const pk=Object.keys(s.val())[0]; await update(ref(db,'users/'+pk),{linkedChild:se}); Swal.fire('Linked!','','success'); app.utils.logAudit('LINK',`${pe}->${se}`); }, checkAutomation: () => {} }
         };
 
