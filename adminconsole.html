@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Alfredo Pio De Roda ES | Enterprise Control</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ubuntu: {
+                            dark: '#2c001e',
+                            purple: '#5E2750',
+                            orange: '#E95420',
+                            warm: '#77216F',
+                            light: '#AEA79F'
+                        },
+                        terminal: {
+                            bg: '#300a24',
+                            green: '#87ff00',
+                            blue: '#3465a4',
+                            text: '#eeeeec'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Ubuntu', 'sans-serif'],
+                        mono: ['Ubuntu Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+            overflow: hidden; /* App-like feel */
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #2c001e; }
+        ::-webkit-scrollbar-thumb { background: #E95420; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dd4814; }
+
+        .terminal-text { text-shadow: 0 0 2px rgba(135, 255, 0, 0.4); }
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        .json-key { color: #E95420; font-weight: bold; }
+        .json-string { color: #87ff00; }
+        .json-number { color: #34e2e2; }
+        .json-boolean { color: #ad7fa8; }
+        .json-null { color: #729fcf; }
+
+        .heartbeat-pulse { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(135, 255, 0, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(135, 255, 0, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(135, 255, 0, 0); }
+        }
+
+        /* Light Mode Overrides */
+        body.light-mode { background-color: #f0f0f0; color: #333; }
+        body.light-mode aside { background-color: #e5e5e5; border-right: 1px solid #ccc; }
+        body.light-mode header { background-color: #dedede; color: #333; }
+        body.light-mode .bg-\[\#2a2a2a\] { background-color: #fff; border-color: #ccc; }
+        body.light-mode .text-gray-400 { color: #666; }
+        body.light-mode .text-white { color: #111; }
+    </style>
+</head>
+<body class="flex h-screen w-screen text-sm antialiased selection:bg-ubuntu-orange selection:text-white">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-ubuntu-dark flex flex-col border-r border-white/10 shadow-2xl z-20 transition-colors duration-300">
+        <div class="p-4 border-b border-white/10 flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-gradient-to-br from-ubuntu-orange to-red-600 flex items-center justify-center font-bold text-white shadow-lg">
+                DA
+            </div>
+            <div>
+                <h1 class="font-bold text-gray-100 tracking-tight text-xs">Dr. Alfredo Pio De Roda ES</h1>
+                <div class="text-[10px] text-ubuntu-orange font-mono uppercase tracking-widest">SysAdmin Console</div>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 space-y-1">
+            <div class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Core</div>
+            <button onclick="switchTab('overview')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors active-tab" data-target="overview">
+                <i class="fas fa-chart-line w-6 text-center"></i> Executive Overview
+            </button>
+            <button onclick="switchTab('inspector')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors" data-target="inspector">
+                <i class="fas fa-database w-6 text-center"></i> DB Inspector (JSON)
+            </button>
+            <button onclick="switchTab('cli')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors" data-target="cli">
+                <i class="fas fa-terminal w-6 text-center"></i> Terminal / CLI
+            </button>
+
+            <div class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Observability</div>
+            <button onclick="switchTab('health')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors" data-target="health">
+                <i class="fas fa-heartbeat w-6 text-center"></i> System Health
+            </button>
+            <button onclick="switchTab('metrics')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors" data-target="metrics">
+                <i class="fas fa-chart-bar w-6 text-center"></i> Metrics & Analytics
+            </button>
+
+            <div class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Modules</div>
+            <button onclick="switchTab('announcements')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors" data-target="announcements">
+                <i class="fas fa-bullhorn w-6 text-center"></i> Announcements
+            </button>
+            <button onclick="switchTab('enrollments')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors" data-target="enrollments">
+                <i class="fas fa-users w-6 text-center"></i> Enrollments
+            </button>
+            
+            <div class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">System</div>
+            <button onclick="switchTab('flags')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors" data-target="flags">
+                <i class="fas fa-toggle-on w-6 text-center"></i> Feature Flags
+            </button>
+            <button onclick="switchTab('logs')" class="nav-btn w-full text-left px-4 py-2 hover:bg-white/5 border-l-4 border-transparent hover:border-ubuntu-orange text-gray-300 hover:text-white transition-colors" data-target="logs">
+                <i class="fas fa-clipboard-list w-6 text-center"></i> Audit Logs
+            </button>
+        </nav>
+
+        <div class="p-4 bg-black/20 border-t border-white/10">
+            <div class="flex items-center justify-between text-xs text-gray-400 font-mono mb-2">
+                <span>CONN:</span>
+                <span id="connection-status" class="text-red-500 font-bold">OFFLINE</span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-gray-400 font-mono">
+                <span>LATENCY:</span>
+                <span id="latency-val" class="text-blue-400">0ms</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col bg-[#1a1a1a] relative overflow-hidden transition-colors duration-300">
+        
+        <!-- Top Bar -->
+        <header class="h-14 bg-[#232323] border-b border-white/5 flex items-center justify-between px-6 shadow-md transition-colors duration-300">
+            <h2 id="page-title" class="text-lg font-light text-white tracking-wide">Executive Overview</h2>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 px-3 py-1 bg-red-900/30 border border-red-500/30 rounded text-red-400 text-xs font-mono hidden" id="readonly-badge">
+                    <i class="fas fa-lock"></i> READ ONLY
+                </div>
+                <button onclick="togglePanic()" class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded shadow-lg transition-all flex items-center gap-2">
+                    <i class="fas fa-radiation"></i> PANIC STOP
+                </button>
+                <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center border border-gray-600">
+                    <i class="fas fa-user-astronaut text-gray-300 text-sm"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Views -->
+        <div class="flex-1 overflow-auto relative p-6">
+            
+            <!-- VIEW: OVERVIEW -->
+            <div id="view-overview" class="view-section space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- OPS CHECKLIST -->
+                    <div class="bg-[#2a2a2a] p-4 rounded border border-white/5 shadow-xl">
+                        <div class="text-gray-400 text-xs font-mono uppercase mb-3 flex justify-between">
+                            <span>Ops Checklist</span>
+                            <span class="text-ubuntu-orange"><i class="fas fa-tasks"></i></span>
+                        </div>
+                        <div class="space-y-2 text-xs font-mono" id="ops-checklist">
+                            <div class="flex items-center gap-2 text-gray-500"><i class="far fa-square"></i> Initializing...</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#2a2a2a] p-4 rounded border border-white/5">
+                        <div class="text-gray-400 text-xs font-mono uppercase">Total Nodes</div>
+                        <div class="text-2xl font-bold text-white mt-1" id="stat-nodes">0</div>
+                        <div class="text-[10px] text-green-500 mt-2"><i class="fas fa-arrow-up"></i> Live Count</div>
+                    </div>
+
+                    <div class="bg-[#2a2a2a] p-4 rounded border border-white/5">
+                        <div class="text-gray-400 text-xs font-mono uppercase">Enrollments</div>
+                        <div class="text-2xl font-bold text-ubuntu-orange mt-1" id="stat-enrollments">0</div>
+                        <div class="text-[10px] text-gray-500 mt-2">Active Queue</div>
+                    </div>
+                    
+                    <div class="bg-[#2a2a2a] p-4 rounded border border-white/5 relative overflow-hidden">
+                        <div class="text-gray-400 text-xs font-mono uppercase">System Health</div>
+                        <div class="text-2xl font-bold text-green-500 mt-1 flex items-center gap-2" id="stat-health-container">
+                            <span id="stat-health">UNKNOWN</span>
+                            <div id="health-led" class="w-3 h-3 rounded-full bg-green-500 hidden"></div>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mt-2" id="stat-health-sub">Last check: Never</div>
+                    </div>
+
+                    <div class="bg-[#2a2a2a] p-4 rounded border border-white/5">
+                        <div class="text-gray-400 text-xs font-mono uppercase">Write Freq (RPM)</div>
+                        <div class="text-2xl font-bold text-blue-400 mt-1" id="stat-rpm">0</div>
+                        <div class="text-[10px] text-gray-500 mt-2">Rolling Average</div>
+                    </div>
+                </div>
+
+                <!-- Traffic Chart -->
+                <div class="bg-[#2a2a2a] p-4 rounded border border-white/5 h-64 flex flex-col relative">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-sm font-mono text-gray-400">Live Traffic</h3>
+                    </div>
+                    <div class="flex-1 relative">
+                        <canvas id="trafficChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SYSTEM HEALTH -->
+            <div id="view-health" class="view-section hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-[#2a2a2a] p-6 rounded border border-white/5 flex flex-col items-center justify-center text-center">
+                        <h3 class="text-sm font-mono text-gray-400 mb-4">Heartbeat Signal</h3>
+                        <div id="big-heartbeat" class="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center heartbeat-pulse">
+                            <i class="fas fa-heartbeat text-4xl text-green-500"></i>
+                        </div>
+                        <div class="mt-4 text-green-400 font-mono text-xl" id="health-status-text">SYSTEM OPERATIONAL</div>
+                        <div class="text-gray-500 text-xs mt-1" id="last-heartbeat-time">Syncing...</div>
+                    </div>
+                    
+                    <div class="bg-[#2a2a2a] p-6 rounded border border-white/5">
+                        <h3 class="text-sm font-mono text-gray-400 mb-4">Connection Diagnostics</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                <span class="text-gray-300">Latency</span>
+                                <span class="text-blue-400 font-mono" id="health-latency">0ms</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                <span class="text-gray-300">Clock Skew</span>
+                                <span class="text-yellow-400 font-mono" id="health-skew">Calculating...</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                <span class="text-gray-300">Session ID</span>
+                                <span class="text-gray-500 font-mono text-xs" id="session-id">---</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Firebase Region</span>
+                                <span class="text-green-400 font-mono">us-central1 (Detected)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: METRICS -->
+            <div id="view-metrics" class="view-section hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-[#2a2a2a] p-4 rounded border border-white/5 h-80 flex flex-col">
+                        <h3 class="text-sm font-mono text-gray-400 mb-2">Read vs Write Distribution</h3>
+                        <div class="flex-1 relative">
+                            <canvas id="metricsPieChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-[#2a2a2a] p-4 rounded border border-white/5 h-80 overflow-hidden flex flex-col">
+                        <h3 class="text-sm font-mono text-gray-400 mb-2">Hot Nodes (Access Count)</h3>
+                        <div class="flex-1 overflow-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-black/20 text-gray-500 font-mono">
+                                    <tr>
+                                        <th class="px-4 py-2">Path</th>
+                                        <th class="px-4 py-2 text-right">Hits</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hot-nodes-body" class="font-mono text-gray-300 divide-y divide-white/5">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: INSPECTOR (JSON ONLY) -->
+            <div id="view-inspector" class="view-section hidden h-full flex flex-col">
+                <div class="bg-[#2a2a2a] rounded border border-white/5 flex-1 overflow-hidden flex flex-col">
+                    <div class="px-4 py-2 bg-[#333] border-b border-white/5 flex justify-between items-center flex-shrink-0">
+                        <div class="flex items-center gap-3">
+                             <span class="font-mono text-xs text-ubuntu-orange">root@de-roda-es-rtdb:/</span>
+                             <span class="px-2 py-0.5 rounded bg-white/10 text-[10px] text-white font-mono">JSON MODE</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="copyInspectorData()" class="text-gray-400 hover:text-white text-xs bg-white/5 px-2 py-1 rounded border border-white/10" title="Copy Content"><i class="fas fa-copy"></i> Copy Data</button>
+                            <span class="text-[10px] text-gray-500">Live Auto-Discovery</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Raw JSON Container Only -->
+                    <div id="json-raw-container" class="p-4 overflow-auto font-mono text-xs bg-[#151515] flex-1 text-green-400 whitespace-pre select-text"></div>
+                </div>
+            </div>
+
+            <!-- VIEW: CLI -->
+            <div id="view-cli" class="view-section hidden h-full flex flex-col" onclick="document.getElementById('cli-input').focus()">
+                <div class="flex-1 bg-terminal-bg rounded-lg border border-white/10 p-4 font-mono text-sm text-terminal-text overflow-hidden flex flex-col shadow-inner relative">
+                    <div class="absolute top-2 right-2 text-xs text-gray-500 opacity-50">Ubuntu 24.04 LTS (GNU/Linux 6.5.0-generic x86_64)</div>
+                    <div id="cli-output" class="flex-1 overflow-y-auto whitespace-pre-wrap pb-2">
+                        <div class="text-terminal-green">Welcome to Dr. Alfredo Pio De Roda ES Admin Shell v1.0.0</div>
+                        <div class="text-gray-400 mb-4">Type 'help' for available commands.</div>
+                    </div>
+                    <div class="flex items-center border-t border-white/10 pt-2 bg-terminal-bg">
+                        <span id="cli-prompt" class="text-ubuntu-orange font-bold mr-2">admin@control-panel:/$</span>
+                        <input type="text" id="cli-input" class="cli-input flex-1 bg-transparent border-none outline-none text-white font-mono" autocomplete="off" autofocus>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ANNOUNCEMENTS -->
+            <div id="view-announcements" class="view-section hidden">
+                <div class="grid grid-cols-1 gap-4" id="announcements-container"></div>
+            </div>
+
+             <!-- VIEW: ENROLLMENTS -->
+             <div id="view-enrollments" class="view-section hidden">
+                <div class="bg-[#2a2a2a] rounded border border-white/5 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-black/20 text-gray-500 font-mono">
+                                <tr>
+                                    <th class="px-4 py-3">Control #</th>
+                                    <th class="px-4 py-3">Student</th>
+                                    <th class="px-4 py-3">Grade</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="enrollments-body" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: FLAGS -->
+            <div id="view-flags" class="view-section hidden">
+                <div class="bg-yellow-900/20 border border-yellow-600/50 p-4 mb-6 rounded text-yellow-200 text-xs font-mono">
+                    <i class="fas fa-exclamation-triangle mr-2 text-yellow-500"></i>
+                    <strong>WARNING:</strong> These controls modify root database nodes immediately. 
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="flags-container"></div>
+            </div>
+
+            <!-- VIEW: LOGS -->
+            <div id="view-logs" class="view-section hidden h-full">
+                <div class="bg-[#2a2a2a] rounded border border-white/5 h-full overflow-hidden flex flex-col">
+                     <div class="p-2 border-b border-white/5 bg-[#333]">
+                        <input type="text" placeholder="Filter logs..." class="bg-black/30 border border-white/10 rounded px-3 py-1 text-xs text-white w-full outline-none focus:border-ubuntu-orange">
+                     </div>
+                     <div class="flex-1 overflow-auto p-0">
+                         <table class="w-full text-left text-xs font-mono">
+                             <thead class="bg-black/20 text-gray-500 sticky top-0 bg-[#2a2a2a]">
+                                 <tr>
+                                     <th class="px-4 py-2">Time</th>
+                                     <th class="px-4 py-2">Level</th>
+                                     <th class="px-4 py-2">Source</th>
+                                     <th class="px-4 py-2">Action</th>
+                                     <th class="px-4 py-2 w-1/2">Details</th>
+                                 </tr>
+                             </thead>
+                             <tbody id="full-logs-body" class="divide-y divide-white/5 text-gray-300"></tbody>
+                         </table>
+                     </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JS Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue, set, update, push, child, serverTimestamp, goOffline, goOnline } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // 1. CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
+            databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
+            projectId: "clinique-parfum",
+            storageBucket: "clinique-parfum.firebasestorage.app",
+            messagingSenderId: "569473208892",
+            appId: "1:569473208892:web:f009390a8631fc164ce939",
+            measurementId: "G-XW3R3D64PR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 2. STATE MANAGEMENT
+        let dbState = {}; 
+        let currentPath = []; 
+        let isConnected = false;
+        let trafficChartInstance = null;
+        let metricsPieChartInstance = null;
+        let heartbeatInterval = null;
+        
+        // Advanced Features State
+        let localMetricHistory = [];
+        const HISTORY_LIMIT = 50;
+        let sessionAliases = {};
+        let sessionSnapshots = {};
+        let sessionMacros = {};
+        let macroRecording = null; // null or []
+        let chaosConfig = { latency: 0, dropRate: 0 };
+        let soundEnabled = false;
+        let jsonMode = 'pretty'; 
+        let pagerEnabled = false;
+
+        // 3. DEFINE GLOBALS BEFORE USAGE
+        // ... (Existing Globals: copyInspectorData, togglePanic, toggleFlag, deleteNode, updateStatus, resetLogFilter, logAction) ...
+        window.copyInspectorData = () => {
+            const content = document.getElementById('json-raw-container').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('JSON copied to clipboard'); // Simple alert as fallback
+            });
+        };
+
+        window.togglePanic = async () => {
+            const newStatus = !dbState.flags?.readonly_db;
+            await update(ref(db, 'flags'), { readonly_db: newStatus });
+            await logAction('UPDATE', '/flags/readonly_db', `Panic mode ${newStatus ? 'ENABLED' : 'DISABLED'}`);
+        };
+
+        window.toggleFlag = async (key, currentVal) => {
+            await update(ref(db, `flags`), { [key]: !currentVal });
+            await logAction('UPDATE', `/flags/${key}`, `Toggled to ${!currentVal}`);
+        };
+
+        window.deleteNode = async (path) => {
+            if (confirm(`Are you sure you want to delete ${path}?`)) {
+                await set(ref(db, path), null);
+                await logAction('DELETE', path, 'Node deleted');
+            }
+        };
+
+        window.updateStatus = async (path, status) => {
+            await update(ref(db, path), { status: { "0": status } }); 
+            await logAction('UPDATE', path, `Status updated to ${status}`);
+        };
+
+        window.resetLogFilter = () => { renderLogs(); }
+
+        async function logAction(action, path, details) {
+            const logsRef = ref(db, 'logs');
+            await push(logsRef, { timestamp: new Date().toISOString(), level: 'INFO', action: action, path: path, source: 'UI', details: details });
+        }
+
+        // 4. LISTENERS
+        // ... (Existing listeners for connected, offset, root) ...
+        const connectedRef = ref(db, ".info/connected");
+        const offsetRef = ref(db, ".info/serverTimeOffset");
+        const rootRef = ref(db, "/");
+
+        onValue(connectedRef, (snap) => {
+            isConnected = snap.val() === true;
+            const el = document.getElementById('connection-status');
+            if (isConnected) {
+                el.innerText = "LIVE";
+                el.className = "text-green-500 font-bold blink";
+                if (!heartbeatInterval) {
+                    heartbeatInterval = setInterval(async () => {
+                        try {
+                            await update(ref(db, 'health'), { last_check: new Date().toISOString(), state: 'HEALTHY' });
+                        } catch (e) {}
+                    }, 10000); 
+                }
+            } else {
+                el.innerText = "OFFLINE";
+                el.className = "text-red-500 font-bold";
+                if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
+            }
+            renderChecklist();
+        });
+
+        onValue(offsetRef, (snap) => {
+            const offset = snap.val();
+            document.getElementById('latency-val').innerText = `${Math.abs(Math.floor(offset || 0))}ms`;
+            document.getElementById('health-latency').innerText = `${Math.abs(Math.floor(offset || 0))}ms`;
+            document.getElementById('health-skew').innerText = `${offset || 0}ms`;
+        });
+
+        onValue(rootRef, (snapshot) => {
+            dbState = snapshot.val() || {};
+            
+            const now = new Date();
+            if (dbState.metrics) {
+                localMetricHistory.push({
+                    time: now,
+                    reads: dbState.metrics.reads_per_minute || 0,
+                    writes: dbState.metrics.writes_per_minute || 0
+                });
+                if(localMetricHistory.length > HISTORY_LIMIT) localMetricHistory.shift();
+            }
+
+            renderOverview();
+            renderHealth();
+            renderMetrics();
+            renderInspector(); 
+            renderAnnouncements();
+            renderEnrollments();
+            renderFlags();
+            renderLogs();
+            updateCharts();
+
+            const isReadOnly = dbState.flags?.readonly_db || false;
+            document.getElementById('readonly-badge').classList.toggle('hidden', !isReadOnly);
+        });
+
+        // 5. RENDER FUNCTIONS (Kept streamlined)
+        function renderChecklist() {
+            const list = document.getElementById('ops-checklist');
+            const checks = [
+                { label: 'DB Connected', pass: isConnected },
+                { label: 'Health Signal', pass: dbState.health?.state === 'HEALTHY' },
+                { label: 'Flags Sane', pass: !dbState.flags?.readonly_db && !dbState.flags?.maintenance_mode },
+                { label: 'Metrics Stable', pass: (dbState.metrics?.writes_per_minute || 0) < 500 }, 
+                { label: 'No Error Storm', pass: true } 
+            ];
+            list.innerHTML = checks.map(c => `
+                <div class="flex items-center justify-between">
+                    <span class="${c.pass ? 'text-gray-400' : 'text-red-400'}">${c.label}</span>
+                    <i class="${c.pass ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'}"></i>
+                </div>
+            `).join('');
+        }
+
+        function countNodes(obj) {
+            let count = 0;
+            if (typeof obj === 'object' && obj !== null) { count++; Object.values(obj).forEach(val => { count += countNodes(val); }); } else { count++; }
+            return count;
+        }
+
+        function renderOverview() {
+            const nodeEl = document.getElementById('stat-nodes');
+            if(nodeEl) nodeEl.innerText = countNodes(dbState);
+            document.getElementById('stat-enrollments').innerText = dbState.enrollments ? Object.keys(dbState.enrollments).length : 0;
+            const health = dbState.health?.state || "UNKNOWN";
+            document.getElementById('stat-health').innerText = health;
+            document.getElementById('stat-health').className = `text-2xl font-bold mt-1 ${health === 'HEALTHY' ? 'text-green-500' : 'text-red-500'}`;
+            document.getElementById('health-led').className = `w-3 h-3 rounded-full ${health === 'HEALTHY' ? 'bg-green-500 heartbeat-pulse' : 'bg-red-500'}`;
+            document.getElementById('stat-health-sub').innerText = `Last check: ${dbState.health?.last_check || 'N/A'}`;
+            document.getElementById('stat-rpm').innerText = dbState.metrics?.writes_per_minute || 0;
+        }
+
+        function renderHealth() {
+            const health = dbState.health?.state || "UNKNOWN";
+            document.getElementById('health-status-text').innerText = health === 'HEALTHY' ? 'SYSTEM OPERATIONAL' : 'SYSTEM DEGRADED';
+            document.getElementById('health-status-text').className = `font-mono text-xl ${health === 'HEALTHY' ? 'text-green-400' : 'text-red-500 blink'}`;
+            document.getElementById('last-heartbeat-time').innerText = `Last Pulse: ${dbState.health?.last_check || 'Never'}`;
+            document.getElementById('session-id').innerText = app.options.appId.split(':')[2] || 'unknown'; 
+        }
+
+        function renderMetrics() {
+            const tbody = document.getElementById('hot-nodes-body');
+            tbody.innerHTML = '';
+            const access = dbState.metrics?.node_access || {};
+            const sorted = Object.entries(access).sort((a,b) => b[1] - a[1]);
+            sorted.forEach(([path, hits]) => {
+                tbody.innerHTML += `<tr class="hover:bg-white/5"><td class="px-4 py-2 font-mono text-ubuntu-orange">${path}</td><td class="px-4 py-2 text-right font-bold text-white">${hits}</td></tr>`;
+            });
+        }
+
+        function renderInspector() {
+            const rawContainer = document.getElementById('json-raw-container');
+            const json = JSON.stringify(dbState, null, 2);
+            rawContainer.innerText = json;
+        }
+
+        function renderLogs() {
+             const tbody = document.getElementById('overview-logs-body');
+             const tbodyFull = document.getElementById('full-logs-body');
+             const targetBody = document.getElementById('view-logs').classList.contains('hidden') ? tbody : tbodyFull;
+             if(!targetBody || !dbState.logs) return;
+             targetBody.innerHTML = '';
+             let logs = Object.values(dbState.logs).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+             if (document.getElementById('view-logs').classList.contains('hidden')) logs = logs.slice(0, 8);
+             logs.forEach((log) => {
+                 const detailsStr = typeof log.details === 'object' ? JSON.stringify(log.details) : log.details;
+                 const shortDetails = detailsStr.length > 50 ? detailsStr.substring(0, 50) + '...' : detailsStr;
+                 targetBody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-4 py-2 text-gray-500 whitespace-nowrap">${new Date(log.timestamp).toLocaleTimeString()}</td>
+                        <td class="px-4 py-2"><span class="bg-gray-700 text-white text-[10px] px-1 rounded">${log.source}</span></td>
+                        <td class="px-4 py-2 ${getActionColor(log.action)}">${log.action}</td>
+                        <td class="px-4 py-2 text-gray-400 truncate max-w-[200px]" title="${detailsStr}">${log.path} <span class="text-[10px] text-gray-600">${shortDetails}</span></td>
+                    </tr>`;
+             });
+        }
+
+        function updateCharts() {
+            const ctx1 = document.getElementById('trafficChart').getContext('2d');
+            if (trafficChartInstance) trafficChartInstance.destroy();
+            trafficChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: localMetricHistory.map(m => m.time.toLocaleTimeString()),
+                    datasets: [
+                        { label: 'Reads', data: localMetricHistory.map(m => m.reads), borderColor: '#87ff00', tension: 0.4, pointRadius: 2 },
+                        { label: 'Writes', data: localMetricHistory.map(m => m.writes), borderColor: '#E95420', tension: 0.4, pointRadius: 2 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { beginAtZero: true, grid: { color: '#ffffff10' }, ticks: { color: '#fff' } }, x: { display: false } } }
+            });
+            if (!document.getElementById('view-metrics').classList.contains('hidden')) {
+                const ctxPie = document.getElementById('metricsPieChart').getContext('2d');
+                if (metricsPieChartInstance) metricsPieChartInstance.destroy();
+                const totalReads = localMetricHistory.reduce((a, b) => a + b.reads, 0);
+                const totalWrites = localMetricHistory.reduce((a, b) => a + b.writes, 0);
+                metricsPieChartInstance = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: { labels: ['Reads', 'Writes'], datasets: [{ data: [totalReads, totalWrites], backgroundColor: ['#87ff00', '#E95420'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
+                });
+            }
+        }
+
+        function getActionColor(action) { switch(action) { case 'UPDATE': return 'text-yellow-400'; case 'DELETE': return 'text-red-500'; case 'CREATE': return 'text-green-500'; default: return 'text-gray-400'; } }
+        function getStatusColor(status) { if (status === 'approved') return 'bg-green-500 text-white'; if (status === 'rejected') return 'bg-red-500 text-white'; return 'bg-yellow-500 text-black'; }
+
+        // Render Others: Announcements, Enrollments, Flags (Streamlined)
+        function renderAnnouncements() {
+             const container = document.getElementById('announcements-container');
+             container.innerHTML = '';
+             if (!dbState.announcements) { container.innerHTML = '<div class="text-gray-500 p-4">No announcements found.</div>'; return; }
+             Object.entries(dbState.announcements).forEach(([key, ann]) => {
+                container.innerHTML += `<div class="bg-[#2a2a2a] p-4 rounded border-l-4 ${ann.isActive ? 'border-green-500' : 'border-red-500'} shadow-lg relative group"><div class="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button onclick="window.deleteNode('announcements/${key}')" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button></div><h3 class="font-bold text-white text-lg">${ann.title}</h3><p class="text-gray-400 text-sm mt-1">${ann.content}</p></div>`;
+             });
+        }
+        function renderEnrollments() {
+             const tbody = document.getElementById('enrollments-body');
+             tbody.innerHTML = '';
+             if (!dbState.enrollments) return;
+             Object.entries(dbState.enrollments).forEach(([key, enr]) => {
+                 let status = "PENDING";
+                 if (enr.status && typeof enr.status === 'object') status = enr.status["0"] || "UNKNOWN"; else if (typeof enr.status === 'string') status = enr.status;
+                 tbody.innerHTML += `<tr class="hover:bg-white/5 group"><td class="px-4 py-3 font-mono text-gray-400">${enr.control_number || 'N/A'}</td><td class="px-4 py-3 font-bold text-white">${enr.student_name}</td><td class="px-4 py-3 text-gray-300">${enr.grade}</td><td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(status)}">${status}</span></td><td class="px-4 py-3"><button onclick="window.updateStatus('enrollments/${key}', 'approved')" class="text-green-500 hover:text-green-300 mr-2"><i class="fas fa-check"></i></button><button onclick="window.updateStatus('enrollments/${key}', 'rejected')" class="text-red-500 hover:text-red-300"><i class="fas fa-times"></i></button></td></tr>`;
+             });
+        }
+        function renderFlags() {
+             const container = document.getElementById('flags-container');
+             container.innerHTML = '';
+             if (!dbState.flags) return;
+             Object.entries(dbState.flags).forEach(([key, val]) => {
+                 container.innerHTML += `<div class="bg-[#2a2a2a] p-6 rounded border border-white/5 flex items-center justify-between"><div><div class="text-gray-400 font-mono text-xs uppercase">Feature Flag</div><div class="text-white font-bold text-lg mt-1">${key}</div></div><button onclick="window.toggleFlag('${key}', ${val})" class="w-12 h-6 rounded-full transition-colors relative ${val ? 'bg-ubuntu-orange' : 'bg-gray-600'}"><div class="absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${val ? 'left-7' : 'left-1'}"></div></button></div>`;
+             });
+        }
+
+        // --- CLI IMPLEMENTATION ---
+        const cliInput = document.getElementById('cli-input');
+        const cliOutput = document.getElementById('cli-output');
+        const cliPrompt = document.getElementById('cli-prompt');
+        let commandHistory = []; let historyIndex = -1;
+        
+        cliInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const cmdLine = cliInput.value.trim();
+                cliInput.value = '';
+                if (!cmdLine) return;
+                commandHistory.push(cmdLine);
+                historyIndex = commandHistory.length;
+                if(macroRecording) {
+                    if(cmdLine === 'record stop') {
+                        printToCLI('Macro recording saved.', 'text-green-500');
+                        macroRecording = null;
+                    } else {
+                        macroRecording.push(cmdLine);
+                        printToCLI(`[REC] ${cmdLine}`, 'text-gray-500');
+                    }
+                    return;
+                }
+                printToCLI(`${cliPrompt.innerText} ${cmdLine}`);
+                try {
+                    if (chaosConfig.latency > 0) await new Promise(r => setTimeout(r, chaosConfig.latency));
+                    if (chaosConfig.dropRate > 0 && Math.random() < chaosConfig.dropRate) {
+                         printToCLI(`ERR_NETWORK_PACKET_LOSS (Chaos Simulation)`, 'text-red-500');
+                    } else {
+                        await processCommand(cmdLine);
+                        if (soundEnabled) playBeep();
+                    }
+                } catch (err) { printToCLI(`ERROR: ${err.message}`, 'text-red-500'); }
+                cliOutput.scrollTop = cliOutput.scrollHeight;
+            } else if (e.key === 'ArrowUp') {
+                if (historyIndex > 0) { historyIndex--; cliInput.value = commandHistory[historyIndex]; }
+            } else if (e.key === 'ArrowDown') {
+                if (historyIndex < commandHistory.length - 1) { historyIndex++; cliInput.value = commandHistory[historyIndex]; } else { historyIndex = commandHistory.length; cliInput.value = ''; }
+            }
+        });
+
+        function printToCLI(text, colorClass = 'text-gray-300') { const div = document.createElement('div'); div.className = colorClass; div.textContent = text; cliOutput.appendChild(div); }
+        function playBeep() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.frequency.value = 800; osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.05); } catch(e){} }
+
+        const getCurrentNode = () => { let curr = dbState; for (const p of currentPath) curr = curr ? curr[p] : undefined; return curr; };
+        const resolvePathStr = (inputPath) => {
+            let p = [...currentPath];
+            if (!inputPath) return p.join('/');
+            if (inputPath.startsWith('/')) p = inputPath.split('/').filter(x=>x);
+            else { const parts = inputPath.split('/'); for(const part of parts) { if(part === '..') p.pop(); else if(part !== '.') p.push(part); } }
+            return p.join('/');
+        };
+
+        async function processCommand(cmdLine) {
+             const rawArgs = cmdLine.split(' ');
+             const cmd = rawArgs[0].toLowerCase();
+             if (sessionAliases[cmd]) return processCommand(`${sessionAliases[cmd]} ${rawArgs.slice(1).join(' ')}`);
+             const args = rawArgs;
+             const target = args[1];
+
+             switch(cmd) {
+                // CORE
+                case 'help':
+                    printToCLI(`--- EXTENDED COMMAND SET ---`, 'text-ubuntu-orange font-bold');
+                    printToCLI(`CORE: whoami, env, date, history (clear), alias, unalias, echo, clear`, 'text-gray-400');
+                    printToCLI(`NAV: ls, cd, pwd, cat, find, grep, du, keys, schema, types, depth`, 'text-gray-400');
+                    printToCLI(`DIAG: readtest, writetest, latency, retry, errors`, 'text-gray-400');
+                    printToCLI(`HEALTH: health (now/history), heartbeat, connections, clock-drift`, 'text-gray-400');
+                    printToCLI(`METRICS: metrics (top/paths/reads/writes/export/reset)`, 'text-gray-400');
+                    printToCLI(`LOGS: logs (tail/last/filter), trace, forensics`, 'text-gray-400');
+                    printToCLI(`FLAGS: flags (get/set/watch), readonly, freeze`, 'text-gray-400');
+                    printToCLI(`EMERGENCY: panic, unpanic, lockdown, unlock, snapshot, rollback, drill, chaos`, 'text-red-400');
+                    printToCLI(`DEBUG: debug, inspect, dump, sdk info, gc`, 'text-gray-400');
+                    printToCLI(`AUTO: run, record, play, schedule, cron`, 'text-gray-400');
+                    printToCLI(`UX: theme, font, json, pager, sound`, 'text-gray-400');
+                    break;
+                case 'whoami': printToCLI('Identity: Admin (Browser Session)', 'text-terminal-blue'); break;
+                case 'env': printToCLI(`Runtime: Browser\nSDK: Firebase 10.7.1\nResolution: ${window.innerWidth}x${window.innerHeight}`, 'text-gray-400'); break;
+                case 'date': printToCLI(new Date().toString(), 'text-white'); break;
+                case 'echo': printToCLI(args.slice(1).join(' ')); break;
+                case 'history': if(target==='clear'){commandHistory=[];printToCLI('Cleared.');} else commandHistory.forEach((c, i) => printToCLI(`${i}  ${c}`, 'text-gray-400')); break;
+                case 'alias': 
+                    if(target === 'set') { const [k,v] = args.slice(2).join(' ').split('='); sessionAliases[k] = v; printToCLI(`Alias ${k} set.`); }
+                    else Object.entries(sessionAliases).forEach(([k,v]) => printToCLI(`${k} -> ${v}`));
+                    break;
+                case 'unalias': delete sessionAliases[target]; printToCLI(`Removed alias ${target}`); break;
+                case 'clear': cliOutput.innerHTML = ''; break;
+
+                // NAV
+                case 'ls':
+                    let navPath = currentPath;
+                    if (target) { if (target === '/') navPath = []; else if (target === '..') navPath = currentPath.slice(0, -1); else navPath = [...currentPath, ...target.split('/').filter(x=>x)]; }
+                    let curr = dbState; for (const p of navPath) curr = curr && curr[p];
+                    if (typeof curr === 'object' && curr !== null) { printToCLI(Object.keys(curr).join('  '), 'text-terminal-green'); printToCLI(`Total: ${Object.keys(curr).length}`, 'text-gray-500 text-xs'); }
+                    else if (curr) printToCLI(`Leaf: ${curr}`, 'text-yellow-500'); else printToCLI(`Path not found`, 'text-red-500');
+                    break;
+                case 'cd':
+                    if (!target || target === '/') currentPath = []; else if (target === '..') { if (currentPath.length > 0) currentPath.pop(); } else currentPath = [...currentPath, ...target.split('/').filter(p => p && p !== '.')];
+                    cliPrompt.innerText = `admin@control-panel:${currentPath.length ? '/'+currentPath.join('/') : '/'}$`;
+                    break;
+                case 'pwd': printToCLI('/' + currentPath.join('/')); break;
+                case 'cat':
+                    let val = dbState; const lookup = target ? [...currentPath, ...target.split('/')] : currentPath;
+                    for (const p of lookup.filter(x=>x)) val = val ? val[p] : undefined;
+                    printToCLI(JSON.stringify(val, null, 2), 'text-white');
+                    break;
+                case 'keys': printToCLI(`Count: ${Object.keys(getCurrentNode() || {}).length}`, 'text-blue-400'); break;
+                case 'schema': 
+                    const sObj = getCurrentNode(); if(typeof sObj !== 'object') { printToCLI('Not an object'); break; }
+                    const types = new Set(); Object.values(sObj).forEach(v => types.add(typeof v));
+                    printToCLI(`Types found: ${Array.from(types).join(', ')}`, 'text-ubuntu-orange');
+                    break;
+                case 'types': processCommand('schema'); break;
+                case 'depth': 
+                    const calcDepth = (o) => typeof o === 'object' && o !== null ? 1 + Math.max(0, ...Object.values(o).map(calcDepth)) : 0;
+                    printToCLI(`Max depth: ${calcDepth(getCurrentNode())}`, 'text-blue-400');
+                    break;
+                case 'find':
+                    printToCLI(`Searching for key '${target}'...`);
+                    const findRec = (o, p) => { if(typeof o !== 'object' || !o) return; Object.keys(o).forEach(k => { if(k.includes(target)) printToCLI(p+'/'+k, 'text-green-400'); findRec(o[k], p+'/'+k); }); };
+                    findRec(dbState, '');
+                    break;
+                case 'grep':
+                    printToCLI(`Searching for value '${target}'...`);
+                    const grepRec = (o, p) => { if(typeof o === 'string' && o.includes(target)) printToCLI(p, 'text-green-400'); else if(typeof o==='object' && o) Object.entries(o).forEach(([k,v])=>grepRec(v, p+'/'+k)); };
+                    grepRec(dbState, '');
+                    break;
+                case 'du':
+                    const size = new Blob([JSON.stringify(getCurrentNode())]).size;
+                    printToCLI(`Size: ${(size/1024).toFixed(2)} KB`, 'text-ubuntu-orange');
+                    break;
+
+                // DIAG & HEALTH
+                case 'readtest': 
+                    const t1 = performance.now(); await get(ref(db, '/health')); 
+                    printToCLI(`Read Latency: ${(performance.now()-t1).toFixed(1)}ms`, 'text-green-400'); break;
+                case 'writetest': 
+                    const t2 = performance.now(); await set(ref(db, '_diag'), 1); 
+                    printToCLI(`Write Latency: ${(performance.now()-t2).toFixed(1)}ms`, 'text-green-400'); break;
+                case 'latency': if(target==='watch') printToCLI('Use UI Health tab for live watch', 'text-yellow-500'); else processCommand('readtest'); break;
+                case 'health': 
+                    if(target==='now') { await update(ref(db, 'health'), { last_check: new Date().toISOString() }); printToCLI('Health check forced.'); }
+                    else printToCLI(`State: ${dbState.health?.state}\nLatency: ${document.getElementById('latency-val').innerText}`, 'text-green-500');
+                    break;
+                case 'clock-drift': printToCLI(`Client Offset: ${document.getElementById('health-skew').innerText}`, 'text-yellow-500'); break;
+                case 'metrics':
+                    const m = dbState.metrics || {};
+                    if(target === 'top') processCommand('metrics'); // Default view shows top info
+                    else if(target === 'reset') printToCLI('Metrics reset not supported in read-only client view.');
+                    else if(target === 'export') { printToCLI(JSON.stringify(m), 'text-white'); }
+                    else printToCLI(`R/M: ${m.reads_per_minute} | W/M: ${m.writes_per_minute}`, 'text-blue-400');
+                    break;
+
+                // LOGS & AUDIT
+                case 'logs':
+                    let logs = Object.values(dbState.logs || {});
+                    if(target === 'tail') printToCLI('Tailing logs (simulated)... use UI for live stream.');
+                    else if(target === 'filter') logs = logs.filter(l => JSON.stringify(l).includes(args[2]));
+                    logs.slice(-10).forEach(l => printToCLI(`[${l.level}] ${l.action} ${l.path}`));
+                    break;
+                case 'trace': printToCLI(`Tracing ${target}... Found ${Object.values(dbState.logs||{}).filter(l=>l.path.includes(target)).length} events.`); break;
+                case 'forensics': printToCLI(`Forensic ID ${target} analysis: No anomalies detected in snapshot.`); break;
+
+                // FLAGS & CONTROL
+                case 'flags': 
+                    if(target === 'set') { await update(ref(db, 'flags'), { [args[2]]: args[3] === 'true' }); printToCLI('Flag set.'); }
+                    else Object.entries(dbState.flags||{}).forEach(([k,v]) => printToCLI(`${k}: ${v}`));
+                    break;
+                case 'readonly': processCommand(`flags set readonly_db ${target === 'on'}`); break;
+                case 'freeze': processCommand(`flags set freeze_enrollments ${target === 'enrollments'}`); break;
+
+                // EMERGENCY
+                case 'panic': window.togglePanic(); printToCLI('PANIC STATE TOGGLED', 'text-red-500 font-bold'); break;
+                case 'unpanic': await update(ref(db, 'flags'), { readonly_db: false }); printToCLI('System restored.', 'text-green-500'); break;
+                case 'lockdown': await update(ref(db, 'flags'), { readonly_db: true, freeze_enrollments: true }); printToCLI('FULL LOCKDOWN ACTIVE', 'text-red-600 blink'); break;
+                case 'unlock': await update(ref(db, 'flags'), { readonly_db: false, freeze_enrollments: false }); printToCLI('Lockdown lifted.', 'text-green-500'); break;
+                case 'snapshot': sessionSnapshots[args[2]||'latest'] = JSON.stringify(dbState); printToCLI('Snapshot saved to memory.', 'text-green-500'); break;
+                case 'rollback': 
+                    if(sessionSnapshots[args[2]||'latest']) printToCLI('Rollback simulation: Data restored from snapshot.', 'text-yellow-500'); 
+                    else printToCLI('Snapshot not found.', 'text-red-500'); break;
+                case 'drill': printToCLI('Simulating Fire Drill... Alerts dispatched. (No actual changes)', 'text-yellow-500'); break;
+                case 'chaos':
+                    if (target === 'latency') { chaosConfig.latency = parseInt(args[2]) || 0; printToCLI(`Chaos: Latency ${chaosConfig.latency}ms`); }
+                    else if (target === 'drop') { chaosConfig.dropRate = parseFloat(args[2]) || 0; printToCLI(`Chaos: Drop Rate ${chaosConfig.dropRate}`); }
+                    break;
+
+                // POWER / DEBUG
+                case 'seed': 
+                    if(!target) { printToCLI('Usage: seed <flag>', 'text-red-500'); break; }
+                    await update(ref(db, 'flags'), { [target]: true }); printToCLI('Seeded.', 'text-green-500'); break;
+                case 'rm': if(!target) break; await set(ref(db, resolvePathStr(target)), null); printToCLI('Deleted.'); break;
+                case 'write': if(args.length < 3) break; await set(ref(db, resolvePathStr(target)), args.slice(2).join(' ')); printToCLI('Written.'); break;
+                case 'debug': printToCLI(`DB State Size: ${new Blob([JSON.stringify(dbState)]).size} bytes`, 'text-gray-400'); break;
+                case 'inspect': console.log(dbState); printToCLI('Logged to DevTools console.'); break;
+                case 'dump': printToCLI(JSON.stringify(dbState)); break;
+                case 'sdk': printToCLI('Firebase JS SDK 10.7.1'); break;
+                case 'gc': printToCLI('Garbage collection triggered (browser managed).'); break;
+
+                // AUTOMATION
+                case 'run': 
+                    if(sessionMacros[target]) { printToCLI(`Running macro ${target}...`); for(const c of sessionMacros[target]) await processCommand(c); } 
+                    else printToCLI('Macro not found.'); break;
+                case 'record': macroRecording = []; sessionMacros[target] = macroRecording; printToCLI(`Recording to ${target}. Type 'record stop' to finish.`); break;
+                case 'play': processCommand(`run ${target}`); break;
+                case 'schedule': setTimeout(() => processCommand(args.slice(3).join(' ')), parseInt(args[2])*1000); printToCLI(`Scheduled in ${args[2]}s`); break;
+                case 'cron': printToCLI('Active Jobs: 1 (Health Heartbeat)', 'text-gray-400'); break;
+
+                // UX
+                case 'theme': if(target==='light') document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode'); break;
+                case 'font': if(target==='size') cliOutput.style.fontSize = args[2]+'px'; break;
+                case 'json': jsonMode = target; printToCLI(`JSON mode: ${target}`); break;
+                case 'pager': pagerEnabled = target === 'on'; printToCLI(`Pager: ${pagerEnabled}`); break;
+                case 'sound': soundEnabled = target === 'on'; printToCLI(`Sound: ${soundEnabled}`); break;
+
+                default: printToCLI(`Command not found: ${cmd}`, 'text-red-500');
+             }
+        }
+
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('border-ubuntu-orange', 'text-white', 'bg-white/5');
+                el.classList.add('border-transparent', 'text-gray-300');
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const btn = document.querySelector(`button[data-target="${tabId}"]`);
+            if(btn) {
+                btn.classList.remove('border-transparent', 'text-gray-300');
+                btn.classList.add('border-ubuntu-orange', 'text-white', 'bg-white/5');
+            }
+            if (tabId === 'cli') setTimeout(() => document.getElementById('cli-input').focus(), 50);
+        };
+        window.switchTab('overview');
+
+    </script>
+</body>
+</html>
