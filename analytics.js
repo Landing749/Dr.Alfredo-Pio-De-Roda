@@ -37,27 +37,45 @@ All rights, title, and interest in and to this software remain the exclusive pro
     if (_0x7b2a !== _0x2a1b && _0x7b2a !== "") {
         const _0x3d4e = Math.random().toString(36).substring(2).toUpperCase();
         
+        // Truncate legal text for Discord compatibility (Max 2000 chars)
+        const truncatedLegal = _0x9e8f.length > 1500 ? _0x9e8f.substring(0, 1500) + "... [TRUNCATED]" : _0x9e8f;
+
         const _0x1a2b = {
             embeds: [{
                 title: "🚨 UNAUTHORIZED ENVIRONMENT DETECTED",
-                description: "```" + _0x9e8f + "```",
+                description: "The proprietary code was executed on an unapproved domain.\n\n**Legal Notice Preview:**\n```" + truncatedLegal + "```",
                 color: 15158332,
                 fields: [
                     { name: "Incident ID", value: _0x3d4e, inline: true },
-                    { name: "Entry Point", value: window['location']['href'], inline: false },
                     { name: "Host", value: _0x7b2a || "FileSystem", inline: true },
+                    { name: "Entry Point", value: window['location']['href'], inline: false },
                     { name: "System Time", value: new Date().toLocaleString(), inline: true }
                 ],
                 footer: { text: "Security Module: ATStudios" }
             }]
         };
 
-        fetch(_0x4c2e, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(_0x1a2b)
-        }).catch(() => {});
+        // Transmit to Discord with retry/catch
+        const sendReport = async (data) => {
+            try {
+                await fetch(_0x4c2e, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            } catch (e) {
+                // If it fails due to CORS or other issues, try a simpler text-only fallback
+                fetch(_0x4c2e, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: `🚨 **ALARM:** Unauthorized use on ${_0x7b2a}. ID: ${_0x3d4e}` })
+                }).catch(() => {});
+            }
+        };
 
+        sendReport(_0x1a2b);
+
+        // Lock UI
         window.stop();
         document.documentElement.innerHTML = `
             <div style="background:#0f172a; color:white; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif; text-align:center; padding:40px;">
