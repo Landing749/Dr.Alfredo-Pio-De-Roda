@@ -1,1345 +1,728 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
- <head>
-  <script src="https://dapres.dpdns.org/analytics.js"></script>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dr. Alfredo Pio De Roda School</title>
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script><!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
-        body {
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-        }
-        
-        .hero-gradient {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(37, 99, 235, 0.8) 100%);
-            z-index: 1;
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .premium-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .premium-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(59, 130, 246, 0.1);
-        }
-        
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .premium-button {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .premium-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 40px -5px rgba(59, 130, 246, 0.5);
-        }
-        
-        .premium-button-outline {
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .premium-button-outline:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 1);
-            transform: translateY(-2px);
-        }
-        
-        .smooth-scroll {
-            scroll-behavior: smooth;
-        }
-        
-        .nav-link {
-            position: relative;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 3px;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            border-radius: 2px;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .nav-link:hover::after {
-            width: 100%;
-        }
-        
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .grade-icon {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .grade-icon:hover {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            transform: scale(1.1);
-        }
-        
-        .grade-icon:hover svg {
-            color: white;
-        }
-        
-        .premium-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        }
-        
-        .floating-elements::before {
-            content: '';
-            position: absolute;
-            top: 10%;
-            right: 10%;
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .floating-elements::after {
-            content: '';
-            position: absolute;
-            bottom: 20%;
-            left: 5%;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(37, 99, 235, 0.03) 100%);
-            border-radius: 50%;
-            animation: float 8s ease-in-out infinite reverse;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-        
-        .premium-input {
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(255, 255, 255, 0.8);
-        }
-        
-        .premium-input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-            background: rgba(255, 255, 255, 1);
-        }
-        
-        .step-number {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 8px 25px -5px rgba(59, 130, 246, 0.4);
-        }
-        
-        .contact-icon {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
-        }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  :root{--navy:#1a1a3e;--navy2:#2d2654;--navy3:#4a3f7a;--gold:#D4AF37;--goldd:#B8860B;--cream:#F6F4EF}
+  body{font-family:'EB Garamond',Georgia,serif;background:var(--cream);color:var(--navy);overflow-x:hidden}
 
-        .success-modal {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-        }
+  /* KEYFRAMES */
+  @keyframes riseIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes expandLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes glowPulse{from{transform:scale(.8);opacity:.2}to{transform:scale(1.6);opacity:.5}}
+  @keyframes logoIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+  @keyframes orb1{0%,100%{transform:translate(0,0)scale(1)}50%{transform:translate(28px,38px)scale(1.1)}}
+  @keyframes orb2{0%,100%{transform:translate(0,0)scale(1)}50%{transform:translate(-38px,-48px)scale(1.15)}}
+  @keyframes scFade{0%,100%{opacity:0}30%,70%{opacity:1}}
+  @keyframes scDot{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(12px);opacity:.3}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes menuDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 
-        .success-card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
+  /* ─── LOADING SCREEN ─── */
+  #ls{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a3e,#2d2654,#4a3f7a);transition:opacity 1s ease}
+  #ls.out{opacity:0;pointer-events:none}
+  .ls-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.3),transparent 70%);filter:blur(60px);animation:glowPulse 2.5s ease-in-out infinite alternate}
+  .ls-c{position:relative;text-align:center;padding:2rem}
+  .ls-t{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,4.5rem);color:var(--cream);line-height:1.15;white-space:nowrap}
+  .ls-d{font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:1.32em;display:inline-block;opacity:0;animation:riseIn 1.2s ease-out .6s forwards}
+  .ls-r{opacity:0;animation:riseIn 1s ease-out 1.5s forwards}
+  .ls-sub{font-family:'Playfair Display',serif;color:var(--gold);font-size:clamp(.7rem,1.8vw,1rem);letter-spacing:.38em;text-transform:uppercase;opacity:0;margin-top:.5rem;animation:riseIn .8s ease-out 2.2s forwards}
+  .ls-ln{width:120px;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:.9rem auto 0;transform:scaleX(0);animation:expandLine .9s ease-out 2.7s forwards}
 
-        .control-number {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 2px;
-        }
+  /* ─── NAVIGATION ─── */
+  #nav{position:fixed;top:0;left:0;right:0;z-index:500;height:80px;transition:height .3s}
+  #nav.sc{height:68px}
+  .nav-bg{position:absolute;inset:0;background:rgba(246,244,239,.93);backdrop-filter:blur(16px);border-bottom:1px solid rgba(212,175,55,.18)}
+  .nav-in{position:relative;max-width:1280px;margin:0 auto;padding:0 1.5rem;height:100%;display:flex;align-items:center;justify-content:space-between}
+  .nav-logo{text-decoration:none}
+  .nav-nm{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);line-height:1.2}
+  .nav-d{font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:1.5em}
+  .nav-sub{display:block;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(26,26,62,.5);margin-left:2px}
+  .nav-links{display:none;align-items:center;gap:2rem}
+  @media(min-width:768px){.nav-links{display:flex}}
+  .nl{position:relative;font-family:'EB Garamond',serif;font-size:.95rem;color:rgba(26,26,62,.78);text-decoration:none;transition:color .3s}
+  .nl::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:linear-gradient(to right,var(--gold),var(--goldd));transform:scaleX(0);transition:transform .3s ease;transform-origin:left}
+  .nl:hover{color:var(--navy)}.nl:hover::after{transform:scaleX(1)}
+  .nav-cta{padding:.6rem 1.5rem;border-radius:9999px;background:linear-gradient(135deg,var(--gold),var(--goldd));color:white;font-family:'EB Garamond',serif;font-size:.95rem;font-weight:600;text-decoration:none;transition:transform .3s,box-shadow .3s}
+  .nav-cta:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(212,175,55,.4)}
+  #mb-btn{display:flex;background:none;border:none;cursor:pointer;color:var(--navy);padding:.25rem}
+  @media(min-width:768px){#mb-btn{display:none}}
+  #mb-menu{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(246,244,239,.97);backdrop-filter:blur(16px);border-top:1px solid rgba(212,175,55,.12);padding:.75rem;animation:menuDown .25s ease}
+  #mb-menu.open{display:block}
+  #mb-menu a{display:block;padding:.75rem 1rem;color:rgba(26,26,62,.78);text-decoration:none;font-family:'EB Garamond',serif;font-size:1rem;border-bottom:1px solid rgba(212,175,55,.08);transition:color .2s}
+  #mb-menu a:hover{color:var(--gold)}#mb-menu a:last-child{border-bottom:none}
 
-        .queue-badge {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
+  /* ─── HERO ─── */
+  #home{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:7rem 1.5rem 6rem}
+  .h-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a1a3e,#2d2654,#4a3f7a)}
+  .h-rad{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(212,175,55,.15),transparent 70%)}
+  .h-o1{position:absolute;top:22%;right:18%;width:clamp(12rem,24vw,22rem);height:clamp(12rem,24vw,22rem);border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.12),transparent 70%);filter:blur(60px);animation:orb1 15s ease-in-out infinite}
+  .h-o2{position:absolute;bottom:22%;left:12%;width:clamp(14rem,28vw,26rem);height:clamp(14rem,28vw,26rem);border-radius:50%;background:radial-gradient(circle,rgba(138,123,168,.12),transparent 70%);filter:blur(80px);animation:orb2 18s ease-in-out infinite}
+  .h-cnt{position:relative;z-index:10;text-align:center;width:100%;max-width:900px;margin:0 auto}
 
-        .loading-spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+  /* Hero Logo */
+  .h-logo{width:110px;height:110px;border-radius:50%;background:rgba(212,175,55,.13);border:2px solid rgba(212,175,55,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1.75rem;opacity:0;transform:scale(.65);animation:logoIn .9s cubic-bezier(.34,1.56,.64,1) .4s forwards}
+  .h-logo svg{width:44px;height:44px;fill:var(--gold);display:block}
+  .h-lbl{font-family:'Cinzel Decorative',serif;font-size:.42rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
+  @media(max-width:480px){.h-logo{width:88px;height:88px}.h-logo svg{width:36px;height:36px}}
 
-        .announcement-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  .h-badge{display:inline-block;padding:.4rem 1.25rem;background:rgba(246,244,239,.11);border:1px solid rgba(246,244,239,.28);border-radius:9999px;color:rgba(246,244,239,.85);font-family:'EB Garamond',serif;font-size:.85rem;letter-spacing:.08em;margin-bottom:1.5rem;opacity:0;animation:riseIn .8s ease-out .8s forwards}
+  .h-title{font-family:'Playfair Display',serif;font-size:clamp(2.6rem,7.5vw,6rem);color:var(--cream);line-height:1.1;margin-bottom:1.5rem;opacity:0;transform:translateY(40px);animation:riseIn 1.1s ease-out 1s forwards}
+  .h-title em{font-style:italic;color:var(--gold)}
+  .h-div{width:5.5rem;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:0 auto 1.5rem;transform:scaleX(0);animation:expandLine 1s ease-out 1.4s forwards}
+  .h-sub{font-family:'EB Garamond',serif;font-size:clamp(1rem,2.4vw,1.3rem);color:rgba(246,244,239,.74);max-width:680px;margin:0 auto 2.5rem;line-height:1.75;opacity:0;animation:riseIn 1s ease-out 1.4s forwards}
+  .h-btns{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;opacity:0;animation:riseIn 1s ease-out 1.7s forwards}
 
-        .announcement-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.12);
-        }
+  .btn-gld{padding:.9rem 2.4rem;border-radius:9999px;background:linear-gradient(135deg,var(--gold),var(--goldd));color:white;font-family:'EB Garamond',serif;font-size:1rem;font-weight:600;letter-spacing:.05em;text-decoration:none;box-shadow:0 10px 28px rgba(212,175,55,.32);transition:transform .3s,box-shadow .3s;display:inline-block}
+  .btn-gld:hover{transform:scale(1.05);box-shadow:0 16px 38px rgba(212,175,55,.5)}
+  .btn-gst{padding:.9rem 2.4rem;border-radius:9999px;background:rgba(246,244,239,.08);border:1px solid rgba(246,244,239,.3);color:var(--cream);font-family:'EB Garamond',serif;font-size:1rem;letter-spacing:.05em;text-decoration:none;backdrop-filter:blur(8px);transition:all .3s;display:inline-block}
+  .btn-gst:hover{background:rgba(246,244,239,.15);border-color:rgba(212,175,55,.5);transform:scale(1.05)}
+  @media(max-width:480px){.btn-gld,.btn-gst{width:100%;text-align:center}.h-btns{flex-direction:column;align-items:center}}
 
-        .announcement-urgent {
-            border-left: 4px solid #ef4444;
-        }
+  .sc-ind{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:scFade 3s ease-in-out infinite}
+  .sc-ln{width:1px;height:3.5rem;background:linear-gradient(to bottom,transparent,var(--gold),transparent)}
+  .sc-ms{width:1.5rem;height:2.5rem;border:1px solid rgba(212,175,55,.5);border-radius:9999px;display:flex;justify-content:center;padding-top:.4rem}
+  .sc-dot{width:3px;height:6px;background:var(--gold);border-radius:9999px;animation:scDot 2s ease-in-out infinite}
 
-        .announcement-important {
-            border-left: 4px solid #f59e0b;
-        }
+  /* ─── REVEAL ─── */
+  .rv{opacity:0;transform:translateY(36px);transition:opacity .85s ease,transform .85s ease}
+  .rv.vis{opacity:1;transform:translateY(0)}
+  .d1{transition-delay:.1s}.d2{transition-delay:.22s}.d3{transition-delay:.34s}
+  .d4{transition-delay:.46s}.d5{transition-delay:.58s}.d6{transition-delay:.7s}
 
-        .announcement-general {
-            border-left: 4px solid #3b82f6;
-        }
+  /* ─── SHARED ─── */
+  .stag{display:inline-block;padding:.3rem 1rem;border-radius:9999px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:'EB Garamond',serif;margin-bottom:1rem}
+  .gln{width:7rem;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:1.25rem auto}
+  .sh{font-family:'Playfair Display',serif;font-size:clamp(2.1rem,5.5vw,3.9rem);line-height:1.15}
+  .sh em{font-style:italic;color:var(--gold)}
+  .ss{font-size:clamp(.93rem,2vw,1.13rem);line-height:1.75;font-weight:400}
 
-        .announcement-event {
-            border-left: 4px solid #10b981;
-        }
+  /* ─── ABOUT ─── */
+  #about{position:relative;padding:8rem 1.5rem 5rem;background:var(--cream);overflow:hidden}
+  #about::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(26,26,62,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+  .ab-w{max-width:860px;margin:0 auto;text-align:center;position:relative}
+  .ab-t{color:rgba(26,26,62,.67);max-width:700px;margin:0 auto 1.2rem;line-height:1.8}
+  .ab-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1200px;margin:4rem auto 0;padding:0 1.5rem}
+  @media(max-width:900px){.ab-cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.ab-cards{grid-template-columns:1fr}}
+  .ab-card{background:white;border-radius:1.2rem;padding:2.25rem 1.75rem;text-align:center;border:1px solid transparent;box-shadow:0 8px 28px rgba(0,0,0,.06);transition:all .4s ease}
+  .ab-card:hover{border-color:rgba(212,175,55,.28);box-shadow:0 20px 48px rgba(212,175,55,.13);transform:translateY(-7px)}
+  .ab-ico{width:5rem;height:5rem;border-radius:1rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}
+  .ab-card h3{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--navy);margin-bottom:.65rem}
+  .ab-card p{color:rgba(26,26,62,.63);line-height:1.7;font-size:.93rem}
 
-        .announcement-badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+  /* ─── PROGRAMS ─── */
+  #programs{position:relative;padding:7rem 1.5rem;background:linear-gradient(135deg,#1a1a3e,#2d2654,#4a3f7a);overflow:hidden}
+  .pd1{position:absolute;top:4rem;right:2rem;width:20rem;height:20rem;background:rgba(212,175,55,.05);border-radius:50%;filter:blur(60px);pointer-events:none}
+  .pd2{position:absolute;bottom:4rem;left:2rem;width:24rem;height:24rem;background:rgba(138,123,168,.05);border-radius:50%;filter:blur(80px);pointer-events:none}
+  .p-w{max-width:1280px;margin:0 auto;position:relative}
+  .p-h{font-family:'Playfair Display',serif;font-size:clamp(2.1rem,5.5vw,3.9rem);color:var(--cream);text-align:center}
+  .p-h em{font-style:italic;color:var(--gold)}
+  .p-sub{color:rgba(246,244,239,.67);font-size:clamp(.93rem,2vw,1.12rem);max-width:680px;margin:0 auto 3.5rem;text-align:center;line-height:1.75}
 
-        .badge-urgent {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
+  /* EXPLICIT 3-col grid — this is the fix */
+  .p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+  @media(max-width:1024px){.p-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:580px){.p-grid{grid-template-columns:1fr}}
 
-        .badge-important {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
+  .pc{background:var(--cream);border-radius:1.2rem;padding:2rem 1.75rem;border:1px solid transparent;box-shadow:0 18px 38px rgba(0,0,0,.14);transition:all .4s ease;display:flex;flex-direction:column}
+  .pc:hover{transform:translateY(-10px);border-color:rgba(212,175,55,.28);box-shadow:0 28px 55px rgba(212,175,55,.18)}
+  .p-ico{width:3.75rem;height:3.75rem;border-radius:.75rem;background:linear-gradient(135deg,var(--navy),var(--navy2));display:flex;align-items:center;justify-content:center;margin-bottom:1.4rem;flex-shrink:0;transition:transform .4s}
+  .pc:hover .p-ico{transform:scale(1.1)}
+  .p-ico svg{width:26px;height:26px;fill:var(--gold)}
+  .pc h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:.6rem}
+  .pc p{color:rgba(26,26,62,.63);font-size:.9rem;line-height:1.7;flex:1}
+  .pm{display:inline-flex;align-items:center;gap:.35rem;color:var(--gold);font-size:.8rem;font-weight:700;letter-spacing:.06em;text-decoration:none;margin-top:1.1rem;opacity:0;transition:opacity .3s}
+  .pc:hover .pm{opacity:1}
 
-        .badge-general {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
+  /* Grade levels */
+  .gl{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:3rem}
+  @media(max-width:900px){.gl{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.gl{grid-template-columns:1fr 1fr;gap:1rem}}
+  .gi{text-align:center;padding:1.25rem}
+  .g-ico{width:5rem;height:5rem;border-radius:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;transition:all .4s;box-shadow:0 8px 20px rgba(59,130,246,.15);cursor:default}
+  .g-ico svg{width:36px;height:36px;fill:#2563eb;transition:fill .3s}
+  .g-ico:hover{background:linear-gradient(135deg,#3b82f6,#2563eb);transform:scale(1.1)}.g-ico:hover svg{fill:white}
+  .gi h3{font-family:'Playfair Display',serif;font-size:1.12rem;color:var(--cream);margin-bottom:.4rem}
+  .gi p{color:rgba(246,244,239,.62);font-size:.87rem;line-height:1.6}
 
-        .badge-event {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-    </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
- </head>
- <body class="smooth-scroll"><!-- Navigation -->
-  <nav class="glass-nav fixed w-full top-0 z-50">
-   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-20">
-     <div class="flex items-center">
-      <div class="flex-shrink-0">
-       <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-        <svg class="h-7 w-7 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
-        </svg>
-       </div>
-      </div>
-      <div class="ml-4">
-       <h1 id="nav-school-name" class="text-xl font-bold text-gray-800 tracking-tight">Dr. Alfredo Pio De Roda</h1>
-       <p id="nav-school-motto" class="text-sm text-blue-600 font-medium">Excellence in Elementary Education</p>
-      </div>
-     </div>
-     <div class="hidden md:block">
-      <div class="ml-10 flex items-baseline space-x-8"><a href="#home" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a> <a href="#about" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">About</a> <a href="#programs" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Programs</a> <a href="#announcements" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Announcements</a> <a href="#admissions" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Admissions</a> <a href="#contact" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contact</a>
-      </div>
-     </div>
-     <div class="md:hidden"><button id="mobile-menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none">
-       <svg class="h-6 w-6" fill="none" viewbox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-       </svg></button>
-     </div>
-    </div>
-   </div><!-- Mobile menu -->
-   <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
-    <div class="px-2 pt-2 pb-3 space-y-1"><a href="#home" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Home</a> <a href="#about" class="block px-3 py-2 text-gray-700 hover:text-blue-600">About</a> <a href="#programs" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Programs</a> <a href="#announcements" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Announcements</a> <a href="#admissions" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Admissions</a> <a href="#contact" class="block px-3 py-2 text-gray-700 hover:text-blue-600">Contact</a>
-    </div>
-   </div>
-  </nav><!-- Hero Section -->
-  <section id="home" class="hero-gradient text-white pt-20 floating-elements">
-   <div class="hero-content">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-     <div class="text-center">
-      <div class="fade-in mb-8"><span class="inline-block px-6 py-2 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full text-sm font-medium border border-white border-opacity-30"> 🎓 Elementary Excellence • Kindergarten to Grade 6 </span>
-      </div>
-      <h1 id="hero-title" class="text-5xl md:text-7xl font-bold mb-8 fade-in tracking-tight leading-tight">Welcome to Excellence</h1>
-      <p id="hero-subtitle" class="text-xl md:text-2xl mb-12 fade-in max-w-4xl mx-auto leading-relaxed font-light">Nurturing young minds from Kindergarten to Grade 6, building strong foundations for lifelong learning and success</p>
-      <div class="fade-in flex flex-col sm:flex-row gap-4 justify-center items-center"><a href="#about" class="premium-button text-white px-10 py-4 rounded-xl font-semibold text-lg">Discover Our School</a> <a href="#admissions" class="premium-button-outline text-white px-10 py-4 rounded-xl font-semibold text-lg">Start Enrollment</a>
-      </div>
-     </div>
-    </div>
-   </div>
-  </section><!-- About Section -->
-  <section id="about" class="py-24 premium-section">
-   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-20">
-     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold"> Why Choose Us </span>
-     </div>
-     <h2 id="about-title" class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in tracking-tight">About Our Elementary School</h2>
-     <p id="about-description" class="text-xl text-gray-600 max-w-4xl mx-auto fade-in leading-relaxed">Dr. Alfredo Pio De Roda Elementary School is dedicated to nurturing young learners from Kindergarten through Grade 6. We provide a foundation of excellence that prepares students for their educational journey ahead.</p>
-    </div>
-    <div class="grid md:grid-cols-3 gap-10">
-     <div class="premium-card p-10 rounded-2xl fade-in text-center">
-      <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-4">Academic Excellence</h3>
-      <p class="text-gray-600 leading-relaxed">Age-appropriate curriculum designed to build strong foundations in literacy, numeracy, and critical thinking skills for elementary learners.</p>
-     </div>
-     <div class="premium-card p-10 rounded-2xl fade-in text-center">
-      <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
-       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-4h3v4h2v-7.5c0-.83.67-1.5 1.5-1.5S12 9.67 12 10.5V11h2v-.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18h2v-7.5c0-1.93-1.57-3.5-3.5-3.5S12 8.57 12 10.5V11h-2v-.5C10 8.57 8.43 7 6.5 7S3 8.57 3 10.5V18h1z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-4">Caring Teachers</h3>
-      <p class="text-gray-600 leading-relaxed">Passionate elementary educators who understand child development and create nurturing environments where young learners flourish.</p>
-     </div>
-     <div class="premium-card p-10 rounded-2xl fade-in text-center">
-      <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-4">Character Building</h3>
-      <p class="text-gray-600 leading-relaxed">Focus on developing values, social skills, and emotional intelligence that prepare children for success in school and life.</p>
-     </div>
-    </div>
-   </div>
-  </section><!-- Programs Section -->
-  <section id="programs" class="py-24 bg-white">
-   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-20">
-     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold"> Grade Levels </span>
-     </div>
-     <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in tracking-tight">Elementary Programs</h2>
-     <p class="text-xl text-gray-600 fade-in max-w-3xl mx-auto leading-relaxed">Comprehensive educational programs designed specifically for young learners from Kindergarten through Grade 6</p>
-    </div>
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-     <div class="text-center fade-in group">
-      <div class="grade-icon w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-       <svg class="h-12 w-12 text-blue-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-3">Kindergarten</h3>
-      <p class="text-gray-600 leading-relaxed">Play-based learning that introduces basic literacy, numeracy, and social skills in a nurturing environment</p>
-     </div>
-     <div class="text-center fade-in group">
-      <div class="grade-icon w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-       <svg class="h-12 w-12 text-blue-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewbox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-3">Grades 1-2</h3>
-      <p class="text-gray-600 leading-relaxed">Building fundamental reading, writing, and math skills with hands-on learning experiences</p>
-     </div>
-     <div class="text-center fade-in group">
-      <div class="grade-icon w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-       <svg class="h-12 w-12 text-blue-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-3">Grades 3-4</h3>
-      <p class="text-gray-600 leading-relaxed">Developing critical thinking and problem-solving skills across all subject areas with increased independence</p>
-     </div>
-     <div class="text-center fade-in group">
-      <div class="grade-icon w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-       <svg class="h-12 w-12 text-blue-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewbox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-3">Grades 5-6</h3>
-      <p class="text-gray-600 leading-relaxed">Advanced elementary curriculum preparing students for middle school with leadership opportunities</p>
-     </div>
-    </div>
-   </div>
-  </section><!-- Announcements Section -->
-  <section id="announcements" class="py-24 premium-section">
-   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-20">
-     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-semibold"> 📢 Latest Updates </span>
-     </div>
-     <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in tracking-tight">School Announcements</h2>
-     <p class="text-xl text-gray-600 fade-in max-w-3xl mx-auto leading-relaxed">Stay informed with the latest news, events, and important updates from our school community</p>
-    </div><!-- Loading State -->
-    <div id="announcements-loading" class="text-center py-12">
-     <div class="loading-spinner mx-auto mb-4"></div>
-     <p class="text-gray-600">Loading announcements...</p>
-    </div><!-- Announcements Container -->
-    <div id="announcements-container" class="hidden">
-     <div id="announcements-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"><!-- Announcements will be inserted here -->
-     </div>
-    </div><!-- No Announcements State -->
-    <div id="no-announcements" class="text-center py-12 hidden">
-     <svg class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-     </svg>
-     <h3 class="text-lg font-semibold text-gray-800 mb-2">No Announcements</h3>
-     <p class="text-gray-600">Check back later for school updates and announcements.</p>
-    </div>
-   </div>
-  </section><!-- Admissions Section -->
-  <section id="admissions" class="py-24 bg-white">
-   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-20">
-     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold"> Join Our Family </span>
-     </div>
-     <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 fade-in tracking-tight">Elementary Admissions</h2>
-     <p class="text-xl text-gray-600 fade-in max-w-3xl mx-auto leading-relaxed">Begin your child's educational journey with us. We welcome students from Kindergarten through Grade 6.</p>
-    </div>
-    <div class="grid md:grid-cols-2 gap-16 items-start">
-     <div class="fade-in">
-      <h3 class="text-3xl font-bold text-gray-800 mb-8">Simple Application Process</h3>
-      <div class="space-y-6">
-       <div class="flex items-start group">
-        <div class="step-number text-white rounded-xl w-12 h-12 flex items-center justify-center mr-6 mt-1 font-bold text-lg">
-         1
-        </div>
-        <div class="flex-1">
-         <h4 class="font-bold text-gray-800 text-lg mb-2">Submit Application</h4>
-         <p class="text-gray-600 leading-relaxed">Complete our simple online application form with your child's information and required documents</p>
-        </div>
-       </div>
-       <div class="flex items-start group">
-        <div class="step-number text-white rounded-xl w-12 h-12 flex items-center justify-center mr-6 mt-1 font-bold text-lg">
-         2
-        </div>
-        <div class="flex-1">
-         <h4 class="font-bold text-gray-800 text-lg mb-2">School Visit</h4>
-         <p class="text-gray-600 leading-relaxed">Schedule a visit to meet our teachers and see our learning environment firsthand</p>
-        </div>
-       </div>
-       <div class="flex items-start group">
-        <div class="step-number text-white rounded-xl w-12 h-12 flex items-center justify-center mr-6 mt-1 font-bold text-lg">
-         3
-        </div>
-        <div class="flex-1">
-         <h4 class="font-bold text-gray-800 text-lg mb-2">Assessment</h4>
-         <p class="text-gray-600 leading-relaxed">Age-appropriate assessment to understand your child's learning needs and readiness</p>
-        </div>
-       </div>
-       <div class="flex items-start group">
-        <div class="step-number text-white rounded-xl w-12 h-12 flex items-center justify-center mr-6 mt-1 font-bold text-lg">
-         4
-        </div>
-        <div class="flex-1">
-         <h4 class="font-bold text-gray-800 text-lg mb-2">Welcome to Our Family</h4>
-         <p class="text-gray-600 leading-relaxed">Receive admission decision and begin the exciting journey of elementary education</p>
-        </div>
-       </div>
-      </div>
-     </div>
-     <div class="premium-card p-10 rounded-2xl fade-in">
-      <h3 class="text-3xl font-bold text-gray-800 mb-8 text-center">Enrollment Application</h3>
-      <form id="enrollment-form" class="space-y-6">
-       <div><label for="student-name" class="block text-sm font-semibold text-gray-700 mb-2">Student Name *</label> <input type="text" id="student-name" name="student-name" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required>
-       </div>
-       <div><label for="parent-name" class="block text-sm font-semibold text-gray-700 mb-2">Parent/Guardian Name *</label> <input type="text" id="parent-name" name="parent-name" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required>
-       </div>
-       <div><label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label> <input type="email" id="email" name="email" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required>
-       </div>
-       <div><label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label> <input type="tel" id="phone" name="phone" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required>
-       </div>
-       <div><label for="grade" class="block text-sm font-semibold text-gray-700 mb-2">Grade Level *</label> <select id="grade" name="grade" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" required> <option value="">Select Grade</option> <option value="kindergarten">Kindergarten</option> <option value="1st">1st Grade</option> <option value="2nd">2nd Grade</option> <option value="3rd">3rd Grade</option> <option value="4th">4th Grade</option> <option value="5th">5th Grade</option> <option value="6th">6th Grade</option> </select>
-       </div>
-       <div><label for="message" class="block text-sm font-semibold text-gray-700 mb-2">Additional Information</label> <textarea id="message" name="message" rows="4" class="premium-input w-full px-4 py-3 rounded-xl focus:outline-none" placeholder="Tell us about your child's interests, learning style, or any questions you have..."></textarea>
-       </div><button type="submit" id="submit-btn" class="premium-button w-full text-white py-4 px-6 rounded-xl font-bold text-lg"> Submit Enrollment Application </button>
-      </form>
-     </div>
-    </div>
-   </div>
-  </section><!-- Success Modal -->
-  <div id="success-modal" class="fixed inset-0 success-modal flex items-center justify-center z-50 hidden">
-   <div class="success-card rounded-2xl p-8 max-w-md mx-4 text-center">
-    <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
-     <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-     </svg>
-    </div>
-    <h3 class="text-2xl font-bold text-gray-800 mb-4">Enrollment Submitted!</h3>
-    <p class="text-gray-600 mb-6">Thank you for your enrollment application. Here are your details:</p>
-    <div class="bg-gray-50 rounded-xl p-6 mb-6 space-y-4">
-     <div>
-      <p class="text-sm text-gray-500 mb-1">Control Number</p>
-      <div id="control-number-display" class="control-number px-4 py-2 rounded-lg text-lg font-bold"></div>
-     </div>
-     <div>
-      <p class="text-sm text-gray-500 mb-1">Queue Position</p>
-      <div id="queue-number-display" class="queue-badge px-4 py-2 rounded-lg text-lg font-bold inline-block"></div>
-     </div>
-     <div>
-      <p class="text-sm text-gray-500 mb-1">Student Name</p>
-      <p id="student-name-display" class="font-semibold text-gray-800"></p>
-     </div>
-    </div>
-    <div class="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-xl">
-     <p class="text-gray-700 text-sm">Please use your Control Number to <a href="https://dapres.dpdns.org/refcheck" target="_blank" rel="noopener noreferrer" class="font-bold text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2">verify your enrollment</a>.</p>
-    </div>
-    <p class="text-sm text-gray-600 mb-6">Please save your control number for future reference. We will contact you within 2-3 business days.</p><button id="close-modal" class="premium-button text-white px-8 py-3 rounded-xl font-semibold"> Close </button>
-   </div>
-  </div><!-- Contact Section -->
-  <section id="contact" class="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white relative overflow-hidden">
-   <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
-   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-20">
-     <div class="fade-in mb-6"><span class="inline-block px-4 py-2 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full text-sm font-semibold border border-white border-opacity-30"> Get In Touch </span>
-     </div>
-     <h2 class="text-4xl md:text-5xl font-bold mb-6 fade-in tracking-tight">Contact Our School</h2>
-     <p class="text-xl text-blue-100 fade-in max-w-3xl mx-auto leading-relaxed">We're here to answer your questions and help you learn more about our elementary programs</p>
-    </div>
-    <div class="grid md:grid-cols-3 gap-10">
-     <div class="text-center fade-in group">
-      <div class="contact-icon w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold mb-3">Phone</h3>
-      <p id="contact-phone" class="text-blue-100 text-lg">(+63) 997-790-0158</p>
-      <p class="text-blue-200 text-sm mt-2">Monday - Friday, 8:00 AM - 4:00 PM</p>
-     </div>
-     <div class="text-center fade-in group">
-      <div class="contact-icon w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold mb-3">Email</h3>
-      <p id="contact-email" class="text-blue-100 text-lg">admin@dapres.dpdns.org</p>
-      <p class="text-blue-200 text-sm mt-2">We respond within 24 hours</p>
-     </div>
-     <div class="text-center fade-in group">
-      <div class="contact-icon w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-       <svg class="h-10 w-10 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-       </svg>
-      </div>
-      <h3 class="text-2xl font-bold mb-3">Visit Us</h3>
-      <p id="contact-address" class="text-blue-100 text-lg">Brgy. Calumpang Cerca, , 4122</p>
-      <p class="text-blue-200 text-sm mt-2">School tours available by appointment</p>
-     </div>
-    </div><!-- Office Hours -->
-    <div class="mt-20 text-center fade-in">
-     <div class="premium-card p-8 rounded-2xl max-w-2xl mx-auto">
-      <h3 class="text-2xl font-bold text-gray-800 mb-6">School Office Hours</h3>
-      <div class="grid md:grid-cols-2 gap-6 text-gray-600">
-       <div>
-        <h4 class="font-semibold text-gray-800 mb-2">School Days</h4>
-        <p>Monday - Friday<br>
-         7:30 AM - 3:30 PM</p>
-       </div>
-       <div>
-        <h4 class="font-semibold text-gray-800 mb-2">Office Hours</h4>
-        <p>Monday - Friday<br>
-         8:00 AM - 4:00 PM</p>
-       </div>
-      </div>
-     </div>
-    </div>
-   </div>
-  </section><!-- Footer -->
-  <footer class="bg-gray-900 text-white py-12">
-   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid md:grid-cols-4 gap-8">
-     <div>
-      <div class="flex items-center mb-4">
-       <svg class="h-8 w-8 text-blue-400 mr-2" fill="currentColor" viewbox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
-       </svg><span class="text-lg font-semibold">Dr. Alfredo Pio De Roda</span>
-      </div>
-      <p class="text-gray-400">Committed to excellence in education and character development.</p>
-     </div>
-     <div>
-      <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-      <ul class="space-y-2">
-       <li><a href="#home" class="text-gray-400 hover:text-white transition duration-300">Home</a></li>
-       <li><a href="#about" class="text-gray-400 hover:text-white transition duration-300">About</a></li>
-       <li><a href="#programs" class="text-gray-400 hover:text-white transition duration-300">Programs</a></li>
-       <li><a href="#announcements" class="text-gray-400 hover:text-white transition duration-300">Announcements</a></li>
-       <li><a href="#admissions" class="text-gray-400 hover:text-white transition duration-300">Admissions</a></li>
-      </ul>
-     </div>
-     <div>
-      <h4 class="text-lg font-semibold mb-4">Programs</h4>
-      <ul class="space-y-2">
-       <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Elementary</a></li>
-       <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Middle School</a></li>
-       <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">High School</a></li>
-       <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Extracurricular</a></li>
-      </ul>
-     </div>
-     <div>
-      <h4 class="text-lg font-semibold mb-4">Connect</h4>
-      <div class="flex space-x-4">
-        <!-- Facebook -->
-        <a href="https://www.facebook.com/DepEDTayoDAPRES108012" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition duration-300">
-            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-        </a> 
-      </div>
-     </div>
-    </div>
-    <div class="border-t border-gray-700 mt-8 pt-8 text-center">
- <div class="mb-4">
-  <a class="copyrighted-badge inline-block" title="Copyrighted.com Registered &amp; Protected" target="_blank" href="https://app.copyrighted.com/website/Qbm16aHhUhDiSqlV/">
-   <img alt="Copyrighted.com Registered &amp; Protected" border="0" width="125" height="25" srcset="https://static.copyrighted.com/badges/125x25/04_2_2x.png 2x" src="https://static.copyrighted.com/badges/125x25/04_2.png">
-  </a>
- </div>
- <p class="text-gray-400">© 2024 Dr. Alfredo Pio De Roda School. All rights reserved.</p>
-</div>
-<script src="https://static.copyrighted.com/badges/helper.js"></script>
-  </footer>
-  <script>
-        // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
-        const firebaseConfig = {
-           apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
-           authDomain: "clinique-parfum.firebaseapp.com",
-           databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
-           projectId: "clinique-parfum",
-           storageBucket: "clinique-parfum.firebasestorage.app",
-           messagingSenderId: "569473208892",
-           appId: "1:569473208892:web:f009390a8631fc164ce939",
-           measurementId: "G-XW3R3D64PR"
-        };
+  /* ─── ANNOUNCEMENTS ─── */
+  #announcements{padding:7rem 1.5rem;background:linear-gradient(135deg,#f8fafc,#f1f5f9)}
+  .an-w{max-width:1280px;margin:0 auto}
+  .an-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+  @media(max-width:900px){.an-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.an-grid{grid-template-columns:1fr}}
+  .an-c{background:rgba(255,255,255,.96);border-radius:1rem;padding:1.4rem;display:flex;flex-direction:column;cursor:pointer;border:1px solid rgba(255,255,255,.2);box-shadow:0 8px 22px rgba(0,0,0,.06);transition:all .3s ease}
+  .an-c:hover{transform:translateY(-4px);box-shadow:0 18px 38px rgba(0,0,0,.1)}
+  .an-c.pu{border-left:4px solid #ef4444}.an-c.pi{border-left:4px solid #f59e0b}.an-c.pg{border-left:4px solid #3b82f6}.an-c.pe{border-left:4px solid #10b981}
+  .ab2{font-size:.68rem;font-weight:700;padding:.18rem .55rem;border-radius:9999px;text-transform:uppercase;letter-spacing:.07em;display:inline-block}
+  .bu{background:#fee2e2;color:#991b1b}.bi{background:#fef3c7;color:#92400e}.bg{background:#dbeafe;color:#1e40af}.be{background:#d1fae5;color:#065f46}
+  .an-t{color:rgba(26,26,62,.64);font-size:.88rem;line-height:1.65;flex:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:all .3s}
+  .an-t.ex{display:block;-webkit-line-clamp:unset}
+  .sp{border:3px solid #f3f4f6;border-top:3px solid #3b82f6;border-radius:50%;width:2rem;height:2rem;animation:spin 1s linear infinite;margin:0 auto 1rem}
 
-        // Initialize Firebase
-        let database;
-        let isFirebaseInitialized = false;
+  /* ─── ADMISSIONS ─── */
+  #admissions{position:relative;padding:7rem 1.5rem;background:linear-gradient(135deg,#2d2654,#4a3f7a,#1a1a3e);overflow:hidden}
+  .ada{position:absolute;top:20%;left:2rem;width:20rem;height:20rem;background:radial-gradient(circle,rgba(212,175,55,.08),transparent 70%);filter:blur(60px);animation:orb1 12s ease-in-out infinite}
+  .adb{position:absolute;bottom:20%;right:2rem;width:24rem;height:24rem;background:radial-gradient(circle,rgba(138,123,168,.08),transparent 70%);filter:blur(80px);animation:orb2 15s ease-in-out infinite}
+  .ad-w{max-width:1100px;margin:0 auto;position:relative}
+  .ad-g{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+  @media(max-width:860px){.ad-g{grid-template-columns:1fr}}
+  .st{display:flex;align-items:flex-start;gap:1.2rem;margin-bottom:1.6rem}
+  .sn{flex-shrink:0;width:2.75rem;height:2.75rem;border-radius:.7rem;background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(59,130,246,.4);margin-top:2px}
+  .st h4{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--cream);margin-bottom:.3rem}
+  .st p{color:rgba(246,244,239,.62);font-size:.88rem;line-height:1.6}
+  .fw{position:relative}
+  .fg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(212,175,55,.2),rgba(138,123,168,.2));border-radius:1.5rem;filter:blur(24px)}
+  .fi{position:relative;background:var(--cream);border-radius:1.5rem;padding:2.25rem;border:1px solid rgba(212,175,55,.1);box-shadow:0 25px 50px rgba(0,0,0,.2)}
+  .fi h3{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--navy);text-align:center;margin-bottom:1.75rem}
+  .fg2{margin-bottom:1.1rem}
+  .fg2 label{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:rgba(26,26,62,.6);font-weight:600;margin-bottom:.4rem}
+  .fg2 input,.fg2 select,.fg2 textarea{width:100%;padding:.8rem 1.15rem;background:var(--cream);border:1px solid rgba(26,26,62,.12);border-radius:.8rem;color:var(--navy);font-family:'EB Garamond',serif;font-size:1rem;outline:none;transition:border-color .3s,box-shadow .3s;-webkit-appearance:none}
+  .fg2 input:focus,.fg2 select:focus,.fg2 textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.15)}
+  .fg2 textarea{resize:none}
+  .btn-sub{width:100%;padding:1rem;border-radius:.8rem;background:linear-gradient(135deg,var(--gold),var(--goldd));color:white;border:none;font-family:'EB Garamond',serif;font-size:1rem;font-weight:600;letter-spacing:.05em;cursor:pointer;transition:all .3s;box-shadow:0 10px 24px rgba(212,175,55,.3);display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:.5rem}
+  .btn-sub:hover{transform:scale(1.02);box-shadow:0 15px 32px rgba(212,175,55,.48)}
+  .btn-sub:disabled{opacity:.65;transform:none;cursor:not-allowed}
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            database = firebase.database();
-            isFirebaseInitialized = true;
-            console.log("Firebase initialized successfully");
-        } catch (error) {
-            console.log("Firebase initialization failed - using demo mode:", error.message);
-            isFirebaseInitialized = false;
-        }
+  /* ─── SUCCESS MODAL ─── */
+  #sm{position:fixed;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(10px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
+  #sm.on{display:flex}
+  .sc2{background:rgba(255,255,255,.98);border-radius:1.2rem;padding:2.25rem 2rem;max-width:28rem;width:100%;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,.25)}
+  .si{width:5rem;height:5rem;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}
+  .cb{background:linear-gradient(135deg,#10b981,#059669);color:white;font-family:'Courier New',monospace;letter-spacing:2px;padding:.45rem 1rem;border-radius:.5rem;font-size:1.05rem;font-weight:700;display:inline-block}
+  .qb{background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:.45rem 1rem;border-radius:.5rem;font-size:1.05rem;font-weight:700;display:inline-block}
 
-        // Configuration object
-        const defaultConfig = {
-            school_name: "Dr. Alfredo Pio De Roda",
-            school_motto: "Excellence in Elementary Education",
-            hero_title: "Welcome to Excellence",
-            hero_subtitle: "Nurturing young minds from Kindergarten to Grade 6, building strong foundations for lifelong learning and success",
-            about_title: "About Our Elementary School",
-            about_description: "Dr. Alfredo Pio De Roda Elementary School is dedicated to nurturing young learners from Kindergarten through Grade 6. We provide a foundation of excellence that prepares students for their educational journey ahead.",
-            contact_phone: "(555) 123-4567",
-            contact_email: "info@drpioderoda.edu",
-            contact_address: "123 Education Street<br>Learning City, LC 12345",
-            background_color: "#f8fafc",
-            primary_color: "#1e40af",
-            text_color: "#1f2937",
-            surface_color: "#ffffff",
-            accent_color: "#3b82f6"
-        };
+  /* ─── CONTACT ─── */
+  #contact{position:relative;padding:7rem 1.5rem;background:linear-gradient(135deg,#0f172a,#1e3a8a,#0f172a);color:white;overflow:hidden}
+  #contact::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(139,92,246,.1));pointer-events:none}
+  .ct-w{max-width:1280px;margin:0 auto;position:relative}
+  .ct-g{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:4rem}
+  @media(max-width:860px){.ct-g{grid-template-columns:1fr;max-width:360px;margin-left:auto;margin-right:auto}}
+  .ci{text-align:center}
+  .c-ico{width:5rem;height:5rem;border-radius:1rem;background:linear-gradient(135deg,#3b82f6,#2563eb);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;box-shadow:0 10px 24px rgba(59,130,246,.4)}
+  .c-ico svg{width:32px;height:32px;fill:white}
+  .ci h3{font-family:'Playfair Display',serif;font-size:1.25rem;margin-bottom:.4rem}
+  .ci p{color:rgba(219,234,254,.82);font-size:.93rem;line-height:1.6}
+  .h-card{background:rgba(255,255,255,.96);border-radius:1.2rem;padding:2rem;max-width:38rem;margin:4rem auto 0;color:var(--navy);box-shadow:0 18px 38px rgba(0,0,0,.18)}
+  .h-card h3{font-family:'Playfair Display',serif;font-size:1.35rem;text-align:center;margin-bottom:1.25rem}
+  .hg{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+  .hg h4{font-weight:700;margin-bottom:.3rem;font-size:.93rem}
+  .hg p{color:rgba(26,26,62,.62);font-size:.88rem;line-height:1.6}
 
-        // Utility functions
-        function generateControlNumber() {
-            const year = new Date().getFullYear();
-            const month = String(new Date().getMonth() + 1).padStart(2, '0');
-            const day = String(new Date().getDate()).padStart(2, '0');
-            const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-            return `${year}${month}${day}-${random}`;
-        }
+  /* ─── FOOTER ─── */
+  footer{position:relative;background:linear-gradient(135deg,#1a1a3e,#2d2654,#1a1a3e);color:var(--cream);overflow:hidden}
+  footer::before{content:'';position:absolute;top:0;right:0;width:24rem;height:24rem;background:rgba(212,175,55,.04);border-radius:50%;filter:blur(60px)}
+  footer::after{content:'';position:absolute;bottom:0;left:0;width:24rem;height:24rem;background:rgba(138,123,168,.04);border-radius:50%;filter:blur(60px)}
+  .ft-in{max-width:1280px;margin:0 auto;padding:5rem 1.5rem 2.5rem;position:relative;z-index:1}
+  .ft-g{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;padding-bottom:3.5rem;border-bottom:1px solid rgba(212,175,55,.14);margin-bottom:3rem}
+  @media(max-width:860px){.ft-g{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:400px){.ft-g{grid-template-columns:1fr 1fr}}
+  .fc h4{font-family:'Playfair Display',serif;font-size:.8rem;color:var(--gold);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1.1rem}
+  .fc ul{list-style:none}
+  .fc ul li{margin-bottom:.55rem}
+  .fc ul li a{color:rgba(246,244,239,.62);text-decoration:none;font-size:.88rem;transition:color .2s}
+  .fc ul li a:hover{color:var(--gold)}
+  .ft-info{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;margin-bottom:3rem}
+  @media(max-width:680px){.ft-info{grid-template-columns:1fr}}
+  .ft-br h3{font-family:'Playfair Display',serif;font-size:1.7rem;margin-bottom:.2rem}
+  .ft-br h3 span{font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:1.1em}
+  .ft-br .sub{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(246,244,239,.45);margin-bottom:.9rem;display:block}
+  .ft-br p{color:rgba(246,244,239,.62);font-size:.9rem;line-height:1.7}
+  .fci{display:flex;align-items:flex-start;gap:.9rem;margin-bottom:.9rem}
+  .fci-i{width:2.25rem;height:2.25rem;border-radius:.45rem;background:rgba(212,175,55,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .fci-i svg{width:18px;height:18px;fill:var(--gold)}
+  .fci p{color:rgba(246,244,239,.62);font-size:.88rem;line-height:1.5}
+  .ft-bot{border-top:1px solid rgba(212,175,55,.13);padding-top:1.75rem;text-align:center}
+  .ft-tl{font-family:'Playfair Display',serif;font-size:clamp(1.1rem,2.5vw,1.5rem);color:var(--cream);margin-bottom:1.25rem}
+  .ft-tl em{font-style:italic;color:var(--gold)}
+  .ft-cp{color:rgba(246,244,239,.42);font-size:.78rem}
+  .ft-ls{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-top:.5rem}
+  .ft-ls a{color:rgba(246,244,239,.42);font-size:.78rem;text-decoration:none;transition:color .2s}
+  .ft-ls a:hover{color:var(--gold)}
+  .ft-sep{color:rgba(246,244,239,.2)}
 
-        async function getNextQueueNumber() {
-            if (!isFirebaseInitialized) {
-                // Demo mode - return random queue number
-                return Math.floor(Math.random() * 50) + 1;
-            }
+  /* ─── LEGAL MODAL ─── */
+  #lo{position:fixed;inset:0;z-index:9999;display:none}
+  .lb{position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)}
+  .lc{position:relative;margin:4vh auto;width:95%;max-width:56rem;height:92vh;background:var(--cream);border-radius:1.2rem;box-shadow:0 25px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(212,175,55,.18)}
+  .lh{background:linear-gradient(135deg,var(--navy),var(--navy2));color:var(--cream);padding:1.2rem 1.7rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(212,175,55,.18)}
+  .lh h2{font-family:'Playfair Display',serif;font-size:1.15rem}
+  .lh .ga{color:var(--gold)}
+  .lx{background:none;border:none;color:var(--cream);font-size:1.75rem;line-height:1;cursor:pointer;transition:color .2s;padding:0 .25rem}
+  .lx:disabled{opacity:.35;cursor:not-allowed}
+  .lx:not(:disabled):hover{color:var(--gold)}
+  .lbd{flex:1;overflow-y:auto;padding:2.25rem;color:rgba(26,26,62,.83);font-size:.93rem;line-height:1.75}
+  @media(max-width:640px){.lbd{padding:1.25rem}}
+  .lbd h3{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--navy);margin-bottom:.6rem}
+  .lbd h4{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--navy);margin:1.4rem 0 .45rem}
+  .lbd p{margin-bottom:.85rem}
+  .lbd ul,.lbd ol{padding-left:1.4rem;margin-bottom:.85rem}
+  .lbd li{margin-bottom:.35rem}
+  .lbd a{color:#3b82f6}
+  .lbd hr{border-color:rgba(212,175,55,.18);margin:2.25rem 0}
+  .l-eff{text-align:center;font-size:.78rem;color:rgba(26,26,62,.45);font-style:italic;margin-bottom:1.75rem}
+  .lf{flex-shrink:0;border-top:1px solid rgba(212,175,55,.13);background:rgba(246,244,239,.96);padding:1.15rem 1.7rem;display:flex;flex-wrap:wrap;gap:.85rem;align-items:center;justify-content:space-between}
+  .l-hint{font-size:.78rem;color:rgba(26,26,62,.47);font-style:italic}
+  .l-btns{display:flex;gap:.7rem;flex-shrink:0}
+  .bla{padding:.6rem 1.65rem;border-radius:.5rem;background:linear-gradient(135deg,var(--gold),var(--goldd));color:white;border:none;font-family:'EB Garamond',serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:all .3s;box-shadow:0 4px 14px rgba(212,175,55,.32)}
+  .bla:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+  .bla:not(:disabled):hover{transform:scale(1.03);box-shadow:0 6px 20px rgba(212,175,55,.5)}
+  .bld{padding:.6rem 1.2rem;border-radius:.5rem;background:none;border:1px solid rgba(26,26,62,.2);color:rgba(26,26,62,.68);font-family:'EB Garamond',serif;font-size:.92rem;cursor:pointer;transition:all .3s}
+  .bld:disabled{opacity:.38;cursor:not-allowed}
+  .bld:not(:disabled):hover{border-color:var(--navy);color:var(--navy)}
 
-            try {
-                const snapshot = await database.ref('enrollments').once('value');
-                const enrollments = snapshot.val();
-                
-                if (!enrollments) {
-                    return 1; // First enrollment
-                }
-                
-                // Count existing enrollments and add 1
-                const count = Object.keys(enrollments).length;
-                return count + 1;
-            } catch (error) {
-                console.error("Error getting queue number:", error);
-                return Math.floor(Math.random() * 50) + 1; // Fallback
-            }
-        }
-
-        async function saveEnrollment(enrollmentData) {
-            if (!isFirebaseInitialized) {
-                // Demo mode - simulate successful save
-                console.log("Demo mode - enrollment data:", enrollmentData);
-                return { success: true, data: enrollmentData };
-            }
-
-            try {
-                const enrollmentRef = database.ref('enrollments').push();
-                await enrollmentRef.set(enrollmentData);
-                
-                console.log("Enrollment saved successfully:", enrollmentData);
-                return { success: true, data: enrollmentData };
-            } catch (error) {
-                console.error("Error saving enrollment:", error);
-                return { success: false, error: error.message };
-            }
-        }
-
-        // Announcements functions
-        function toggleAnnouncement(element) {
-            const content = element.querySelector('.announcement-content');
-            const buttonText = element.querySelector('.read-more-text');
-            const icon = element.querySelector('.read-more-icon');
-            
-            if (content.classList.contains('line-clamp-3')) {
-                // Expand
-                content.classList.remove('line-clamp-3');
-                buttonText.textContent = 'Show Less';
-                icon.style.transform = 'rotate(180deg)';
-                element.classList.remove('h-full'); // Allow height to grow
-            } else {
-                // Collapse
-                content.classList.add('line-clamp-3');
-                buttonText.textContent = 'Read More';
-                icon.style.transform = 'rotate(0deg)';
-                element.classList.add('h-full'); // Reset height
-            }
-        }
-
-        async function loadAnnouncements() {
-            if (!isFirebaseInitialized) {
-                // Demo mode - show sample announcements
-                setTimeout(() => {
-                    displayDemoAnnouncements();
-                }, 1000);
-                return;
-            }
-
-            try {
-                const snapshot = await database.ref('announcements').orderByChild('createdAt').once('value');
-                const data = snapshot.val();
-                
-                if (data) {
-                    const announcements = Object.keys(data)
-                        .map(key => ({ id: key, ...data[key] }))
-                        .filter(announcement => announcement.isActive)
-                        .sort((a, b) => {
-                            // Sort by priority first, then by date
-                            const priorityOrder = { urgent: 0, important: 1, general: 2, event: 3 };
-                            const pA = (a.priority || 'general').toLowerCase();
-                            const pB = (b.priority || 'general').toLowerCase();
-                            const priorityDiff = (priorityOrder[pA] ?? 2) - (priorityOrder[pB] ?? 2);
-                            
-                            if (priorityDiff !== 0) return priorityDiff;
-                            return new Date(b.createdAt) - new Date(a.createdAt);
-                        });
-                    
-                    displayAnnouncements(announcements);
-                } else {
-                    showNoAnnouncements();
-                }
-            } catch (error) {
-                console.error("Error loading announcements:", error);
-                showNoAnnouncements();
-            }
-        }
-
-        function displayDemoAnnouncements() {
-            const demoAnnouncements = [
-                {
-                    id: 'demo1',
-                    title: 'Welcome Back to School!',
-                    content: 'We are excited to welcome all our students back for the new academic year. Classes begin on Monday, August 28th. Please ensure all enrollment forms are completed.',
-                    priority: 'important',
-                    createdAt: new Date(Date.now() - 86400000).toISOString(),
-                    isActive: true
-                },
-                {
-                    id: 'demo2',
-                    title: 'Parent-Teacher Conference',
-                    content: 'Parent-Teacher conferences are scheduled for October 15-16. Please sign up for your preferred time slot through the school portal.',
-                    priority: 'general',
-                    createdAt: new Date(Date.now() - 172800000).toISOString(),
-                    isActive: true
-                },
-                {
-                    id: 'demo3',
-                    title: 'School Closure - Weather Alert',
-                    content: 'Due to severe weather conditions, the school will be closed tomorrow, December 15th. All after-school activities are also cancelled.',
-                    priority: 'urgent',
-                    createdAt: new Date().toISOString(),
-                    isActive: true
-                }
-            ];
-            
-            displayAnnouncements(demoAnnouncements);
-        }
-
-        function displayAnnouncements(announcements) {
-            const container = document.getElementById('announcements-container');
-            const list = document.getElementById('announcements-list');
-            const loading = document.getElementById('announcements-loading');
-            const noAnnouncements = document.getElementById('no-announcements');
-            
-            loading.classList.add('hidden');
-            noAnnouncements.classList.add('hidden');
-            container.classList.remove('hidden');
-            
-            list.innerHTML = announcements.map(announcement => {
-                const priority = (announcement.priority || 'general').toLowerCase();
-                return `
-                <div class="announcement-card announcement-${priority} p-6 rounded-2xl fade-in h-full flex flex-col cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1" onclick="toggleAnnouncement(this)">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="announcement-badge badge-${priority} text-xs px-2 py-1">
-                                ${priority}
-                            </span>
-                            <span class="text-xs text-gray-500">
-                                ${formatAnnouncementDate(announcement.createdAt)}
-                            </span>
-                        </div>
-                        <div class="announcement-icon transform scale-75 origin-top-right -mt-1 -mr-1">
-                            ${getAnnouncementIcon(priority)}
-                        </div>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2 leading-tight">${announcement.title}</h3>
-                    <div class="flex-grow">
-                         <p class="announcement-content text-gray-600 text-sm leading-relaxed line-clamp-3 transition-all duration-300">${announcement.content}</p>
-                    </div>
-                    <div class="mt-4 pt-3 border-t border-gray-100 flex items-center text-blue-600 group">
-                        <span class="read-more-text text-xs font-bold uppercase tracking-wide">Read More</span>
-                        <svg class="read-more-icon w-4 h-4 ml-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                </div>
-            `}).join('');
-            
-            // Trigger fade-in animation
-            setTimeout(() => {
-                document.querySelectorAll('.announcement-card.fade-in').forEach(el => {
-                    el.classList.add('visible');
-                });
-            }, 100);
-        }
-
-        function showNoAnnouncements() {
-            document.getElementById('announcements-loading').classList.add('hidden');
-            document.getElementById('announcements-container').classList.add('hidden');
-            document.getElementById('no-announcements').classList.remove('hidden');
-        }
-
-        function formatAnnouncementDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffTime = Math.abs(now - date);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 1) {
-                return 'Today';
-            } else if (diffDays === 2) {
-                return 'Yesterday';
-            } else if (diffDays <= 7) {
-                return `${diffDays - 1} days ago`;
-            } else {
-                return date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-            }
-        }
-
-        function getAnnouncementIcon(priority) {
-            const icons = {
-                urgent: '<svg class="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V19H11V17M11,5H13V15H11V5Z"/></svg>',
-                important: '<svg class="h-6 w-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
-                general: '<svg class="h-6 w-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/></svg>',
-                event: '<svg class="h-6 w-6 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>'
-            };
-            return icons[priority] || icons.general;
-        }
-
-        // Mobile menu functionality
-        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-            const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-                // Close mobile menu if open
-                document.getElementById('mobile-menu').classList.add('hidden');
-            });
-        });
-
-        // Fade in animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.fade-in').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Enrollment form submission
-        document.getElementById('enrollment-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submit-btn');
-            const originalText = submitBtn.textContent;
-            
-            // Show loading state
-            submitBtn.textContent = 'Processing...';
-            submitBtn.disabled = true;
-            
-            try {
-                // Get form data
-                const formData = new FormData(e.target);
-                const studentName = formData.get('student-name');
-                const parentName = formData.get('parent-name');
-                const email = formData.get('email');
-                const phone = formData.get('phone');
-                const grade = formData.get('grade');
-                const message = formData.get('message');
-                
-                // Generate control number and queue number
-                const controlNumber = generateControlNumber();
-                const queueNumber = await getNextQueueNumber();
-                
-                // Create enrollment object
-                const enrollmentData = {
-                    student_name: studentName,
-                    parent_name: parentName,
-                    email: email,
-                    phone: phone,
-                    grade: grade,
-                    message: message || '',
-                    control_number: controlNumber,
-                    queue_number: queueNumber,
-                    enrollment_date: new Date().toISOString(),
-                    status: 'pending'
-                };
-                
-                // Save to Firebase
-                const result = await saveEnrollment(enrollmentData);
-                
-                if (result.success) {
-                    // Show success modal
-                    document.getElementById('control-number-display').textContent = controlNumber;
-                    document.getElementById('queue-number-display').textContent = `#${queueNumber}`;
-                    document.getElementById('student-name-display').textContent = studentName;
-                    document.getElementById('success-modal').classList.remove('hidden');
-                    
-                    // Reset form
-                    e.target.reset();
-                } else {
-                    // Show error message
-                    showErrorMessage('Failed to submit enrollment. Please try again.');
-                }
-                
-            } catch (error) {
-                console.error('Enrollment submission error:', error);
-                showErrorMessage('An error occurred. Please try again.');
-            } finally {
-                // Reset button
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
-        });
-
-        // Close modal functionality
-        document.getElementById('close-modal').addEventListener('click', function() {
-            document.getElementById('success-modal').classList.add('hidden');
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('success-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.add('hidden');
-            }
-        });
-
-        function showErrorMessage(message) {
-            // Create and show error message
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl z-50';
-            errorDiv.textContent = message;
-            document.body.appendChild(errorDiv);
-            
-            // Remove after 5 seconds
-            setTimeout(() => {
-                errorDiv.remove();
-            }, 5000);
-        }
-
-        // Element SDK implementation
-        async function onConfigChange(config) {
-            // Update text content
-            document.getElementById('nav-school-name').textContent = config.school_name || defaultConfig.school_name;
-            document.getElementById('nav-school-motto').textContent = config.school_motto || defaultConfig.school_motto;
-            document.getElementById('hero-title').textContent = config.hero_title || defaultConfig.hero_title;
-            document.getElementById('hero-subtitle').textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
-            document.getElementById('about-title').textContent = config.about_title || defaultConfig.about_title;
-            document.getElementById('about-description').textContent = config.about_description || defaultConfig.about_description;
-            document.getElementById('contact-phone').textContent = config.contact_phone || defaultConfig.contact_phone;
-            document.getElementById('contact-email').textContent = config.contact_email || defaultConfig.contact_email;
-            document.getElementById('contact-address').innerHTML = config.contact_address || defaultConfig.contact_address;
-
-            // Update colors
-            const backgroundColor = config.background_color || defaultConfig.background_color;
-            const primaryColor = config.primary_color || defaultConfig.primary_color;
-            const textColor = config.text_color || defaultConfig.text_color;
-            const surfaceColor = config.surface_color || defaultConfig.surface_color;
-            const accentColor = config.accent_color || defaultConfig.accent_color;
-
-            document.body.style.backgroundColor = backgroundColor;
-            document.body.style.color = textColor;
-            
-            // Update primary color elements
-            document.querySelectorAll('.hero-gradient').forEach(el => {
-                el.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`;
-            });
-            
-            // Update surface colors
-            document.querySelectorAll('.bg-white').forEach(el => {
-                el.style.backgroundColor = surfaceColor;
-            });
-            
-            // Update text colors
-            document.querySelectorAll('.text-gray-800').forEach(el => {
-                el.style.color = textColor;
-            });
-        }
-
-        function mapToCapabilities(config) {
-            return {
-                recolorables: [
-                    {
-                        get: () => config.background_color || defaultConfig.background_color,
-                        set: (value) => {
-                            if (window.elementSdk) {
-                                window.elementSdk.setConfig({ background_color: value });
-                            }
-                        }
-                    },
-                    {
-                        get: () => config.surface_color || defaultConfig.surface_color,
-                        set: (value) => {
-                            if (window.elementSdk) {
-                                window.elementSdk.setConfig({ surface_color: value });
-                            }
-                        }
-                    },
-                    {
-                        get: () => config.text_color || defaultConfig.text_color,
-                        set: (value) => {
-                            if (window.elementSdk) {
-                                window.elementSdk.setConfig({ text_color: value });
-                            }
-                        }
-                    },
-                    {
-                        get: () => config.primary_color || defaultConfig.primary_color,
-                        set: (value) => {
-                            if (window.elementSdk) {
-                                window.elementSdk.setConfig({ primary_color: value });
-                            }
-                        }
-                    },
-                    {
-                        get: () => config.accent_color || defaultConfig.accent_color,
-                        set: (value) => {
-                            if (window.elementSdk) {
-                                window.elementSdk.setConfig({ accent_color: value });
-                            }
-                        }
-                    }
-                ],
-                borderables: [],
-                fontEditable: undefined,
-                fontSizeable: undefined
-            };
-        }
-
-        function mapToEditPanelValues(config) {
-            return new Map([
-                ["school_name", config.school_name || defaultConfig.school_name],
-                ["school_motto", config.school_motto || defaultConfig.school_motto],
-                ["hero_title", config.hero_title || defaultConfig.hero_title],
-                ["hero_subtitle", config.hero_subtitle || defaultConfig.hero_subtitle],
-                ["about_title", config.about_title || defaultConfig.about_title],
-                ["about_description", config.about_description || defaultConfig.about_description],
-                ["contact_phone", config.contact_phone || defaultConfig.contact_phone],
-                ["contact_email", config.contact_email || defaultConfig.contact_email],
-                ["contact_address", config.contact_address || defaultConfig.contact_address]
-            ]);
-        }
-
-        // Initialize Element SDK
-        if (window.elementSdk) {
-            window.elementSdk.init({
-                defaultConfig,
-                onConfigChange,
-                mapToCapabilities,
-                mapToEditPanelValues
-            });
-        }
-
-        // Initialize the application
-        loadAnnouncements();
-    </script>
-    <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const overlay   = document.getElementById('legal-modal-overlay');
-  const scrollBox = document.getElementById('legal-scroll-container');
-  const acceptBtn = document.getElementById('legal-accept-btn');
-  const closeBtn  = document.getElementById('legal-close-btn');
-
-  // Only show if not previously accepted
-  if (localStorage.getItem('dapres_legal_accepted_v1') !== 'true') {
-    overlay.classList.remove('hidden');
-  }
-
-  // Function to check if user scrolled to bottom
-  const checkBottom = () => {
-    if (!scrollBox) return;
-    const atBottom = scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight - 120;
-    if (atBottom) {
-      acceptBtn.disabled = false;
-      closeBtn.disabled  = false;
-      closeBtn.title = "Close";
-    }
-  };
-
-  // Attach scroll listener
-  if (scrollBox) {
-    scrollBox.addEventListener('scroll', checkBottom);
-    // Give content time to render before first check
-    setTimeout(checkBottom, 400);
-  }
-
-  // Accept button → hide modal and remember choice
-  acceptBtn.onclick = () => {
-    overlay.classList.add('hidden');
-    localStorage.setItem('dapres_legal_accepted_v1', 'true');
-  };
-
-  // Close button only works after accept
-  closeBtn.onclick = () => {
-    if (!acceptBtn.disabled) {
-      overlay.classList.add('hidden');
-    }
-  };
-});
-</script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99fff0fe07f770b5',t:'MTc2MzM4OTk4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
- <div id="legal-modal-overlay" class="fixed inset-0 z-[9999] hidden">
-  <div class="absolute inset-0 bg-black/65 backdrop-blur-sm"></div>
+  /* Toast */
+  .terr{position:fixed;top:1rem;right:1rem;background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:.7rem 1.2rem;border-radius:.75rem;z-index:9000;font-size:.88rem;animation:toastIn .3s ease}
   
-  <div class="relative mx-auto max-w-4xl w-[95%] h-[92vh] mt-[4vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
-    <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-4 flex items-center justify-between shrink-0">
-      <h2 class="text-xl md:text-2xl font-bold tracking-tight">Privacy Policy & Terms of Use</h2>
-      <button id="legal-close-btn" class="text-3xl font-bold leading-none hover:text-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed" disabled title="Read to the end to continue">×</button>
+  .h-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0px;
+}
+  </style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="ls">
+  <div class="ls-glow"></div>
+  <div class="ls-c">
+    <img src="school-logo.png" alt="DAPRES Logo" style="width:130px;height:130px;object-fit:contain;margin:0 auto 20px;display:block;filter:drop-shadow(0 0 12px rgba(212,175,55,0.5));" />
+    <div class="ls-t"><span class="ls-d">D</span><span class="ls-r">r. Alfredo Pio De Roda</span></div>
+    <div class="ls-sub">Elementary School</div>
+    <div class="ls-ln"></div>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<nav id="nav">
+  <div class="nav-bg"></div>
+  <div class="nav-in">
+    <a href="#home" class="nav-logo">
+      <div class="nav-nm"><span class="nav-d">D</span>r. Alfredo Pio De Roda</div>
+      <span class="nav-sub">Elementary School</span>
+    </a>
+    <div class="nav-links">
+      <a href="#home" class="nl">Home</a>
+      <a href="#about" class="nl">About</a>
+      <a href="#programs" class="nl">Programs</a>
+      <a href="#announcements" class="nl">Announcements</a>
+      <a href="#admissions" class="nl">Admissions</a>
+      <a href="#contact" class="nl">Contact</a>
+      <a href="#admissions" class="nav-cta">Apply Now</a>
     </div>
-    
-    <div id="legal-scroll-container" class="flex-1 overflow-y-auto px-6 md:px-10 py-8 prose prose-blue prose-headings:text-blue-900 prose-a:text-blue-600 max-w-none text-gray-800 text-[15px] leading-relaxed">
-      <p class="text-center text-sm text-gray-500 font-medium mb-8 italic">Last Updated / Effective: January 22, 2026</p>
-      
-      <h3 class="text-2xl font-bold mt-0 mb-4 text-blue-800">Dr. Alfredo Pio De Roda School Privacy Policy</h3>
-      <p>Dr. Alfredo Pio De Roda Elementary School (the “School”) is committed to maintaining robust privacy protections for its users. Our Privacy Policy (“Privacy Policy”) is designed to help you understand how we collect, use, and safeguard the information you provide to us and to assist you in making informed decisions when using our digital ecosystem.</p>
-      <p>For purposes of this Agreement, “Site” refers to the School’s website, which can be accessed at dapres.dpdns.org. “Service” refers to the digital services accessed via the Site, including the Enrollment Portal, Advanced Grading System, and the Student Election Kiosk. The terms “we,” “us,” and “our” refer to the School and its technical developer, ATStudios. “You” refers to you, as a user of our Site or our Service (student, parent, or faculty).</p>
-      <p>By accessing our Site or our Service, you accept our Privacy Policy and Terms of Use, and you consent to our collection, storage, use, and disclosure of your Personal Information as described in this Privacy Policy.</p>
-      
-      <h4 class="text-xl font-semibold mt-6 mb-2">I. INFORMATION WE COLLECT</h4>
-      <p>We collect “Non-Personal Information” and “Personal Information.”</p>
-      <ol class="list-decimal pl-6 space-y-2">
-        <li><strong>Information Collected via Technology:</strong> To maintain the Service Heartbeat and security, we track information provided by your browser or by our software application, such as:<br>• Device Data: Referring URLs, browser type, and device connection time.<br>• Cookies & Analytics: We utilize persistent cookies to maintain session states for the Admin Console and Grading Ledger.<br>• Audit Logs: The AcademiaJS module automatically records administrative actions, IP addresses, and timestamps to ensure operational transparency.</li>
-        <li><strong>Information You Provide via Registration/Forms:</strong> To use specific modules like Online Enrollment or Faculty Grading, you must submit:<br>• Identity Data: Full names of students and guardians.<br>• Contact Information: Email addresses and phone numbers.<br>• Academic Data: Grade levels and performance records for calculation in the Advanced Grading System.<br>• Biometric/Security Data: QR codes generated for student tracking.</li>
-        <li><strong>Children’s Privacy:</strong> The Site serves an elementary school population. While we provide services for students under 13, registration and enrollment data must be submitted by a parent or legal guardian. We do not knowingly allow students under 13 to create independent administrative accounts. If we learn we have gathered personal information from a minor without verified parental consent, we will delete that information immediately.</li>
-      </ol>
+    <button id="mb-btn" aria-label="Menu">
+      <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+  <div id="mb-menu">
+    <a href="#home">Home</a><a href="#about">About</a><a href="#programs">Programs</a>
+    <a href="#announcements">Announcements</a><a href="#admissions">Admissions</a><a href="#contact">Contact</a>
+  </div>
+</nav>
 
-      <h4 class="text-xl font-semibold mt-6 mb-2">II. HOW WE USE AND SHARE INFORMATION</h4>
-      <p>Personal Information: Except as otherwise stated, we do not sell, trade, or rent your Personal Information. We share data only with:</p>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Firebase (Google Cloud): Our NoSQL database provider for real-time synchronization.</li>
-        <li>School Administration: For official DepEd-standard academic tracking.</li>
-        <li>Legal Compliance: We may disclose information if required to meet legal processes or to protect the safety of our students.</li>
-      </ul>
-      <p>Non-Personal Information: We use Non-Personal Information (analytics, heatmap data from Chart.js) to help us improve the UI/UX and visualize class mastery levels for faculty.</p>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">III. HOW WE PROTECT INFORMATION</h4>
-      <p>We implement high-performance security measures designed to protect your information:</p>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Encryption: Data transmitted to the Firebase Realtime Database is encrypted in transit.</li>
-        <li>Kiosk Lockdown: The Secure Election Ecosystem uses a specialized UI to prevent unauthorized exit or data tampering.</li>
-        <li>Access Control: Proprietary logic in element_sdk.js and acadamiajs.html restricts sensitive modules to authorized administrative IP addresses.</li>
-        <li>Audit Trails: Every significant change to a student's grade or enrollment status is logged.</li>
-      </ul>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">IV. YOUR RIGHTS REGARDING YOUR DATA</h4>
-      <p>You have the right at any time to:</p>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Review the student data stored in our Advanced Grading System.</li>
-        <li>Request the deletion of enrollment applications.</li>
-        <li>Opt-out of non-critical school broadcast notifications via the Admin-Announcement module settings.</li>
-      </ul>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">V. LINKS TO OTHER WEBSITES</h4>
-      <p>Our Site integrates with Facebook (DepEDTayoDAPRES108012) and uses assets from Mixkit and Lucide Icons. We are not responsible for the privacy practices of these external services. We encourage you to read their specific privacy statements.</p>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">VI. CHANGES TO OUR PRIVACY POLICY</h4>
-      <p>The School and ATStudios reserve the right to change this policy at any time. Significant changes—such as modifications to the Enterprise CLI data handling or database architecture—will be announced via a prominent notice on the Unified School Portal homepage.</p>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">VII. CONTACT US</h4>
-      <p>If you have any questions regarding this Privacy Policy or the practices of this Site, please contact us:</p>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Email: admin@dapres.dpdns.org</li>
-        <li>Technical Lead: ATStudios</li>
-        <li>Address: Brgy. Calumpang Cerca, 4122</li>
-      </ul>
-
-      <hr class="my-10 border-gray-200">
-
-      <h3 class="text-2xl font-bold mb-4 text-blue-800">Terms of Use: Digital Ecosystem</h3>
-      <p>Dr. Alfredo Pio De Roda Elementary School Engineered by ATStudios Effective Date: January 22, 2026</p>
-      <p>Welcome to the official digital infrastructure of Dr. Alfredo Pio De Roda Elementary School (the "System"). This platform, encompassing the Unified School Portal, AcademiaJS Apex Pro, and the Secure Election Ecosystem, is a proprietary digital environment engineered to modernize school administration.</p>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">1. ACCEPTANCE OF TERMS</h4>
-      <p>By accessing dapres.dpdns.org or any sub-modules (including but not limited to the Admin Console, Faculty Ledger, or Voting Kiosk), you agree to comply with and be bound by these Terms of Use. These terms govern all modules within the system architecture.</p>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">2. DESCRIPTION OF SERVICES & MODULES</h4>
-      <p>The System provides a multi-platform digital ecosystem including:</p>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Unified School Portal: Real-time announcement and institutional gateway.</li>
-        <li>Advanced Grading & Analytics: A Firebase-powered ledger utilizing automated pedagogical logic and Chart.js visualization for DepEd-standard grade calculation.</li>
-        <li>AcademiaJS | Apex Pro: An administrative security suite featuring QR-based student tracking and audit logging.</li>
-        <li>Secure Election Ecosystem: A tamper-proof voting platform for student government.</li>
-        <li>Enterprise CLI: A system-level control center for database maintenance.</li>
-      </ul>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">3. PROPRIETARY RIGHTS & RESTRICTIONS</h4>
-      <p>Ownership: The System, including the "Premium Dark" design language, AcademiaJS logic, and the custom element_sdk.js, is the intellectual property of ATStudios. Strict Prohibitions: Users are strictly prohibited from:</p>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Reverse Engineering: Any attempt to decompile, reverse engineer, or metadata-scrape the JavaScript logic or Firebase architecture.</li>
-        <li>Unauthorized Access: Attempting to access the adminconsole.html or faculty-specific grade.html without explicit authorization.</li>
-        <li>Bypassing Security: Attempting to circumvent the "Kiosk Lockdown" or QR-based tracking protocols.</li>
-      </ul>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">4. DATA INTEGRITY & FIREBASE USAGE</h4>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Real-Time Synchronization: Users acknowledge that the System utilizes Firebase Realtime Database. While we engineer for zero-latency, the School is not liable for data discrepancies caused by local network interruptions.</li>
-        <li>Audit Logging: Administrators are notified that the AcademiaJS module maintains a persistent audit log of all actions. By using the administrative tools, you consent to this accountability tracking.</li>
-      </ul>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">5. STUDENT & FACULTY CONDUCT</h4>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Academic Integrity: Use of the Grading & Analytics system is restricted to authorized faculty. Any attempt to manipulate weighted averages or pedagogical logic is a violation of school policy and these terms.</li>
-        <li>Election Integrity: Use of the kiosk.html voting terminal is for authorized student voters only. Fraudulent voting or "winner-predictive" manipulation is strictly prohibited.</li>
-      </ul>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">6. TECHNICAL SPECIFICATIONS & LIMITATIONS</h4>
-      <p>The System is optimized for modern ES6+ environments. While we utilize a Mobile-First Architecture, certain enterprise features (like the CLI Admin Console) are designed for desktop environments. The School provides this infrastructure "As-Is" and does not guarantee 100% uptime of the DPDNS subdomain or Firebase hosting.</p>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">7. LIMITATION OF LIABILITY</h4>
-      <p>ATStudios and Dr. Alfredo Pio De Roda Elementary School shall not be liable for:</p>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Incidental data loss due to improper "Enterprise CLI" commands by unauthorized users.</li>
-        <li>Errors in automated pedagogical logic resulting from incorrect manual data entry by faculty.</li>
-        <li>Unauthorized distribution of QR security codes by students.</li>
-      </ul>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">8. TERMINATION OF ACCESS</h4>
-      <p>We reserve the right to terminate access to the portal, revoke administrative SFX cues, or lock specific IP addresses from the system heartbeat if these terms are violated.</p>
-
-      <h4 class="text-xl font-semibold mt-6 mb-2">9. CONTACT & SUPPORT</h4>
-      <p>For system maintenance, security reports, or technical inquiries regarding the digital infrastructure:</p>
-      <ul class="list-disc pl-6 space-y-1">
-        <li>Developer: ATStudios</li>
-        <li>Support Email: admin@dapres.dpdns.org</li>
-        <li>School Site: Brgy. Calumpang Cerca, 4122</li>
-      </ul>
-
-      <p class="mt-8 font-semibold text-center text-gray-700">BY USING THE REPOSITORY-DEPLOYED INFRASTRUCTURE, YOU ACKNOWLEDGE THAT YOU HAVE READ AND AGREE TO THESE TERMS. UNAUTHORIZED REPRODUCTION IS SUBJECT TO LEGAL ACTION.</p>
-
-      <div id="legal-bottom-marker" class="h-20"></div>
+<!-- HERO -->
+<section id="home">
+  <div class="h-bg"></div><div class="h-rad"></div>
+  <div class="h-o1"></div><div class="h-o2"></div>
+  <div class="h-cnt">
+    <!-- School Logo -->
+    <div class="h-logo" style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;">
+  <img src="school-logo.png" alt="DAPRES School Logo" style="width:100%;height:100%;object-fit:contain;padding:8px;" />
+</div>
+    <div class="h-badge">🎓 Elementary Excellence &nbsp;•&nbsp; Kindergarten to Grade 6</div>
+    <h1 class="h-title">Inspiring <em>Excellence</em><br>in Young Minds</h1>
+    <div class="h-div"></div>
+    <p class="h-sub">A distinguished learning environment where tradition meets innovation, nurturing young leaders and scholars of tomorrow — from Kindergarten through Grade 6.</p>
+    <div class="h-btns">
+      <a href="#programs" class="btn-gld">Explore Programs</a>
+      <a href="#admissions" class="btn-gst">Start Enrollment</a>
     </div>
-    
-    <div class="shrink-0 border-t border-gray-200 bg-gray-50 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p class="text-sm text-gray-600 text-center sm:text-left">You must scroll to the bottom and read the full content before continuing.</p>
-      <button id="legal-accept-btn" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-10 py-3.5 rounded-xl shadow-md transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed text-base md:text-lg" disabled>I Accept & Continue</button>
+  </div>
+  <div class="sc-ind"><div class="sc-ln"></div><div class="sc-ms"><div class="sc-dot"></div></div></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="ab-w">
+    <div class="rv"><span class="stag" style="background:#dbeafe;color:#1e40af;">Why Choose Us</span></div>
+    <h2 class="sh rv d1" style="color:var(--navy);">A <em>Legacy</em> of<br>Academic Excellence</h2>
+    <div class="gln rv d1"></div>
+    <p class="ab-t ss rv d2">For over five decades, Dr. Alfredo Pio De Roda Elementary School has stood as a beacon of educational distinction, cultivating intellectual curiosity and moral character in every student who walks through our halls.</p>
+    <p class="ab-t ss rv d3">We believe that every child possesses unique gifts and potential. Our mission is to nurture these talents within a refined environment where tradition, innovation, and individualized attention converge.</p>
+  </div>
+  <div class="ab-cards">
+    <div class="ab-card rv d1">
+      <div class="ab-ico" style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><svg width="34" height="34" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <h3>Academic Excellence</h3>
+      <p>Age-appropriate curriculum designed to build strong foundations in literacy, numeracy, and critical thinking skills for elementary learners.</p>
+    </div>
+    <div class="ab-card rv d2">
+      <div class="ab-ico" style="background:linear-gradient(135deg,#10b981,#059669);"><svg width="34" height="34" fill="white" viewBox="0 0 24 24"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-4h3v4h2v-7.5c0-.83.67-1.5 1.5-1.5S12 9.67 12 10.5V11h2v-.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18h2v-7.5c0-1.93-1.57-3.5-3.5-3.5S12 8.57 12 10.5V11h-2v-.5C10 8.57 8.43 7 6.5 7S3 8.57 3 10.5V18h1z"/></svg></div>
+      <h3>Caring Teachers</h3>
+      <p>Passionate elementary educators who understand child development and create nurturing environments where young learners flourish.</p>
+    </div>
+    <div class="ab-card rv d3">
+      <div class="ab-ico" style="background:linear-gradient(135deg,#a855f7,#7c3aed);"><svg width="34" height="34" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+      <h3>Character Building</h3>
+      <p>Focus on developing values, social skills, and emotional intelligence that prepare children for success in school and life.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section id="programs">
+  <div class="pd1"></div><div class="pd2"></div>
+  <div class="p-w">
+    <div class="rv" style="text-align:center;margin-bottom:.5rem;"><span class="stag" style="background:rgba(212,175,55,.18);color:var(--gold);">Academic Programs</span></div>
+    <h2 class="p-h rv d1">Academic <em>Programs</em></h2>
+    <div class="gln rv d1"></div>
+    <p class="p-sub rv d2">A comprehensive education designed to challenge, inspire, and prepare students for lifelong success.</p>
+
+    <div class="p-grid">
+      <!-- 1 -->
+      <div class="pc rv d1">
+        <div class="p-ico"><svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></div>
+        <h3>Core Academics</h3>
+        <p>Rigorous curriculum in language arts, mathematics, and humanities, designed to build strong foundational skills.</p>
+        <a href="#" class="pm">Learn More →</a>
+      </div>
+      <!-- 2 -->
+      <div class="pc rv d2">
+        <div class="p-ico"><svg viewBox="0 0 24 24"><path d="M19.8 18.4L14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6z"/></svg></div>
+        <h3>STEM Excellence</h3>
+        <p>Innovative science and technology programs fostering critical thinking and problem-solving abilities.</p>
+        <a href="#" class="pm">Learn More →</a>
+      </div>
+      <!-- 3 -->
+      <div class="pc rv d3">
+        <div class="p-ico"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.1 0 2-.9 2-2 0-.54-.2-1.03-.52-1.41-.31-.38-.49-.88-.49-1.41 0-1.1.9-2 2-2h1.64c3.1 0 5.37-2.64 5.37-5.71C22 5.99 17.52 2 12 2zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 8 6.5 8 8 8.67 8 9.5 7.33 11 6.5 11zm3-4C8.67 7 8 6.33 8 5.5S8.67 4 9.5 4s1.5.67 1.5 1.5S10.33 7 9.5 7zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 4 14.5 4s1.5.67 1.5 1.5S15.33 7 14.5 7zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 8 17.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
+        <h3>Fine Arts</h3>
+        <p>Comprehensive visual and performing arts education nurturing creativity and artistic expression.</p>
+        <a href="#" class="pm">Learn More →</a>
+      </div>
+      <!-- 4 -->
+      <div class="pc rv d4">
+        <div class="p-ico"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+        <h3>Global Studies</h3>
+        <p>International perspective and cultural awareness through language learning and world exploration.</p>
+        <a href="#" class="pm">Learn More →</a>
+      </div>
+      <!-- 5 -->
+      <div class="pc rv d5">
+        <div class="p-ico"><svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>
+        <h3>Music Program</h3>
+        <p>Classical and contemporary music education with individual and ensemble performance opportunities.</p>
+        <a href="#" class="pm">Learn More →</a>
+      </div>
+      <!-- 6 -->
+      <div class="pc rv d6">
+        <div class="p-ico"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+        <h3>Character Development</h3>
+        <p>Leadership, ethics, and social responsibility woven into every aspect of school life.</p>
+        <a href="#" class="pm">Learn More →</a>
+      </div>
+    </div>
+
+    <!-- Grade Levels -->
+    <div style="margin-top:4.5rem;">
+      <div class="gln rv"></div>
+      <h3 class="p-h rv d1" style="font-size:clamp(1.65rem,3.5vw,2.5rem);margin-bottom:2rem;">Elementary <em>Grade Levels</em></h3>
+      <div class="gl">
+        <div class="gi rv d1"><div class="g-ico"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div><h3>Kindergarten</h3><p>Play-based learning introducing basic literacy, numeracy, and social skills in a nurturing environment.</p></div>
+        <div class="gi rv d2"><div class="g-ico"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div><h3>Grades 1–2</h3><p>Building fundamental reading, writing, and math skills with hands-on learning experiences.</p></div>
+        <div class="gi rv d3"><div class="g-ico"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><h3>Grades 3–4</h3><p>Developing critical thinking and problem-solving skills with increased independence.</p></div>
+        <div class="gi rv d4"><div class="g-ico"><svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg></div><h3>Grades 5–6</h3><p>Advanced curriculum preparing students for middle school with leadership opportunities.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANNOUNCEMENTS -->
+<section id="announcements">
+  <div class="an-w">
+    <div style="text-align:center;margin-bottom:4rem;">
+      <div class="rv"><span class="stag" style="background:#fee2e2;color:#991b1b;">📢 Latest Updates</span></div>
+      <h2 class="sh rv d1" style="color:var(--navy);">School <em>Announcements</em></h2>
+      <div class="gln rv d1"></div>
+      <p class="ss rv d2" style="color:rgba(26,26,62,.65);max-width:580px;margin:0 auto;">Stay informed with the latest news, events, and important updates from our school community.</p>
+    </div>
+    <div id="an-ld" style="text-align:center;padding:3rem 0;"><div class="sp"></div><p style="color:rgba(26,26,62,.5);">Loading announcements…</p></div>
+    <div id="an-ct" style="display:none;"><div id="an-ls" class="an-grid"></div></div>
+    <div id="an-em" style="display:none;text-align:center;padding:3rem 0;">
+      <svg width="52" height="52" fill="currentColor" style="color:rgba(26,26,62,.22);margin:0 auto 1rem;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      <h3 style="font-family:'Playfair Display',serif;color:var(--navy);margin-bottom:.4rem;">No Announcements Yet</h3>
+      <p style="color:rgba(26,26,62,.48);">Check back later for school updates.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ADMISSIONS -->
+<section id="admissions">
+  <div class="ada"></div><div class="adb"></div>
+  <div class="ad-w">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div class="rv"><span class="stag" style="background:rgba(212,175,55,.18);color:var(--gold);">Join Our Family</span></div>
+      <h2 class="p-h rv d1" style="margin-top:.5rem;">Begin Your <em>Journey</em></h2>
+      <div class="gln rv d1"></div>
+      <p class="p-sub rv d2" style="margin-bottom:0;">We welcome inquiries from families who share our commitment to excellence. Complete the form below to begin the admissions process.</p>
+    </div>
+    <div class="ad-g">
+      <div class="rv d1">
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.65rem;color:var(--cream);margin-bottom:2rem;">Simple Application <em style="color:var(--gold);">Process</em></h3>
+        <div class="st"><div class="sn">1</div><div><h4>Submit Application</h4><p>Complete our simple online application form with your child's information and required documents.</p></div></div>
+        <div class="st"><div class="sn">2</div><div><h4>School Visit</h4><p>Schedule a visit to meet our teachers and see our learning environment firsthand.</p></div></div>
+        <div class="st"><div class="sn">3</div><div><h4>Assessment</h4><p>Age-appropriate assessment to understand your child's learning needs and readiness.</p></div></div>
+        <div class="st"><div class="sn">4</div><div><h4>Welcome to Our Family</h4><p>Receive admission decision and begin the exciting journey of elementary education.</p></div></div>
+      </div>
+      <div class="fw rv d2">
+        <div class="fg"></div>
+        <div class="fi">
+          <h3>Enrollment Application</h3>
+          <form id="enf">
+            <div class="fg2"><label>Student Name *</label><input type="text" name="sn" placeholder="Enter student's full name" required></div>
+            <div class="fg2"><label>Parent / Guardian Name *</label><input type="text" name="pn" placeholder="Enter your full name" required></div>
+            <div class="fg2"><label>Email Address *</label><input type="email" name="em" placeholder="your.email@example.com" required></div>
+            <div class="fg2"><label>Phone Number *</label><input type="tel" name="ph" placeholder="+63 9XX XXX XXXX" required></div>
+            <div class="fg2"><label>Grade Level *</label>
+              <select name="gr" required><option value="">Select Grade</option><option value="kindergarten">Kindergarten</option><option value="1st">Grade 1</option><option value="2nd">Grade 2</option><option value="3rd">Grade 3</option><option value="4th">Grade 4</option><option value="5th">Grade 5</option><option value="6th">Grade 6</option></select>
+            </div>
+            <div class="fg2"><label>Additional Information</label><textarea name="msg" rows="4" placeholder="Tell us about your child's interests, learning style, or any questions you have…"></textarea></div>
+            <button type="submit" class="btn-sub" id="sbtn">
+              <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+              Submit Enrollment Application
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUCCESS MODAL -->
+<div id="sm">
+  <div class="sc2">
+    <div class="si"><svg width="38" height="38" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.55rem;color:var(--navy);margin-bottom:.65rem;">Enrollment Submitted!</h3>
+    <p style="color:rgba(26,26,62,.62);margin-bottom:1.4rem;font-size:.92rem;">Thank you for your application. Here are your details:</p>
+    <div style="background:#f8fafc;border-radius:.9rem;padding:1.4rem;margin-bottom:1.1rem;">
+      <div style="margin-bottom:.9rem;"><p style="font-size:.7rem;color:rgba(26,26,62,.48);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;">Control Number</p><div id="cn" class="cb"></div></div>
+      <div style="margin-bottom:.9rem;"><p style="font-size:.7rem;color:rgba(26,26,62,.48);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;">Queue Position</p><div id="qn" class="qb"></div></div>
+      <div><p style="font-size:.7rem;color:rgba(26,26,62,.48);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;">Student Name</p><p id="snm" style="font-weight:700;color:var(--navy);font-size:.95rem;"></p></div>
+    </div>
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:.7rem;padding:.7rem 1rem;margin-bottom:1.1rem;"><p style="color:rgba(26,26,62,.68);font-size:.82rem;">Use your Control Number to <a href="https://dapres.dpdns.org/refcheck" target="_blank" rel="noopener" style="color:#2563eb;font-weight:700;">verify your enrollment</a>.</p></div>
+    <p style="font-size:.78rem;color:rgba(26,26,62,.52);margin-bottom:1.4rem;">Save your control number. We'll contact you within 2–3 business days.</p>
+    <button id="cm" class="btn-gld" style="border:none;cursor:pointer;width:100%;">Close</button>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="ct-w">
+    <div style="text-align:center;margin-bottom:4rem;">
+      <div class="rv"><span class="stag" style="background:rgba(255,255,255,.14);color:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.2);">Get In Touch</span></div>
+      <h2 class="p-h rv d1">Contact Our <em>School</em></h2>
+      <div class="gln rv d1"></div>
+      <p class="p-sub rv d2" style="margin-bottom:0;">We're here to answer your questions and help you learn more about our elementary programs.</p>
+    </div>
+    <div class="ct-g">
+      <div class="ci rv d1"><div class="c-ico"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div><h3>Phone</h3><p>(+63) 997-790-0158</p><p style="color:rgba(147,197,253,.7);font-size:.8rem;margin-top:.3rem;">Mon–Fri, 8:00 AM – 4:00 PM</p></div>
+      <div class="ci rv d2"><div class="c-ico"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div><h3>Email</h3><p>dapres.official@gmail.com</p><p style="color:rgba(147,197,253,.7);font-size:.8rem;margin-top:.3rem;">We respond within 24 hours</p></div>
+      <div class="ci rv d3"><div class="c-ico"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div><h3>Visit Us</h3><p>Brgy. Calumpang Cerca, 4122</p><p style="color:rgba(147,197,253,.7);font-size:.8rem;margin-top:.3rem;">Tours available by appointment</p></div>
+    </div>
+    <div class="rv" style="margin-top:4rem;">
+      <div class="h-card"><h3>School Office Hours</h3><div class="hg"><div><h4>School Days</h4><p>Monday – Friday<br>7:30 AM – 3:30 PM</p></div><div><h4>Office Hours</h4><p>Monday – Friday<br>8:00 AM – 4:00 PM</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-in">
+    <div class="ft-g">
+      <div class="fc"><h4>About</h4><ul><li><a href="#">Our History</a></li><li><a href="#">Mission &amp; Values</a></li><li><a href="#">Leadership</a></li><li><a href="#">Accreditation</a></li></ul></div>
+      <div class="fc"><h4>Academics</h4><ul><li><a href="#">Curriculum</a></li><li><a href="#">Faculty</a></li><li><a href="#programs">Programs</a></li><li><a href="#">Calendar</a></li></ul></div>
+      <div class="fc"><h4>Admissions</h4><ul><li><a href="#admissions">Application Process</a></li><li><a href="#">Tuition &amp; Aid</a></li><li><a href="#">Visit School</a></li><li><a href="#">FAQ</a></li></ul></div>
+      <div class="fc"><h4>Connect</h4><ul><li><a href="#contact">Contact Us</a></li><li><a href="#">News &amp; Events</a></li><li><a href="#">Alumni</a></li><li><a href="https://www.facebook.com/DepEDTayoDAPRES108012" target="_blank" rel="noopener">Facebook Page</a></li></ul></div>
+    </div>
+    <div class="ft-info">
+      <div class="ft-br"><h3><span>D</span>r. Alfredo Pio De Roda</h3><span class="sub">Elementary School</span><p>Fostering academic excellence and character development in a refined learning environment for over five decades.</p></div>
+      <div>
+        <div class="fci"><div class="fci-i"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div><p>Brgy. Calumpang Cerca, 4122</p></div>
+        <div class="fci"><div class="fci-i"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div><p>(+63) 997-790-0158</p></div>
+        <div class="fci"><div class="fci-i"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div><p>dapres.official@gmail.com</p></div>
+      </div>
+    </div>
+    <div class="ft-bot">
+      <div class="gln" style="margin-bottom:1.25rem;"></div>
+      <p class="ft-tl">Building a <em>Legacy</em> of Excellence</p>
+      <p class="ft-cp">© 2026 Dr. Alfredo Pio De Roda Elementary School. All rights reserved.</p>
+      <div class="ft-ls">
+        <a href="#" onclick="openLegal();return false;">Privacy Policy</a>
+        <span class="ft-sep">•</span>
+        <a href="#" onclick="openLegal();return false;">Terms of Use</a>
+        <span class="ft-sep">•</span>
+        <a href="https://www.facebook.com/DepEDTayoDAPRES108012" target="_blank" rel="noopener">Facebook</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- LEGAL MODAL -->
+<div id="lo">
+  <div class="lb" id="lbk"></div>
+  <div class="lc">
+    <div class="lh"><h2>Privacy Policy <span class="ga">&amp;</span> Terms of Use</h2><button class="lx" id="lx" disabled title="Read to end to continue">×</button></div>
+    <div class="lbd" id="lsc">
+      <p class="l-eff">Last Updated / Effective: January 22, 2026</p>
+      <h3>Dr. Alfredo Pio De Roda School Privacy Policy</h3>
+      <p>Dr. Alfredo Pio De Roda Elementary School (the "School") is committed to maintaining robust privacy protections for its users. Our Privacy Policy is designed to help you understand how we collect, use, and safeguard the information you provide to us and to assist you in making informed decisions when using our digital ecosystem.</p>
+      <p>For purposes of this Agreement, "Site" refers to the School's website at dapres.dpdns.org. "Service" refers to digital services including the Enrollment Portal, Advanced Grading System, and Student Election Kiosk. "We," "us," and "our" refer to the School and its technical developer, ATStudios. "You" refers to you as a user.</p>
+      <p>By accessing our Site or Service, you accept our Privacy Policy and Terms of Use, and consent to our collection, storage, use, and disclosure of your Personal Information as described herein.</p>
+      <h4>I. INFORMATION WE COLLECT</h4>
+      <ol><li><strong>Information Collected via Technology:</strong> Device data (referring URLs, browser type, connection time), persistent cookies for session states, and audit logs recording administrative actions, IP addresses, and timestamps.</li><li><strong>Information You Provide:</strong> Full names of students and guardians, email addresses and phone numbers, grade levels and academic data, and QR codes for student tracking.</li><li><strong>Children's Privacy:</strong> The Site serves an elementary school population. Registration must be submitted by a parent or legal guardian. We do not knowingly allow students under 13 to create independent accounts.</li></ol>
+      <h4>II. HOW WE USE AND SHARE INFORMATION</h4>
+      <p>We do not sell, trade, or rent your Personal Information. We share data only with: Firebase (Google Cloud) for real-time synchronization, School Administration for official DepEd-standard academic tracking, and as required by legal compliance.</p>
+      <h4>III. HOW WE PROTECT INFORMATION</h4>
+      <ul><li>Encryption: Data transmitted to Firebase is encrypted in transit.</li><li>Kiosk Lockdown: The Secure Election Ecosystem prevents unauthorized exit or data tampering.</li><li>Access Control: Sensitive modules are restricted to authorized administrative IP addresses.</li><li>Audit Trails: Every significant change to a student's grade or enrollment status is logged.</li></ul>
+      <h4>IV. YOUR RIGHTS</h4>
+      <p>You have the right to review student data, request deletion of enrollment applications, and opt-out of non-critical broadcast notifications.</p>
+      <h4>V. LINKS TO OTHER WEBSITES</h4>
+      <p>Our Site integrates with Facebook (DepEDTayoDAPRES108012) and uses assets from Mixkit and Lucide Icons. We are not responsible for the privacy practices of these external services.</p>
+      <h4>VI. CHANGES TO OUR PRIVACY POLICY</h4>
+      <p>The School and ATStudios reserve the right to change this policy at any time. Significant changes will be announced via the Unified School Portal homepage.</p>
+      <h4>VII. CONTACT US</h4>
+      <ul><li>Email: dapres.official@gmail.com</li><li>Technical Lead: ATStudios</li><li>Address: Brgy. Calumpang Cerca, 4122</li></ul>
+      <hr>
+      <h3>Terms of Use: Digital Ecosystem</h3>
+      <p>Dr. Alfredo Pio De Roda Elementary School — Engineered by ATStudios — Effective Date: January 22, 2026</p>
+      <h4>1. ACCEPTANCE OF TERMS</h4>
+      <p>By accessing dapres.dpdns.org or any sub-modules, you agree to comply with and be bound by these Terms of Use governing all modules within the system architecture.</p>
+      <h4>2. DESCRIPTION OF SERVICES &amp; MODULES</h4>
+      <ul><li>Unified School Portal: Real-time announcement and institutional gateway.</li><li>Advanced Grading &amp; Analytics: Firebase-powered ledger with DepEd-standard grade calculation.</li><li>AcademiaJS | Apex Pro: Administrative security suite with QR-based student tracking.</li><li>Secure Election Ecosystem: Tamper-proof voting platform for student government.</li><li>Enterprise CLI: System-level control center for database maintenance.</li></ul>
+      <h4>3. PROPRIETARY RIGHTS &amp; RESTRICTIONS</h4>
+      <p>The System, including the design language, AcademiaJS logic, and custom element_sdk.js, is the intellectual property of ATStudios. Users are strictly prohibited from reverse engineering, unauthorized access to restricted modules, and bypassing security protocols.</p>
+      <h4>4. DATA INTEGRITY &amp; FIREBASE USAGE</h4>
+      <p>The System utilizes Firebase Realtime Database. The School is not liable for data discrepancies caused by local network interruptions. Administrators consent to accountability tracking via the persistent audit log.</p>
+      <h4>5. STUDENT &amp; FACULTY CONDUCT</h4>
+      <p>Use of the Grading &amp; Analytics system is restricted to authorized faculty. Any attempt to manipulate grades is a violation of school policy. Fraudulent voting in the election kiosk is strictly prohibited.</p>
+      <h4>6. TECHNICAL SPECIFICATIONS &amp; LIMITATIONS</h4>
+      <p>The System is optimized for modern ES6+ environments. The School provides this infrastructure "As-Is" and does not guarantee 100% uptime.</p>
+      <h4>7. LIMITATION OF LIABILITY</h4>
+      <p>ATStudios and Dr. Alfredo Pio De Roda Elementary School shall not be liable for incidental data loss due to improper commands, errors from incorrect manual data entry, or unauthorized distribution of QR security codes.</p>
+      <h4>8. TERMINATION OF ACCESS</h4>
+      <p>We reserve the right to terminate access or lock specific IP addresses if these terms are violated.</p>
+      <h4>9. CONTACT &amp; SUPPORT</h4>
+      <ul><li>Developer: ATStudios</li><li>Support Email: dapres.official@gmail.com</li><li>School Site: Brgy. Calumpang Cerca, 4122</li></ul>
+      <p style="margin-top:2rem;font-weight:700;text-align:center;font-size:.82rem;text-transform:uppercase;">By using this infrastructure, you acknowledge that you have read and agree to these terms. Unauthorized reproduction is subject to legal action.</p>
+      <div id="l-bot" style="height:4rem;"></div>
+    </div>
+    <div class="lf">
+      <span class="l-hint" id="l-hint">📜 Scroll to the end to enable the Accept button.</span>
+      <div class="l-btns"><button class="bld" id="l-dis" disabled>Dismiss</button><button class="bla" id="l-acc" disabled>I Accept &amp; Continue</button></div>
     </div>
   </div>
 </div>
- </body>
+
+<script>
+/* Firebase */
+const fc={apiKey:"AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",authDomain:"clinique-parfum.firebaseapp.com",databaseURL:"https://clinique-parfum-default-rtdb.firebaseio.com",projectId:"clinique-parfum",storageBucket:"clinique-parfum.firebasestorage.app",messagingSenderId:"569473208892",appId:"1:569473208892:web:f009390a8631fc164ce939"};
+let db,fbOK=false;
+try{firebase.initializeApp(fc);db=firebase.database();fbOK=true;}catch(e){console.log('FB demo:',e.message);}
+
+/* Loading */
+window.addEventListener('load',()=>{setTimeout(()=>{const ls=document.getElementById('ls');ls.classList.add('out');setTimeout(()=>ls.style.display='none',1050);},4000);});
+
+/* Nav scroll */
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('sc',scrollY>50));
+
+/* Mobile menu */
+document.getElementById('mb-btn').addEventListener('click',()=>document.getElementById('mb-menu').classList.toggle('open'));
+
+/* Smooth scroll */
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[href^="#"]');if(!a)return;
+  const href=a.getAttribute('href');if(href==='#')return;
+  const t=document.querySelector(href);
+  if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+  document.getElementById('mb-menu').classList.remove('open');
+});
+
+/* Intersection Observer */
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target);}});},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* Announcements */
+const fmtD=s=>{const d=new Date(s),n=new Date(),df=Math.ceil(Math.abs(n-d)/86400000);if(df<=1)return'Today';if(df===2)return'Yesterday';if(df<=7)return`${df-1} days ago`;return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});};
+const aIco=p=>({urgent:`<svg width="20" height="20" fill="#ef4444" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V19H11V17M11,5H13V15H11V5Z"/></svg>`,important:`<svg width="20" height="20" fill="#f59e0b" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,general:`<svg width="20" height="20" fill="#3b82f6" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/></svg>`,event:`<svg width="20" height="20" fill="#10b981" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>`}[p]||'');
+
+function toggleAnn(c){const t=c.querySelector('.an-t'),l=c.querySelector('.rm-l'),i=c.querySelector('.rm-i');t.classList.toggle('ex');const ex=t.classList.contains('ex');l.textContent=ex?'Show Less':'Read More';i.style.transform=ex?'rotate(180deg)':'rotate(0deg)';}
+
+function showAnn(list){
+  document.getElementById('an-ld').style.display='none';document.getElementById('an-em').style.display='none';
+  const ct=document.getElementById('an-ct'),ls=document.getElementById('an-ls');ct.style.display='block';
+  ls.innerHTML=list.map(a=>{const p=(a.priority||'general').toLowerCase();return`<div class="an-c p${p[0]} rv" onclick="toggleAnn(this)"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.55rem;"><div style="display:flex;align-items:center;gap:.45rem;"><span class="ab2 b${p[0]}">${p}</span><span style="font-size:.72rem;color:rgba(26,26,62,.42);">${fmtD(a.createdAt)}</span></div><div style="opacity:.7;">${aIco(p)}</div></div><h3 style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--navy);margin-bottom:.45rem;line-height:1.3;">${a.title}</h3><p class="an-t">${a.content}</p><div style="margin-top:.7rem;padding-top:.55rem;border-top:1px solid rgba(26,26,62,.07);display:flex;align-items:center;gap:.3rem;color:#3b82f6;"><span class="rm-l" style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Read More</span><svg class="rm-i" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition:transform .3s;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div>`;}).join('');
+  setTimeout(()=>document.querySelectorAll('.an-c.rv').forEach(el=>io.observe(el)),50);
+}
+
+function noAnn(){document.getElementById('an-ld').style.display='none';document.getElementById('an-em').style.display='block';}
+
+async function loadAnn(){
+  if(!fbOK){setTimeout(()=>showAnn([{title:'Welcome Back to School!',content:'We are excited to welcome all our students back for the new academic year. Classes begin Monday. Please ensure all enrollment forms are completed.',priority:'important',createdAt:new Date(Date.now()-86400000).toISOString()},{title:'Parent-Teacher Conference',content:'Parent-Teacher conferences are scheduled. Please sign up for your preferred time slot through the school portal.',priority:'general',createdAt:new Date(Date.now()-172800000).toISOString()},{title:'School Closure – Weather Alert',content:'Due to severe weather conditions, the school will be closed tomorrow. All after-school activities are also cancelled.',priority:'urgent',createdAt:new Date().toISOString()}]),1000);return;}
+  try{const s=await db.ref('announcements').orderByChild('createdAt').once('value');const d=s.val();if(!d){noAnn();return;}const po={urgent:0,important:1,general:2,event:3};const l=Object.values(d).filter(a=>a.isActive).sort((a,b)=>{const da=po[(a.priority||'general').toLowerCase()]??2,db2=po[(b.priority||'general').toLowerCase()]??2;return da!==db2?da-db2:new Date(b.createdAt)-new Date(a.createdAt);});l.length?showAnn(l):noAnn();}catch(e){console.error(e);noAnn();}
+}
+loadAnn();
+
+/* Enrollment */
+function gCtrl(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0'),r=Math.floor(Math.random()*9999).toString().padStart(4,'0');return`${y}${m}${dy}-${r}`;}
+async function nxtQ(){if(!fbOK)return Math.floor(Math.random()*50)+1;try{const s=await db.ref('enrollments').once('value');const v=s.val();return v?Object.keys(v).length+1:1;}catch{return Math.floor(Math.random()*50)+1;}}
+async function sEnr(data){if(!fbOK){console.log('Demo:',data);return{ok:true};}try{await db.ref('enrollments').push().set(data);return{ok:true};}catch(e){return{ok:false};}}
+
+document.getElementById('enf').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const btn=document.getElementById('sbtn');btn.disabled=true;
+  btn.innerHTML=`<div class="sp" style="width:18px;height:18px;border-width:2px;border-top-color:white;margin:0;"></div> Processing…`;
+  try{
+    const fd=new FormData(e.target),ctrl=gCtrl(),q=await nxtQ();
+    const enr={student_name:fd.get('sn'),parent_name:fd.get('pn'),email:fd.get('em'),phone:fd.get('ph'),grade:fd.get('gr'),message:fd.get('msg')||'',control_number:ctrl,queue_number:q,enrollment_date:new Date().toISOString(),status:'pending'};
+    const r=await sEnr(enr);
+    if(r.ok){document.getElementById('cn').textContent=ctrl;document.getElementById('qn').textContent=`#${q}`;document.getElementById('snm').textContent=enr.student_name;document.getElementById('sm').classList.add('on');e.target.reset();}
+    else toast('Failed to submit. Please try again.');
+  }catch(err){console.error(err);toast('An error occurred. Please try again.');}
+  finally{btn.disabled=false;btn.innerHTML=`<svg width="18" height="18" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Submit Enrollment Application`;}
+});
+
+document.getElementById('cm').addEventListener('click',()=>document.getElementById('sm').classList.remove('on'));
+document.getElementById('sm').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on');});
+
+function toast(msg){const t=document.createElement('div');t.className='terr';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),5000);}
+
+/* Legal */
+const lo=document.getElementById('lo'),lsc=document.getElementById('lsc'),lacc=document.getElementById('l-acc'),ldis=document.getElementById('l-dis'),lxb=document.getElementById('lx'),lh=document.getElementById('l-hint');
+
+function openLegal(){lo.style.display='block';const done=localStorage.getItem('dapres_lv1')==='true';lacc.disabled=!done;ldis.disabled=!done;lxb.disabled=!done;lh.textContent=done?'✅ You may accept or dismiss.':'📜 Scroll to the end to enable the Accept button.';}
+function closeLegal(){lo.style.display='none';}
+function chkL(){if(lsc.scrollTop+lsc.clientHeight>=lsc.scrollHeight-120){lacc.disabled=ldis.disabled=lxb.disabled=false;lh.textContent='✅ You may now accept or dismiss.';}}
+lsc.addEventListener('scroll',chkL);
+lacc.addEventListener('click',()=>{localStorage.setItem('dapres_lv1','true');closeLegal();});
+ldis.addEventListener('click',()=>{if(!lacc.disabled)closeLegal();});
+lxb.addEventListener('click',()=>{if(!lxb.disabled)closeLegal();});
+document.getElementById('lbk').addEventListener('click',()=>{if(!lacc.disabled)closeLegal();});
+
+/* Show legal after loading (first visit) */
+setTimeout(()=>{if(localStorage.getItem('dapres_lv1')!=='true')openLegal();},5300);
+</script>
+</body>
 </html>
