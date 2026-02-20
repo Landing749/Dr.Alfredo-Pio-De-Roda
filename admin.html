@@ -1,1132 +1,854 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <script src="https://dapres.dpdns.org/analytics.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enrollment Admin Dashboard</title>
-    <script src="/_sdk/element_sdk.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Quill.js for Rich Text Editing -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    
-    <!-- Firebase SDK (Compat version for Realtime Database) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom scrollbar for webkit */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
-        /* Quill Overrides for rounded corners */
-        .ql-toolbar.ql-snow {
-            border-top-left-radius: 0.375rem;
-            border-top-right-radius: 0.375rem;
-            border-color: #e2e8f0;
-        }
-        .ql-container.ql-snow {
-            border-bottom-left-radius: 0.375rem;
-            border-bottom-right-radius: 0.375rem;
-            border-color: #e2e8f0;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.875rem;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width:6px;height:6px; }
+        ::-webkit-scrollbar-track { background:#f1f5f9; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1;border-radius:3px; }
+        .presence-dot { width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;box-shadow:0 0 0 2px white,0 0 8px #22c55e;animation:pulseGreen 2s infinite;flex-shrink:0; }
+        .presence-dot.offline { background:#94a3b8;box-shadow:0 0 0 2px white;animation:none; }
+        @keyframes pulseGreen { 0%,100%{box-shadow:0 0 0 2px white,0 0 6px #22c55e}50%{box-shadow:0 0 0 2px white,0 0 14px #22c55e} }
+        .label-chip { display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .6rem;border-radius:9999px;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase; }
+        @keyframes modalIn { from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)} }
+        .modal-enter { animation:modalIn .2s ease-out both; }
+        @keyframes msgIn { from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)} }
+        .msg-in { animation:msgIn .18s ease-out both; }
+        .doc-row:hover .doc-remove { opacity:1 !important; }
     </style>
-    <style>@view-transition { navigation: auto; }</style>
-    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Header -->
-    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-inner overflow-hidden p-1">
-                        <!-- Updated Logo from GitHub -->
-                        <img src="https://raw.githubusercontent.com/Landing749/Dr.Alfredo-Pio-De-Roda/main/school-logo.png" alt="Logo" class="w-full h-full object-contain">
-                    </div>
-                    <div>
-                        <h1 id="dashboard-title" class="text-xl font-bold tracking-tight">Enrollment Admin</h1>
-                        <p id="school-name" class="text-slate-400 text-xs font-medium">Dr. Alfredo Pio De Roda Elementary School</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-3">
-                    <button id="refresh-btn" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-slate-700">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Refresh
-                    </button>
-                    <button id="export-btn" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-sm">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        Export CSV
-                    </button>
-                </div>
+<!-- HEADER -->
+<header class="bg-slate-900 text-white sticky top-0 z-30 border-b border-slate-800 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-white rounded-lg overflow-hidden p-1 flex-shrink-0">
+                <img src="https://raw.githubusercontent.com/Landing749/Dr.Alfredo-Pio-De-Roda/main/school-logo.png" class="w-full h-full object-contain">
+            </div>
+            <div>
+                <p class="text-sm font-bold leading-tight">Enrollment Admin</p>
+                <p class="text-slate-400 text-xs">Dr. Alfredo Pio De Roda Elementary School</p>
             </div>
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Total -->
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Enrollments</p>
-                    <p id="total-count" class="text-2xl font-bold text-slate-800 mt-1">0</p>
-                </div>
-                <div class="p-3 bg-blue-50 rounded-lg">
-                    <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-md text-xs text-slate-300">
+                <span class="presence-dot" id="admin-dot"></span>
+                <span>Admin Online</span>
             </div>
-
-            <!-- Pending -->
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Pending Review</p>
-                    <p id="pending-count" class="text-2xl font-bold text-amber-600 mt-1">0</p>
-                </div>
-                <div class="p-3 bg-amber-50 rounded-lg">
-                    <svg class="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Approved -->
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Approved</p>
-                    <p id="approved-count" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
-                </div>
-                <div class="p-3 bg-emerald-50 rounded-lg">
-                    <svg class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Weekly -->
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">This Week</p>
-                    <p id="week-count" class="text-2xl font-bold text-indigo-600 mt-1">0</p>
-                </div>
-                <div class="p-3 bg-indigo-50 rounded-lg">
-                    <svg class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                </div>
-            </div>
+            <button onclick="openStepsModal()" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                Manage Steps
+            </button>
+            <button onclick="openDocsConfigModal()" class="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Required Docs
+            </button>
+            <button onclick="loadEnrollments()" class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-md text-xs font-medium transition-colors border border-slate-700">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Refresh
+            </button>
+            <button onclick="exportCSV()" class="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors shadow-sm">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Export CSV
+            </button>
         </div>
+    </div>
+</header>
 
-        <!-- Controls -->
-        <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <!-- Tabs -->
-                <div class="flex flex-wrap gap-2" id="filter-tabs">
-                    <button class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-slate-900 text-white shadow-sm" data-status="all">All</button>
-                    <button class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="pending">Pending</button>
-                    <button class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="approved">Approved</button>
-                    <button class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="contacted">Contacted</button>
-                    <button class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="rejected">Rejected</button>
-                </div>
+<!-- MAIN -->
+<main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-5">
 
-                <!-- Search & Grade -->
-                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                    <div class="relative flex-grow">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <input type="text" id="search-input" class="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Search students...">
-                    </div>
-                    <select id="grade-filter" class="block w-full sm:w-40 pl-3 pr-8 py-2 text-sm border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 rounded-md bg-white">
-                        <option value="">All Grades</option>
-                        <option value="kindergarten">Kindergarten</option>
-                        <option value="1st">1st Grade</option>
-                        <option value="2nd">2nd Grade</option>
-                        <option value="3rd">3rd Grade</option>
-                        <option value="4th">4th Grade</option>
-                        <option value="5th">5th Grade</option>
-                        <option value="6th">6th Grade</option>
-                    </select>
-                </div>
-            </div>
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+            <div><p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total</p><p id="stat-total" class="text-2xl font-bold text-slate-800 mt-0.5">0</p></div>
+            <div class="p-2.5 bg-blue-50 rounded-lg"><svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
         </div>
-
-        <!-- Data Display -->
-        <div class="relative min-h-[400px]">
-            <!-- Loading -->
-            <div id="loading-state" class="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 rounded-xl">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
-                <p class="text-slate-500 text-sm font-medium">Loading...</p>
-            </div>
-
-            <!-- Table -->
-            <div id="enrollments-container" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-200">
-                        <thead class="bg-slate-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Student</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Control #</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Queue</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="enrollments-tbody" class="bg-white divide-y divide-slate-200">
-                            <!-- Rows inserted via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
-                <div class="p-3 bg-slate-50 rounded-full mb-3">
-                    <svg class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <h3 class="text-base font-semibold text-slate-800">No Enrollments Found</h3>
-                <p class="text-slate-500 text-sm mt-1">Try adjusting your filters or search terms.</p>
-                <button onclick="document.querySelector('[data-status=all]').click()" class="mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium">Clear Filters</button>
-            </div>
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+            <div><p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Pending</p><p id="stat-pending" class="text-2xl font-bold text-amber-600 mt-0.5">0</p></div>
+            <div class="p-2.5 bg-amber-50 rounded-lg"><svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
         </div>
-    </main>
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+            <div><p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Under Review</p><p id="stat-review" class="text-2xl font-bold text-blue-600 mt-0.5">0</p></div>
+            <div class="p-2.5 bg-blue-50 rounded-lg"><svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+            <div><p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Approved</p><p id="stat-approved" class="text-2xl font-bold text-emerald-600 mt-0.5">0</p></div>
+            <div class="p-2.5 bg-emerald-50 rounded-lg"><svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+            <div><p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Being Called</p><p id="stat-calling" class="text-2xl font-bold text-purple-600 mt-0.5">0</p></div>
+            <div class="p-2.5 bg-purple-50 rounded-lg"><svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg></div>
+        </div>
+    </div>
 
-    <!-- Detail Modal -->
-    <div id="detail-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity opacity-0" id="modal-backdrop"></div>
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" id="modal-panel">
-                <div class="bg-white px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-slate-800" id="modal-title">Application Details</h3>
-                    <button id="close-detail-modal" class="text-slate-400 hover:text-slate-500 focus:outline-none transition-colors"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+    <!-- Filter + Search -->
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="flex flex-wrap gap-2" id="filter-tabs">
+                <button class="px-3 py-1.5 rounded-md text-sm font-medium bg-slate-900 text-white shadow-sm" data-status="all">All</button>
+                <button class="px-3 py-1.5 rounded-md text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="pending">Pending</button>
+                <button class="px-3 py-1.5 rounded-md text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="under_review">Under Review</button>
+                <button class="px-3 py-1.5 rounded-md text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="being_called">Being Called</button>
+                <button class="px-3 py-1.5 rounded-md text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="approved">Approved</button>
+                <button class="px-3 py-1.5 rounded-md text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-status="rejected">Rejected</button>
+            </div>
+            <div class="flex gap-2 w-full lg:w-auto">
+                <div class="relative flex-grow lg:w-64">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
+                    <input id="search-input" type="text" placeholder="Search students..." class="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-md text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="px-6 py-6 max-h-[70vh] overflow-y-auto">
-                    <div id="modal-content" class="space-y-6"></div>
-                </div>
-                <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:justify-end gap-3">
-                    <button id="modal-reject" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-rose-300 shadow-sm text-sm font-medium rounded-md text-rose-700 bg-white hover:bg-rose-50 focus:outline-none transition-colors">
-                        Reject
-                    </button>
-                    <button id="modal-contact" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-blue-300 shadow-sm text-sm font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none transition-colors">
-                        Mark Contacted
-                    </button>
-                    <button id="modal-approve" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none transition-colors">
-                        Approve Enrollment
-                    </button>
-                </div>
+                <select id="grade-filter" class="pl-3 pr-8 py-2 text-sm border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md bg-white">
+                    <option value="">All Grades</option>
+                    <option value="kindergarten">Kindergarten</option>
+                    <option value="1st">Grade 1</option>
+                    <option value="2nd">Grade 2</option>
+                    <option value="3rd">Grade 3</option>
+                    <option value="4th">Grade 4</option>
+                    <option value="5th">Grade 5</option>
+                    <option value="6th">Grade 6</option>
+                </select>
             </div>
         </div>
     </div>
 
-    <!-- Brevo Email Modal -->
-    <div id="email-modal" class="fixed inset-0 z-[60] overflow-y-auto hidden" aria-labelledby="email-modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0" id="email-backdrop"></div>
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" id="email-panel">
-                <div class="bg-blue-600 px-6 py-4 flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        <span id="email-modal-title">Compose Email</span>
-                    </h3>
-                    <button id="close-email-modal" class="text-blue-100 hover:text-white focus:outline-none transition-colors"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
-                </div>
-                
-                <div class="px-6 py-6 max-h-[70vh] overflow-y-auto space-y-4">
-                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-blue-700">
-                                    Action: <strong id="email-action-badge" class="uppercase"></strong>. This email will be sent to the guardian.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hidden config fields for cleanliness, can be shown if needed -->
-                    <div class="hidden">
-                        <input type="password" id="brevo-api-key" placeholder="xkeysib-..." class="block w-full">
-                        <input type="email" id="email-from" class="block w-full">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">To</label>
-                            <input type="text" id="email-to" readonly class="block w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-100 text-slate-600 sm:text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Recipient Name</label>
-                            <input type="text" id="email-name" readonly class="block w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-100 text-slate-600 sm:text-sm">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Subject</label>
-                        <input type="text" id="email-subject" class="block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Message Body</label>
-                        <!-- Quill Editor Container -->
-                        <div class="bg-white rounded-md shadow-sm border border-slate-300">
-                            <div id="editor-container" class="h-64 font-sans"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-3">
-                    <button id="email-mark-only" class="px-4 py-2 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none transition-colors">
-                        Update Status (No Email)
-                    </button>
-                    <button id="email-send" class="flex items-center justify-center gap-2 px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition-colors">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                        <span id="email-send-text">Send & Update Status</span>
-                    </button>
-                </div>
+    <!-- Table -->
+    <div class="relative min-h-[300px]">
+        <div id="loading-state" class="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 rounded-xl">
+            <div class="animate-spin rounded-full h-7 w-7 border-b-2 border-blue-600 mb-3"></div>
+            <p class="text-slate-500 text-sm">Loading...</p>
+        </div>
+        <div id="table-container" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Student</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Control #</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Docs</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Stage</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider w-20">Open</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="bg-white divide-y divide-slate-200"></tbody>
+                </table>
             </div>
         </div>
+        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-dashed border-slate-200">
+            <svg class="h-10 w-10 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-slate-500 text-sm font-medium">No enrollments found</p>
+        </div>
     </div>
+</main>
 
-    <script>
-        // ------------------------------------------------------------------
-        // CONFIGURATION (HARDCODED FOR PRODUCTION)
-        // ------------------------------------------------------------------
-        const config = {
-            firebase: {
-                apiKey: "AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",
-                authDomain: "clinique-parfum.firebaseapp.com",
-                databaseURL: "https://clinique-parfum-default-rtdb.firebaseio.com",
-                projectId: "clinique-parfum",
-                storageBucket: "clinique-parfum.firebasestorage.app",
-                messagingSenderId: "569473208892",
-                appId: "1:569473208892:web:f009390a8631fc164ce939",
-                measurementId: "G-XW3R3D64PR"
-            },
-            email: {
-                senderName: "Dr. Alfredo Pio De Roda Elementary School",
-                senderEmail: "globalinsightnewsmain@gmail.com"
-            }
-        };
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- DETAIL MODAL -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="detail-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="flex items-start justify-center min-h-screen px-4 py-6">
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl modal-enter" style="max-height:94vh;display:flex;flex-direction:column">
 
-        // ------------------------------------------------------------------
-        // STATE MANAGEMENT
-        // ------------------------------------------------------------------
-        let state = {
-            enrollments: [],
-            filter: 'all',
-            searchTerm: '',
-            gradeFilter: '',
-            currentEnrollment: null,
-            isFirebaseReady: false,
-            // Hardcoded key as per user request
-            brevoKey: '${{ secrets.MY_API_BREVO }}',
-            emailAction: 'contact' // 'contact', 'approve', 'reject'
-        };
+            <!-- Modal header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800" id="m-name">Application Details</h3>
+                    <p class="text-xs text-slate-400 mt-0.5" id="m-ctrl">—</p>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
 
-        let database;
-        let quill;
+            <!-- STATUS BAR -->
+            <div class="px-6 py-2.5 bg-slate-50 border-b border-slate-100 flex-shrink-0 flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">Set Status:</span>
+                <button onclick="setStatus('pending')"       data-s="pending"       class="sbt px-3 py-1 text-xs font-bold rounded-full bg-amber-100   text-amber-800   border border-amber-200   hover:ring-2 hover:ring-amber-400   hover:ring-offset-1 transition-all">⏳ Pending</button>
+                <button onclick="setStatus('under_review')"  data-s="under_review"  class="sbt px-3 py-1 text-xs font-bold rounded-full bg-blue-100    text-blue-800    border border-blue-200    hover:ring-2 hover:ring-blue-400    hover:ring-offset-1 transition-all">🔍 Under Review</button>
+                <button onclick="setStatus('being_called')"  data-s="being_called"  class="sbt px-3 py-1 text-xs font-bold rounded-full bg-purple-100  text-purple-800  border border-purple-200  hover:ring-2 hover:ring-purple-400  hover:ring-offset-1 transition-all">📞 Being Called</button>
+                <button onclick="setStatus('approved')"      data-s="approved"      class="sbt px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 hover:ring-2 hover:ring-emerald-400 hover:ring-offset-1 transition-all">✅ Approved</button>
+                <button onclick="setStatus('rejected')"      data-s="rejected"      class="sbt px-3 py-1 text-xs font-bold rounded-full bg-rose-100    text-rose-800    border border-rose-200    hover:ring-2 hover:ring-rose-400    hover:ring-offset-1 transition-all">✕ Rejected</button>
+                <div class="ml-auto flex items-center gap-2">
+                    <span class="text-xs text-slate-400">Current:</span>
+                    <span id="m-status-badge" class="px-2.5 py-0.5 text-xs font-bold rounded-full border"></span>
+                </div>
+            </div>
 
-        // ------------------------------------------------------------------
-        // INITIALIZATION
-        // ------------------------------------------------------------------
-        function initApp() {
-            // Restore Key if available
-            const keyInput = document.getElementById('brevo-api-key');
-            if(keyInput) keyInput.value = state.brevoKey;
-            
-            const senderInput = document.getElementById('email-from');
-            if(senderInput) senderInput.value = config.email.senderEmail;
+            <!-- Body -->
+            <div class="flex overflow-hidden flex-1" style="min-height:0">
 
-            // Initialize Quill Editor
-            quill = new Quill('#editor-container', {
-                theme: 'snow',
-                modules: {
-                    toolbar: [
-                        ['bold', 'italic', 'underline'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['clean']
-                    ]
-                },
-                placeholder: 'Compose email...'
-            });
+                <!-- LEFT -->
+                <div class="flex-1 overflow-y-auto p-6 space-y-6">
 
-            try {
-                if (typeof firebase !== 'undefined') {
-                    firebase.initializeApp(config.firebase);
-                    database = firebase.database();
-                    state.isFirebaseReady = true;
-                    console.log("Firebase initialized.");
-                    loadEnrollments();
-                } else {
-                    throw new Error("Firebase SDK not loaded");
-                }
-            } catch (error) {
-                console.warn("Firebase Init Failed (Running in Demo Mode):", error);
-                loadDemoData();
-            }
-        }
-
-        // ------------------------------------------------------------------
-        // DATA OPERATIONS
-        // ------------------------------------------------------------------
-        async function loadEnrollments() {
-            if (!state.isFirebaseReady) return;
-
-            setLoading(true);
-            try {
-                const snapshot = await database.ref('enrollments').once('value');
-                const data = snapshot.val();
-                
-                if (data) {
-                    state.enrollments = Object.keys(data).map(key => {
-                        let enrollment = { id: key, ...data[key] };
-                        // Ensure status is array for multi-tag support
-                        if (typeof enrollment.status === 'string') {
-                            enrollment.status = [enrollment.status]; 
-                        } else if (!enrollment.status) {
-                            enrollment.status = ['pending'];
-                        }
-                        return enrollment;
-                    });
-                } else {
-                    state.enrollments = [];
-                }
-                
-                render();
-            } catch (error) {
-                console.error("Load Error:", error);
-                showNotification("Failed to load data from server.", "error");
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        function loadDemoData() {
-            setLoading(true);
-            setTimeout(() => {
-                state.enrollments = [
-                    {
-                        id: 'demo1',
-                        student_name: 'Maria Santos',
-                        parent_name: 'Juan Santos',
-                        email: 'juan.santos@example.com',
-                        phone: '(555) 123-4567',
-                        grade: 'kindergarten',
-                        message: 'Excited for the new year!',
-                        control_number: '2024-001',
-                        queue_number: 1,
-                        enrollment_date: new Date(Date.now() - 86400000).toISOString(),
-                        status: ['pending']
-                    },
-                    {
-                        id: 'demo2',
-                        student_name: 'Carlos Rodriguez',
-                        parent_name: 'Ana Rodriguez',
-                        email: 'ana.r@example.com',
-                        phone: '(555) 987-6543',
-                        grade: '1st',
-                        message: '',
-                        control_number: '2024-002',
-                        queue_number: 2,
-                        enrollment_date: new Date(Date.now() - 172800000).toISOString(),
-                        status: ['approved', 'contacted']
-                    }
-                ];
-                setLoading(false);
-                render();
-                showNotification("Running in Demo Mode", "info");
-            }, 800);
-        }
-
-        async function updateStatus(id, action) {
-            // Find item
-            const idx = state.enrollments.findIndex(e => e.id === id);
-            if (idx === -1) return;
-            const item = state.enrollments[idx];
-            
-            // Logic for multiple tags
-            let currentTags = new Set(Array.isArray(item.status) ? item.status : [item.status]);
-
-            if (action === 'approve') {
-                currentTags.delete('pending');
-                currentTags.delete('rejected');
-                currentTags.add('approved');
-            } else if (action === 'reject') {
-                currentTags.delete('pending');
-                currentTags.delete('approved');
-                currentTags.add('rejected');
-            } else if (action === 'contact') {
-                currentTags.add('contacted');
-            }
-
-            const newTags = Array.from(currentTags);
-
-            if (!state.isFirebaseReady) {
-                state.enrollments[idx].status = newTags;
-                render();
-                showNotification(`Status updated (Demo)`, 'success');
-                return;
-            }
-
-            try {
-                await database.ref(`enrollments/${id}/status`).set(newTags);
-                // Optimistic Update
-                state.enrollments[idx].status = newTags;
-                render();
-                showNotification(`Status updated successfully`, 'success');
-            } catch (error) {
-                console.error("Update Error:", error);
-                showNotification("Failed to update status.", "error");
-            }
-        }
-
-        // ------------------------------------------------------------------
-        // EMAIL LOGIC (BREVO)
-        // ------------------------------------------------------------------
-        function openEmailModal(enrollment, action = 'contact') {
-            if (!enrollment) return;
-            state.currentEnrollment = enrollment;
-            state.emailAction = action;
-
-            const modal = document.getElementById('email-modal');
-            const backdrop = document.getElementById('email-backdrop');
-            const panel = document.getElementById('email-panel');
-
-            // Set UI elements based on action
-            const actionBadge = document.getElementById('email-action-badge');
-            const sendBtnText = document.getElementById('email-send-text');
-            const subjectInput = document.getElementById('email-subject');
-            const markOnlyBtn = document.getElementById('email-mark-only');
-
-            // Default values
-            document.getElementById('email-to').value = enrollment.email || '';
-            document.getElementById('email-name').value = enrollment.parent_name || '';
-
-            let template = '';
-            let subject = '';
-
-            if (action === 'approve') {
-                actionBadge.textContent = 'Approve Enrollment';
-                actionBadge.className = 'uppercase text-emerald-700 font-bold';
-                sendBtnText.textContent = 'Send Approval Email';
-                markOnlyBtn.textContent = 'Approve (No Email)';
-                subject = `Enrollment Approved: ${enrollment.student_name}`;
-                template = `
-                    <p>Dear <strong>${enrollment.parent_name}</strong>,</p>
-                    <br>
-                    <p>We are pleased to inform you that the application for <strong>${enrollment.student_name}</strong> (Grade: ${enrollment.grade}) has been <strong style="color: green;">APPROVED</strong>.</p>
-                    <p><strong>Control Number:</strong> ${enrollment.control_number || 'N/A'}</p>
-                    <p>Please visit the Registrar's Office by [Date] to complete the final enrollment steps and submit any remaining physical documents.</p>
-                    <p>Welcome to the Dr. Alfredo Pio De Roda Elementary School family!</p>
-                    <br>
-                    <p>Sincerely,</p>
-                    <p>Admissions Office</p>
-                `;
-            } else if (action === 'reject') {
-                actionBadge.textContent = 'Reject Application';
-                actionBadge.className = 'uppercase text-rose-700 font-bold';
-                sendBtnText.textContent = 'Send Rejection Email';
-                markOnlyBtn.textContent = 'Reject (No Email)';
-                subject = `Update on Enrollment Application for ${enrollment.student_name}`;
-                template = `
-                    <p>Dear <strong>${enrollment.parent_name}</strong>,</p>
-                    <br>
-                    <p>Thank you for giving us the opportunity to review your application for <strong>${enrollment.student_name}</strong>.</p>
-                    <p>After careful consideration, we regret to inform you that we are unable to offer admission at this time due to [Reason, e.g., limited capacity or incomplete requirements].</p>
-                    <p>We wish ${enrollment.student_name} the very best in their future academic endeavors.</p>
-                    <br>
-                    <p>Sincerely,</p>
-                    <p>Admissions Office</p>
-                `;
-            } else {
-                // Default: Contact (Missing Docs)
-                actionBadge.textContent = 'Contact Parent';
-                actionBadge.className = 'uppercase text-blue-700 font-bold';
-                sendBtnText.textContent = 'Send Email & Mark Contacted';
-                markOnlyBtn.textContent = 'Mark Contacted (No Email)';
-                subject = `Action Required: Enrollment Application for ${enrollment.student_name}`;
-                template = `
-                    <p>Dear <strong>${enrollment.parent_name}</strong>,</p>
-                    <br>
-                    <p>We have reviewed your submission for <strong>${enrollment.student_name}</strong> (Control #: ${enrollment.control_number || 'N/A'}).</p>
-                    <p>To proceed with enrollment, please provide the following missing documents:</p>
-                    <ul>
-                        <li>PSA Birth Certificate</li>
-                        <li>Report Card (Form 138)</li>
-                        <li>Certificate of Good Moral Character</li>
-                        <li>2x2 ID Picture</li>
-                        <li>Other: ______________________</li>
-                    </ul>
-                    <p>Please reply to this email or visit the registrar's office to submit these items.</p>
-                    <br>
-                    <p>Sincerely,</p>
-                    <p>Admissions Office</p>
-                `;
-            }
-
-            subjectInput.value = subject;
-            if (quill) {
-                quill.clipboard.dangerouslyPasteHTML(template);
-            }
-
-            // Show Modal
-            modal.classList.remove('hidden');
-            void modal.offsetWidth;
-            backdrop.classList.remove('opacity-0');
-            panel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
-            panel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
-        }
-
-        function closeEmailModal() {
-            const modal = document.getElementById('email-modal');
-            const backdrop = document.getElementById('email-backdrop');
-            const panel = document.getElementById('email-panel');
-
-            backdrop.classList.add('opacity-0');
-            panel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
-            panel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
-
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        async function sendEmail() {
-            const apiKey = document.getElementById('brevo-api-key').value;
-            const fromEmail = document.getElementById('email-from').value;
-            const toEmail = document.getElementById('email-to').value;
-            const toName = document.getElementById('email-name').value;
-            const subject = document.getElementById('email-subject').value;
-            
-            const editorContent = quill.root.innerHTML;
-
-            // Updated Email Template with GitHub Raw Image
-            const finalHtml = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; color: #111827; }
-                .email-wrapper { width: 100%; background-color: #f3f4f6; padding: 40px 0; }
-                .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; overflow: hidden; font-size: 16px; line-height: 1.6; }
-                .header-text { font-size: 14px; color: #111827; font-weight: 600; }
-                .header-date { font-size: 14px; color: #6b7280; margin-top: 4px; font-weight: 400; }
-                .logo-container { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-                .content { padding: 20px 40px; }
-                .greeting { font-size: 24px; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.5px; }
-                .text-body { margin-bottom: 30px; color: #374151; }
-                .btn-container { padding: 0 40px 40px; }
-                .btn { display: inline-block; background-color: #111827; color: #ffffff; padding: 16px 32px; text-decoration: none; font-weight: 700; font-size: 12px; letter-spacing: 1px; border-radius: 9999px; text-transform: uppercase; }
-                .footer { background-color: #1f2937; padding: 60px 40px; text-align: center; color: #9ca3af; }
-                .footer-title { color: #ffffff; font-size: 16px; font-weight: 700; margin-bottom: 20px; }
-                .footer-text { font-size: 12px; line-height: 1.6; margin-bottom: 20px; }
-                .footer-links a { color: #9ca3af; text-decoration: none; margin: 0 8px; font-size: 12px; font-weight: 600; }
-            </style>
-            </head>
-            <body>
-                <div class="email-wrapper">
-                    <div class="email-container">
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding: 40px 40px 20px;">
-                            <tr>
-                                <td align="left" valign="top">
-                                    <div class="header-text">Application Status Update</div>
-                                    <div class="header-date">${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                                </td>
-                                <td align="right" valign="top">
-                                    <div class="logo-container">
-                                        <!-- Updated Logo from GitHub in Email -->
-                                        <img src="https://raw.githubusercontent.com/Landing749/Dr.Alfredo-Pio-De-Roda/main/school-logo.png" alt="Logo" style="max-width: 100%; max-height: 100%;">
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                        <div class="content">
-                            <div class="greeting">Hello ${toName.split(' ')[0]},</div>
-                            <div class="text-body">
-                                ${editorContent}
+                    <!-- Info -->
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider pb-1.5 border-b border-slate-100 mb-2">Student</p>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between"><span class="text-slate-400">Name</span><span class="font-semibold" id="m-student">—</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Grade</span><span class="font-semibold capitalize" id="m-grade">—</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Queue</span><span class="font-bold text-blue-600" id="m-queue">—</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Filed</span><span class="font-semibold" id="m-date">—</span></div>
                             </div>
                         </div>
-                        <div class="btn-container">
-                            <a href="https://dapres.dpdns.org/" class="btn" style="background-color: #000; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 12px;">VISIT REGISTRAR</a>
-                        </div>
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f3f4f6; margin: 0 40px 40px; width: calc(100% - 80px);">
-                            <tr>
-                                <td style="padding: 30px;">
-                                    <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px;">STUDENT INFO</div>
-                                    <div style="font-size: 14px; margin-bottom: 5px;">${state.currentEnrollment?.student_name}</div>
-                                    <div style="font-size: 14px; color: #6b7280;">Grade: ${state.currentEnrollment?.grade}</div>
-                                </td>
-                            </tr>
-                        </table>
-                        <div class="footer" style="background-color: #1f2937; padding: 60px 40px; text-align: center; color: #9ca3af;">
-                            <div class="footer-title" style="color: #ffffff; font-size: 16px; font-weight: 700; margin-bottom: 20px;">Questions? Contact Us.</div>
-                            <div class="footer-text" style="font-size: 12px; line-height: 1.6; margin-bottom: 20px;">
-                                Dr. Alfredo Pio De Roda Elementary School
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider pb-1.5 border-b border-slate-100 mb-2">Guardian</p>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between"><span class="text-slate-400">Name</span><span class="font-semibold" id="m-parent">—</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Email</span><span class="font-semibold text-xs break-all" id="m-email">—</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Phone</span><span class="font-semibold" id="m-phone">—</span></div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </body>
-            </html>
-            `;
 
-            if (!apiKey) {
-                showNotification("Missing Brevo API Key.", "error");
-                return;
-            }
+                    <!-- PROCESS STEP -->
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">📋 Enrollment Stage <span class="text-slate-300 font-normal normal-case text-xs">(shown to parent)</span></p>
+                        <div class="flex flex-wrap gap-2" id="step-btns"></div>
+                    </div>
 
-            const payload = {
-                sender: {
-                    name: config.email.senderName,
-                    email: fromEmail
-                },
-                to: [{
-                    email: toEmail,
-                    name: toName
-                }],
-                subject: subject,
-                htmlContent: finalHtml
-            };
+                    <!-- DOCUMENTS -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">📎 Submitted Documents</p>
+                            <span id="docs-count" class="text-xs text-slate-400 font-medium">—</span>
+                        </div>
+                        <div id="modal-docs" class="space-y-2"></div>
+                    </div>
 
-            const btn = document.getElementById('email-send');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Sending...`;
-            btn.disabled = true;
-
-            try {
-                const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-                    method: 'POST',
-                    headers: {
-                        'accept': 'application/json',
-                        'api-key': apiKey,
-                        'content-type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    showNotification("Email sent successfully!", "success");
-                    if(state.currentEnrollment) {
-                        updateStatus(state.currentEnrollment.id, state.emailAction); // Pass ACTION, not resolved status
-                    }
-                    closeEmailModal();
-                } else {
-                    const errData = await response.json();
-                    console.error("Brevo Error:", errData);
-                    
-                    if(errData.code === 'invalid_parameter') {
-                         showNotification("Error: Sender email not verified in Brevo.", "error");
-                    } else {
-                         // API Failure (e.g., 401, 400)
-                        showNotification(`API Error ${response.status}: Email could not be sent.`, "error");
-                    }
-                    
-                    // Keep modal open so the user can debug the key/sender email
-                }
-            } catch (error) {
-                console.error("Network Error:", error);
-                 // Network/CORS Failure
-                showNotification("Network Error: Could not connect to Brevo API. Check Console.", "error");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        // ------------------------------------------------------------------
-        // RENDERING & UI LOGIC
-        // ------------------------------------------------------------------
-        function render() {
-            updateStats();
-            renderTable();
-        }
-
-        function updateStats() {
-            const total = state.enrollments.length;
-            const pending = state.enrollments.filter(e => e.status.includes('pending')).length;
-            const approved = state.enrollments.filter(e => e.status.includes('approved')).length;
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            const week = state.enrollments.filter(e => new Date(e.enrollment_date) >= oneWeekAgo).length;
-
-            document.getElementById('total-count').textContent = total;
-            document.getElementById('pending-count').textContent = pending;
-            document.getElementById('approved-count').textContent = approved;
-            document.getElementById('week-count').textContent = week;
-        }
-
-        function getFilteredData() {
-            return state.enrollments.filter(item => {
-                const tags = item.status || [];
-                const matchesStatus = state.filter === 'all' || tags.includes(state.filter);
-                const matchesGrade = state.gradeFilter === '' || item.grade === state.gradeFilter;
-                const searchLower = state.searchTerm.toLowerCase();
-                const matchesSearch = !searchLower || 
-                    item.student_name.toLowerCase().includes(searchLower) ||
-                    item.parent_name.toLowerCase().includes(searchLower) ||
-                    item.email.toLowerCase().includes(searchLower) ||
-                    (item.control_number && item.control_number.toLowerCase().includes(searchLower));
-                
-                return matchesStatus && matchesGrade && matchesSearch;
-            }).sort((a, b) => new Date(b.enrollment_date) - new Date(a.enrollment_date));
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('enrollments-tbody');
-            const data = getFilteredData();
-            
-            if (data.length === 0) {
-                document.getElementById('enrollments-container').classList.add('hidden');
-                document.getElementById('empty-state').classList.remove('hidden');
-                return;
-            }
-
-            document.getElementById('enrollments-container').classList.remove('hidden');
-            document.getElementById('empty-state').classList.add('hidden');
-
-            tbody.innerHTML = data.map(item => {
-                const tags = Array.isArray(item.status) ? item.status : [item.status];
-                
-                const badgesHtml = tags.map(tag => {
-                    const styles = {
-                        pending: 'bg-amber-100 text-amber-800',
-                        approved: 'bg-emerald-100 text-emerald-800',
-                        rejected: 'bg-rose-100 text-rose-800',
-                        contacted: 'bg-blue-100 text-blue-800'
-                    };
-                    const css = styles[tag] || 'bg-slate-100 text-slate-800';
-                    return `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide mr-1 ${css}">${tag}</span>`;
-                }).join('');
-
-                return `
-                <tr class="hover:bg-slate-50 transition-colors duration-150">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-semibold text-slate-900">${item.student_name}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-slate-900">${item.parent_name}</div>
-                        <div class="text-xs text-slate-500">${item.email}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 capitalize">
-                            ${item.grade}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="font-mono text-xs bg-slate-100 px-2 py-1 rounded border border-slate-200 text-slate-600">
-                            ${item.control_number || 'N/A'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-bold text-blue-600">#${item.queue_number}</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                        ${formatDate(item.enrollment_date)}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        ${badgesHtml}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <!-- LABELS -->
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">🏷 Labels</p>
+                        <div id="modal-labels" class="flex flex-wrap gap-1.5 mb-2 min-h-[24px]"></div>
                         <div class="flex gap-2">
-                            <button onclick="openModal('${item.id}')" class="text-slate-600 hover:text-blue-600 bg-white border border-slate-300 hover:border-blue-400 rounded px-3 py-1.5 transition-all text-xs shadow-sm">View</button>
+                            <input id="label-input" type="text" placeholder="Add a label..." maxlength="40" class="flex-1 text-xs px-3 py-1.5 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" onkeydown="if(event.key==='Enter')addLabel()">
+                            <button onclick="addLabel()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-md transition-colors">Add</button>
                         </div>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        }
+                    </div>
 
-        function openModal(id) {
-            const item = state.enrollments.find(e => e.id === id);
-            if (!item) return;
-            state.currentEnrollment = item;
-            
-            const modal = document.getElementById('detail-modal');
-            const backdrop = document.getElementById('modal-backdrop');
-            const panel = document.getElementById('modal-panel');
-            const content = document.getElementById('modal-content');
-
-            // Determine border color based on primary status
-            const tags = Array.isArray(item.status) ? item.status : [item.status];
-            let statusColor = 'border-slate-200 bg-slate-50 text-slate-800';
-            if(tags.includes('approved')) statusColor = 'border-emerald-200 bg-emerald-50 text-emerald-800';
-            else if(tags.includes('rejected')) statusColor = 'border-rose-200 bg-rose-50 text-rose-800';
-            else if(tags.includes('pending')) statusColor = 'border-amber-200 bg-amber-50 text-amber-800';
-
-            const badgesHtml = tags.map(tag => `<span class="uppercase font-bold mr-2">${tag}</span>`).join('/');
-
-            content.innerHTML = `
-                <div class="flex items-center justify-between p-4 rounded-lg border ${statusColor}">
+                    <!-- SCHEDULE -->
                     <div>
-                        <p class="text-xs font-bold uppercase opacity-70">Current Status</p>
-                        <p class="text-lg font-bold">${badgesHtml}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs font-bold uppercase opacity-70">Control Number</p>
-                        <p class="text-lg font-mono font-bold">${item.control_number || 'N/A'}</p>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">📅 Schedule Appointment</p>
+                        <div class="flex gap-2 flex-wrap items-center">
+                            <input id="sched-date" type="datetime-local" class="text-xs px-3 py-1.5 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <input id="sched-note" type="text" placeholder="Note (e.g. bring originals)" class="flex-1 min-w-[140px] text-xs px-3 py-1.5 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <button onclick="saveSchedule()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-md transition-colors">Save</button>
+                        </div>
+                        <div id="sched-display" class="mt-2"></div>
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">Student Information</h4>
-                        <div class="text-sm space-y-2">
-                            <div class="flex justify-between"><span class="text-slate-500">Name:</span> <span class="font-medium text-slate-900">${item.student_name}</span></div>
-                            <div class="flex justify-between"><span class="text-slate-500">Grade:</span> <span class="font-medium text-slate-900 capitalize">${item.grade}</span></div>
-                            <div class="flex justify-between"><span class="text-slate-500">Queue #:</span> <span class="font-medium text-blue-600">#${item.queue_number}</span></div>
+                <!-- RIGHT: Chat -->
+                <div class="w-68 flex-shrink-0 border-l border-slate-100 flex flex-col" style="width:272px">
+                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between flex-shrink-0">
+                        <div class="flex items-center gap-2">
+                            <svg class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            <span class="text-sm font-semibold text-slate-700">Chat</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="parent-dot" class="presence-dot offline" style="width:8px;height:8px;box-shadow:0 0 0 1.5px white,0 0 6px #22c55e"></span>
+                            <span id="parent-lbl" class="text-xs text-slate-400">Offline</span>
                         </div>
                     </div>
-
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">Guardian Information</h4>
-                        <div class="text-sm space-y-2">
-                            <div class="flex justify-between"><span class="text-slate-500">Name:</span> <span class="font-medium text-slate-900">${item.parent_name}</span></div>
-                            <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span class="font-medium text-slate-900 truncate max-w-[150px]" title="${item.email}">${item.email}</span></div>
-                            <div class="flex justify-between"><span class="text-slate-500">Phone:</span> <span class="font-medium text-slate-900">${item.phone}</span></div>
-                        </div>
+                    <div id="chat-msgs" class="flex-1 overflow-y-auto p-3 space-y-2 bg-white" style="min-height:0">
+                        <p class="text-xs text-center text-slate-400 py-6">Loading messages...</p>
+                    </div>
+                    <div class="p-3 border-t border-slate-100 bg-slate-50 flex gap-2 flex-shrink-0">
+                        <input id="chat-input" type="text" placeholder="Message parent..." class="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white" onkeydown="if(event.key==='Enter')sendMsg()">
+                        <button onclick="sendMsg()" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-white rounded-md flex items-center justify-center flex-shrink-0 transition-colors">
+                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                ${item.message ? `
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1 mb-2">Message</h4>
-                        <div class="bg-slate-50 p-3 rounded-md border border-slate-100 text-slate-600 text-sm italic">
-                            "${item.message}"
-                        </div>
-                    </div>
-                ` : ''}
-                
-                <div class="text-xs text-slate-400 text-center pt-2">
-                    Application received on ${formatDate(item.enrollment_date, true)}
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- MANAGE STEPS MODAL -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="steps-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeStepsModal()"></div>
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg modal-enter">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-start">
+                <div><h3 class="font-bold text-slate-800">Manage Enrollment Steps</h3><p class="text-xs text-slate-400 mt-0.5">Define the stages shown to parents as progress tracker.</p></div>
+                <button onclick="closeStepsModal()" class="text-slate-400 hover:text-slate-600 p-1"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="px-6 py-4 space-y-2 max-h-72 overflow-y-auto" id="steps-list"></div>
+            <div class="px-6 py-4 border-t border-slate-100 space-y-2">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Add Step</p>
+                <div class="flex gap-2">
+                    <input id="new-step-label" type="text" placeholder="Step name" class="flex-1 text-sm px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500" onkeydown="if(event.key==='Enter')addStep()">
+                    <input id="new-step-desc" type="text" placeholder="Description (optional)" class="flex-1 text-sm px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <button onclick="addStep()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-md transition-colors">+ Add</button>
                 </div>
-            `;
+            </div>
+            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 rounded-b-xl flex justify-end gap-2">
+                <button onclick="closeStepsModal()" class="px-4 py-2 text-sm text-slate-700 border border-slate-300 rounded-md hover:bg-slate-100">Cancel</button>
+                <button onclick="saveSteps()" class="px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700 font-semibold">Save Steps</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-            modal.classList.remove('hidden');
-            void modal.offsetWidth;
-            backdrop.classList.remove('opacity-0');
-            panel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
-            panel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
-        }
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- REQUIRED DOCS CONFIG MODAL -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="docs-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeDocsConfigModal()"></div>
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg modal-enter">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-start">
+                <div><h3 class="font-bold text-slate-800">Required Documents</h3><p class="text-xs text-slate-400 mt-0.5">Parents will be asked to upload these on the verification page.</p></div>
+                <button onclick="closeDocsConfigModal()" class="text-slate-400 hover:text-slate-600 p-1"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="px-6 py-4 space-y-2 max-h-72 overflow-y-auto" id="docs-config-list"></div>
+            <div class="px-6 py-4 border-t border-slate-100 space-y-2">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Add Document</p>
+                <div class="flex gap-2">
+                    <input id="new-doc-label" type="text" placeholder="Document name" class="flex-1 text-sm px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-violet-500" onkeydown="if(event.key==='Enter')addRequiredDoc()">
+                    <input id="new-doc-hint" type="text" placeholder="Hint for parent (optional)" class="flex-1 text-sm px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-violet-500">
+                    <button onclick="addRequiredDoc()" class="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-md transition-colors">+ Add</button>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 rounded-b-xl flex justify-end gap-2">
+                <button onclick="closeDocsConfigModal()" class="px-4 py-2 text-sm text-slate-700 border border-slate-300 rounded-md hover:bg-slate-100">Cancel</button>
+                <button onclick="saveRequiredDocs()" class="px-4 py-2 text-sm text-white bg-violet-600 rounded-md hover:bg-violet-700 font-semibold">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        function closeModal() {
-            const modal = document.getElementById('detail-modal');
-            const backdrop = document.getElementById('modal-backdrop');
-            const panel = document.getElementById('modal-panel');
+<!-- LIGHTBOX -->
+<div id="lightbox" class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/90 cursor-zoom-out" onclick="document.getElementById('lightbox').classList.add('hidden');document.getElementById('lightbox').classList.remove('flex')">
+    <img id="lb-img" src="" class="max-w-[90vw] max-h-[90vh] rounded-xl shadow-2xl object-contain">
+</div>
 
-            backdrop.classList.add('opacity-0');
-            panel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
-            panel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+<script>
+/* ═══════════════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════════════ */
+const FB_CONFIG={apiKey:"AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",authDomain:"clinique-parfum.firebaseapp.com",databaseURL:"https://clinique-parfum-default-rtdb.firebaseio.com",projectId:"clinique-parfum",storageBucket:"clinique-parfum.firebasestorage.app",messagingSenderId:"569473208892",appId:"1:569473208892:web:f009390a8631fc164ce939"};
 
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
+const DEFAULT_STEPS=[
+    {id:'submitted',label:'Application Submitted',desc:'Enrollment form received by the school.'},
+    {id:'documents',label:'Document Submission',desc:'Parent uploads all required documents.'},
+    {id:'review',label:'Under Review',desc:'Admissions office reviews the application.'},
+    {id:'approved',label:'Enrollment Approved',desc:'Application approved. Visit the school to finalize.'},
+    {id:'enrolled',label:'Fully Enrolled',desc:'Welcome to Dr. Alfredo Pio De Roda Elementary School!'},
+];
 
-        function setLoading(isLoading) {
-            const loader = document.getElementById('loading-state');
-            if (isLoading) loader.classList.remove('hidden');
-            else loader.classList.add('hidden');
-        }
+const DEFAULT_DOCS=[
+    {id:'birth_cert',label:'PSA Birth Certificate',hint:'Clear scan or photo'},
+    {id:'report_card',label:'Report Card (Form 138)',hint:'Latest school year'},
+    {id:'good_moral',label:'Certificate of Good Moral Character',hint:'From previous school'},
+    {id:'id_picture',label:'2x2 ID Picture',hint:'White background, recent'},
+    {id:'medical_cert',label:'Medical Certificate',hint:'From licensed physician'},
+];
 
-        function formatDate(isoString, full = false) {
-            if (!isoString) return 'N/A';
-            const date = new Date(isoString);
-            const opts = full 
-                ? { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }
-                : { month: 'short', day: 'numeric', year: 'numeric' };
-            return date.toLocaleDateString('en-US', opts);
-        }
+const STATUS_STYLE={
+    pending:      {cls:'bg-amber-100 text-amber-800 border-amber-300',   lbl:'⏳ Pending'},
+    under_review: {cls:'bg-blue-100 text-blue-800 border-blue-300',      lbl:'🔍 Under Review'},
+    being_called: {cls:'bg-purple-100 text-purple-800 border-purple-300',lbl:'📞 Being Called'},
+    approved:     {cls:'bg-emerald-100 text-emerald-800 border-emerald-300',lbl:'✅ Approved'},
+    rejected:     {cls:'bg-rose-100 text-rose-800 border-rose-300',      lbl:'✕ Rejected'},
+};
 
-        function showNotification(msg, type = 'info') {
-            const div = document.createElement('div');
-            const colors = {
-                success: 'bg-emerald-600',
-                error: 'bg-rose-600',
-                info: 'bg-slate-800'
-            };
-            
-            div.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-y-10 opacity-0 z-50 flex items-center gap-2 text-sm font-medium`;
-            div.innerHTML = `<span>${msg}</span>`;
-            
-            document.body.appendChild(div);
-            
-            requestAnimationFrame(() => {
-                div.classList.remove('translate-y-10', 'opacity-0');
-            });
+const LABEL_COLORS=['bg-blue-100 text-blue-800','bg-purple-100 text-purple-800','bg-amber-100 text-amber-800','bg-emerald-100 text-emerald-800','bg-rose-100 text-rose-800','bg-indigo-100 text-indigo-800','bg-teal-100 text-teal-800'];
 
-            setTimeout(() => {
-                div.classList.add('translate-y-10', 'opacity-0');
-                setTimeout(() => div.remove(), 300);
-            }, 3000);
-        }
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+let DB, fbOK=false;
+let S={
+    enrollments:[],
+    filter:'all', search:'', grade:'',
+    current:null,
+    processSteps:[...DEFAULT_STEPS],
+    tempSteps:[],
+    requiredDocs:[...DEFAULT_DOCS],
+    tempDocs:[],
+    chatUnsub:null,
+};
 
-        function exportToCSV() {
-            if (state.enrollments.length === 0) {
-                showNotification("No data to export", "error");
-                return;
-            }
-            
-            const headers = ['ID', 'Student Name', 'Parent Name', 'Email', 'Phone', 'Grade', 'Control #', 'Queue #', 'Date', 'Status', 'Message'];
-            const rows = state.enrollments.map(e => [
-                e.id,
-                `"${e.student_name}"`,
-                `"${e.parent_name}"`,
-                e.email,
-                e.phone,
-                e.grade,
-                e.control_number,
-                e.queue_number,
-                formatDate(e.enrollment_date, true),
-                e.status.join('/'),
-                `"${(e.message || '').replace(/"/g, '""')}"`
-            ]);
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+async function init(){
+    try{
+        firebase.initializeApp(FB_CONFIG);
+        DB=firebase.database();fbOK=true;
+        setAdminPresence();
+        await loadConfig();
+        await loadEnrollments();
+    }catch(e){
+        console.warn('Firebase unavailable, demo mode',e);
+        loadDemoData();
+    }
+}
 
-            const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `enrollments_${new Date().toISOString().slice(0,10)}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showNotification("Export downloaded!", "success");
-        }
+function setAdminPresence(){
+    const r=DB.ref('presence/admin');
+    r.set({online:true,lastSeen:Date.now()});
+    r.onDisconnect().set({online:false,lastSeen:Date.now()});
+    setInterval(()=>r.update({online:true,lastSeen:Date.now()}),25000);
+}
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initApp();
+async function loadConfig(){
+    try{
+        const snap=await DB.ref('config').once('value');
+        const cfg=snap.val()||{};
+        if(cfg.process_steps&&cfg.process_steps.length) S.processSteps=cfg.process_steps;
+        if(cfg.required_docs&&cfg.required_docs.length) S.requiredDocs=cfg.required_docs;
+    }catch(e){}
+}
 
-            const tabs = document.querySelectorAll('#filter-tabs button');
-            tabs.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    tabs.forEach(t => {
-                        t.className = "px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
-                    });
-                    e.target.className = "px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-slate-900 text-white shadow-sm";
-                    state.filter = e.target.dataset.status;
-                    render();
-                });
-            });
-
-            document.getElementById('search-input')?.addEventListener('input', (e) => {
-                state.searchTerm = e.target.value;
-                render();
-            });
-
-            document.getElementById('grade-filter')?.addEventListener('change', (e) => {
-                state.gradeFilter = e.target.value;
-                render();
-            });
-
-            document.getElementById('refresh-btn')?.addEventListener('click', () => {
-                loadEnrollments();
-            });
-
-            document.getElementById('export-btn')?.addEventListener('click', exportToCSV);
-
-            document.getElementById('close-detail-modal')?.addEventListener('click', closeModal);
-            document.getElementById('detail-modal')?.addEventListener('click', (e) => {
-                if(e.target.id === 'modal-backdrop' || e.target.id === 'detail-modal') closeModal();
-            });
-
-            // Email Modal Listeners
-            document.getElementById('close-email-modal')?.addEventListener('click', closeEmailModal);
-            document.getElementById('email-cancel')?.addEventListener('click', closeEmailModal);
-            
-            // Send Email (and update status)
-            document.getElementById('email-send')?.addEventListener('click', sendEmail);
-            
-            // Mark without Email
-            document.getElementById('email-mark-only')?.addEventListener('click', () => {
-                if(state.currentEnrollment) {
-                    updateStatus(state.currentEnrollment.id, state.emailAction);
-                    closeEmailModal();
-                }
-            });
-
-            document.getElementById('email-modal')?.addEventListener('click', (e) => {
-                if(e.target.id === 'email-backdrop' || e.target.id === 'email-modal') closeEmailModal();
-            });
-
-            // Workflow Actions
-            // Approve -> Open Email with Approve Template
-            document.getElementById('modal-approve')?.addEventListener('click', () => {
-                if(state.currentEnrollment) {
-                    closeModal();
-                    setTimeout(() => {
-                        openEmailModal(state.currentEnrollment, 'approve');
-                    }, 300);
-                }
-            });
-            
-            // Contact -> Open Email with Contact Template
-            document.getElementById('modal-contact')?.addEventListener('click', () => {
-                if(state.currentEnrollment) {
-                    closeModal();
-                    setTimeout(() => {
-                        openEmailModal(state.currentEnrollment, 'contact');
-                    }, 300);
-                }
-            });
-
-            // Reject -> Open Email with Reject Template
-            document.getElementById('modal-reject')?.addEventListener('click', () => {
-                if(state.currentEnrollment) {
-                    closeModal();
-                    setTimeout(() => {
-                        openEmailModal(state.currentEnrollment, 'reject');
-                    }, 300);
-                }
-            });
+/* ═══════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════ */
+async function loadEnrollments(){
+    setLoading(true);
+    try{
+        const snap=await DB.ref('enrollments').once('value');
+        const data=snap.val()||{};
+        S.enrollments=Object.entries(data).map(([k,v])=>{
+            if(Array.isArray(v.status)) v.status=v.status[0]||'pending';
+            if(!v.status) v.status='pending';
+            return{id:k,...v};
         });
-    </script>
+        renderAll();
+    }catch(e){toast('Failed to load data','error');}
+    finally{setLoading(false);}
+}
+
+function loadDemoData(){
+    setLoading(true);
+    setTimeout(()=>{
+        S.enrollments=[
+            {id:'d1',student_name:'Maria Santos',parent_name:'Juan Santos',email:'juan@email.com',phone:'09123456789',grade:'kindergarten',control_number:'20260220-0001',queue_number:1,enrollment_date:new Date(Date.now()-86400000).toISOString(),status:'pending',process_step:1,labels:['missing docs'],documents:{birth_cert:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/320px-Camponotus_flavomarginatus_ant.jpg'}},
+            {id:'d2',student_name:'Carlos Reyes',parent_name:'Ana Reyes',email:'ana@email.com',phone:'09987654321',grade:'1st',control_number:'20260220-0002',queue_number:2,enrollment_date:new Date(Date.now()-172800000).toISOString(),status:'under_review',process_step:2,labels:['call back'],documents:{}},
+            {id:'d3',student_name:'Luisa Garcia',parent_name:'Roberto Garcia',email:'rob@email.com',phone:'09111111111',grade:'3rd',control_number:'20260220-0003',queue_number:3,enrollment_date:new Date(Date.now()-259200000).toISOString(),status:'approved',process_step:3,documents:{},schedule:{date:'2026-03-01T10:00',note:'Bring originals'}},
+            {id:'d4',student_name:'Ryan Cruz',parent_name:'Elena Cruz',email:'elena@email.com',phone:'09222222222',grade:'2nd',control_number:'20260220-0004',queue_number:4,enrollment_date:new Date(Date.now()-345600000).toISOString(),status:'being_called',process_step:2,documents:{}},
+        ];
+        setLoading(false);
+        renderAll();
+        toast('Demo Mode — Firebase not connected','info');
+    },600);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER TABLE
+═══════════════════════════════════════════════════════════ */
+function renderAll(){updateStats();renderTable();}
+
+function updateStats(){
+    const e=S.enrollments;
+    document.getElementById('stat-total').textContent=e.length;
+    document.getElementById('stat-pending').textContent=e.filter(x=>x.status==='pending').length;
+    document.getElementById('stat-review').textContent=e.filter(x=>x.status==='under_review').length;
+    document.getElementById('stat-approved').textContent=e.filter(x=>x.status==='approved').length;
+    document.getElementById('stat-calling').textContent=e.filter(x=>x.status==='being_called').length;
+}
+
+function filtered(){
+    return S.enrollments.filter(e=>{
+        if(S.filter!=='all'&&e.status!==S.filter)return false;
+        if(S.grade&&e.grade!==S.grade)return false;
+        if(S.search){const s=S.search.toLowerCase();if(!(e.student_name||'').toLowerCase().includes(s)&&!(e.parent_name||'').toLowerCase().includes(s)&&!(e.email||'').toLowerCase().includes(s)&&!(e.control_number||'').toLowerCase().includes(s))return false;}
+        return true;
+    }).sort((a,b)=>new Date(b.enrollment_date)-new Date(a.enrollment_date));
+}
+
+function renderTable(){
+    const data=filtered();
+    if(!data.length){
+        document.getElementById('table-container').classList.add('hidden');
+        document.getElementById('empty-state').classList.remove('hidden');
+        return;
+    }
+    document.getElementById('table-container').classList.remove('hidden');
+    document.getElementById('empty-state').classList.add('hidden');
+
+    document.getElementById('table-body').innerHTML=data.map(item=>{
+        const ss=STATUS_STYLE[item.status]||STATUS_STYLE.pending;
+        const docs=item.documents||{};
+        const total=S.requiredDocs.length;
+        const up=S.requiredDocs.filter(d=>docs[d.id]).length;
+        const step=item.process_step!==undefined?parseInt(item.process_step):-1;
+        const stepLbl=step>=0&&S.processSteps[step]?S.processSteps[step].label:'—';
+        const docColor=up===total&&total>0?'text-emerald-600':up>0?'text-amber-600':'text-slate-400';
+        return`<tr class="hover:bg-blue-50/40 transition-colors cursor-pointer" onclick="openModal('${item.id}')">
+            <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-sm font-semibold text-slate-900">${item.student_name||'—'}</div>
+                <div class="text-xs text-slate-400">#${item.queue_number||'?'}</div>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-sm text-slate-700">${item.parent_name||'—'}</div>
+                <div class="text-xs text-slate-400">${item.email||''}</div>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap"><span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 capitalize">${item.grade||'—'}</span></td>
+            <td class="px-4 py-3 whitespace-nowrap"><span class="font-mono text-xs bg-slate-100 px-2 py-1 rounded border border-slate-200 text-slate-600">${item.control_number||'N/A'}</span></td>
+            <td class="px-4 py-3 whitespace-nowrap"><span class="text-xs font-bold ${docColor}">${up}/${total} uploaded</span></td>
+            <td class="px-4 py-3 whitespace-nowrap max-w-[130px]"><span class="text-xs text-slate-600 truncate block">${stepLbl}</span></td>
+            <td class="px-4 py-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-xs font-bold border ${ss.cls}">${ss.lbl}</span></td>
+            <td class="px-4 py-3 whitespace-nowrap" onclick="event.stopPropagation()">
+                <button onclick="openModal('${item.id}')" class="text-xs px-3 py-1.5 bg-white border border-slate-300 hover:border-blue-400 hover:text-blue-600 rounded-md transition-all shadow-sm font-medium">Open</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DETAIL MODAL
+═══════════════════════════════════════════════════════════ */
+function openModal(id){
+    const item=S.enrollments.find(e=>e.id===id);
+    if(!item)return;
+    S.current=item;
+
+    document.getElementById('m-name').textContent=item.student_name||'—';
+    document.getElementById('m-ctrl').textContent='Control #: '+(item.control_number||'N/A')+'  ·  Queue #'+( item.queue_number||'?');
+    document.getElementById('m-student').textContent=item.student_name||'—';
+    document.getElementById('m-grade').textContent=item.grade||'—';
+    document.getElementById('m-queue').textContent='#'+(item.queue_number||'?');
+    document.getElementById('m-date').textContent=fmtDate(item.enrollment_date);
+    document.getElementById('m-parent').textContent=item.parent_name||'—';
+    document.getElementById('m-email').textContent=item.email||'—';
+    document.getElementById('m-phone').textContent=item.phone||'—';
+    document.getElementById('label-input').value='';
+
+    refreshStatusUI();
+    renderStepBtns();
+    renderModalDocs();
+    renderModalLabels();
+
+    const sc=item.schedule||{};
+    document.getElementById('sched-date').value=sc.date||'';
+    document.getElementById('sched-note').value=sc.note||'';
+    renderSchedDisplay();
+
+    document.getElementById('detail-modal').classList.remove('hidden');
+    initChat(id);
+    watchParent(id);
+}
+
+function closeModal(){
+    document.getElementById('detail-modal').classList.add('hidden');
+    if(S.chatUnsub){S.chatUnsub();S.chatUnsub=null;}
+    if(S.current&&fbOK) DB.ref('presence/parents/'+S.current.id).off();
+}
+
+function refreshStatusUI(){
+    const item=S.current;if(!item)return;
+    const ss=STATUS_STYLE[item.status]||STATUS_STYLE.pending;
+    const badge=document.getElementById('m-status-badge');
+    badge.className='px-2.5 py-0.5 text-xs font-bold rounded-full border '+ss.cls;
+    badge.textContent=ss.lbl;
+    document.querySelectorAll('.sbt').forEach(b=>{
+        b.classList.toggle('ring-2',b.dataset.s===item.status);
+        b.classList.toggle('ring-offset-1',b.dataset.s===item.status);
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STATUS
+═══════════════════════════════════════════════════════════ */
+async function setStatus(ns){
+    if(!S.current)return;
+    const id=S.current.id;const idx=S.enrollments.findIndex(e=>e.id===id);if(idx<0)return;
+    if(fbOK){try{await DB.ref('enrollments/'+id+'/status').set(ns);}catch(e){toast('Failed to update status','error');return;}}
+    S.enrollments[idx].status=ns;S.current=S.enrollments[idx];
+    refreshStatusUI();renderAll();
+    toast('Status → '+(STATUS_STYLE[ns]?.lbl||ns),'success');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PROCESS STEPS (in modal)
+═══════════════════════════════════════════════════════════ */
+function renderStepBtns(){
+    const cur=S.current?.process_step!==undefined?parseInt(S.current.process_step):-1;
+    document.getElementById('step-btns').innerHTML=S.processSteps.map((s,i)=>`
+        <button onclick="setStep(${i})" data-step="${i}" class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all border
+            ${i===cur?'bg-slate-900 text-white border-slate-900':'border-slate-200 text-slate-600 hover:bg-slate-50'}">
+            ${i<cur?'✓ ':i===cur?'▶ ':''}${s.label}
+        </button>`).join('');
+}
+
+async function setStep(step){
+    if(!S.current)return;
+    const id=S.current.id;const idx=S.enrollments.findIndex(e=>e.id===id);if(idx<0)return;
+    if(fbOK){try{await DB.ref('enrollments/'+id+'/process_step').set(step);}catch(e){}}
+    S.enrollments[idx].process_step=step;S.current=S.enrollments[idx];
+    renderStepBtns();renderAll();
+    toast('Stage → '+(S.processSteps[step]?.label||'Step '+(step+1)),'success');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DOCUMENTS (admin viewer + remover)
+═══════════════════════════════════════════════════════════ */
+function renderModalDocs(){
+    const item=S.current;
+    const docs=item?.documents||{};
+    const req=S.requiredDocs;
+    const up=req.filter(d=>docs[d.id]).length;
+    document.getElementById('docs-count').textContent=`${up} / ${req.length} uploaded`;
+
+    if(!req.length){
+        document.getElementById('modal-docs').innerHTML='<p class="text-xs text-slate-400 italic py-2">No required documents configured. Click "Required Docs" in the header to add them.</p>';
+        return;
+    }
+    document.getElementById('modal-docs').innerHTML=req.map(d=>{
+        const url=docs[d.id];
+        if(!url)return`<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                <div class="w-7 h-7 rounded bg-slate-200 flex items-center justify-center flex-shrink-0">
+                    <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div class="flex-1 min-w-0"><p class="text-sm font-medium text-slate-500 truncate">${d.label}</p><p class="text-xs text-slate-400">Not uploaded yet</p></div>
+            </div>`;
+
+        const ext=url.split('?')[0].split('.').pop().toLowerCase();
+        const isImg=['jpg','jpeg','png','gif','webp'].includes(ext);
+        const preview=isImg
+            ?`<img src="${url}" onclick="openLB('${url}')" class="w-16 h-11 object-cover rounded-md border border-slate-200 cursor-zoom-in hover:opacity-80 transition-opacity flex-shrink-0" title="Click to enlarge">`
+            :`<a href="${url}" target="_blank" class="text-xs font-semibold text-blue-600 hover:text-blue-700 underline flex items-center gap-1 flex-shrink-0"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>View PDF</a>`;
+
+        return`<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors doc-row group">
+            <div class="w-7 h-7 rounded bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div class="flex-1 min-w-0"><p class="text-sm font-medium text-slate-800 truncate">${d.label}</p><p class="text-xs text-emerald-600">Uploaded ✓</p></div>
+            ${preview}
+            <button onclick="removeDoc('${d.id}')" class="doc-remove opacity-0 group-hover:opacity-100 ml-1 text-xs text-rose-500 hover:text-rose-700 font-bold px-2 py-1 rounded hover:bg-rose-50 transition-all flex-shrink-0" title="Remove document">✕ Remove</button>
+        </div>`;
+    }).join('');
+}
+
+async function removeDoc(docId){
+    if(!S.current)return;
+    if(!confirm('Remove this document? The parent will need to re-upload it.'))return;
+    const id=S.current.id;const idx=S.enrollments.findIndex(e=>e.id===id);if(idx<0)return;
+    if(fbOK){try{await DB.ref('enrollments/'+id+'/documents/'+docId).remove();}catch(e){toast('Failed to remove','error');return;}}
+    if(!S.enrollments[idx].documents)S.enrollments[idx].documents={};
+    delete S.enrollments[idx].documents[docId];
+    S.current=S.enrollments[idx];
+    renderModalDocs();renderAll();
+    toast('Document removed','success');
+}
+
+function openLB(url){document.getElementById('lb-img').src=url;document.getElementById('lightbox').classList.remove('hidden');document.getElementById('lightbox').classList.add('flex');}
+
+/* ═══════════════════════════════════════════════════════════
+   LABELS
+═══════════════════════════════════════════════════════════ */
+async function addLabel(){
+    const input=document.getElementById('label-input');
+    const text=input.value.trim();if(!text||!S.current)return;input.value='';
+    const id=S.current.id;const idx=S.enrollments.findIndex(e=>e.id===id);
+    const labels=[...(S.enrollments[idx]?.labels||[])];
+    if(labels.includes(text))return;labels.push(text);
+    if(fbOK){try{await DB.ref('enrollments/'+id+'/labels').set(labels);}catch(e){}}
+    S.enrollments[idx].labels=labels;S.current=S.enrollments[idx];
+    renderModalLabels();renderAll();
+}
+async function removeLabel(t){
+    if(!S.current)return;
+    const id=S.current.id;const idx=S.enrollments.findIndex(e=>e.id===id);
+    const labels=(S.enrollments[idx]?.labels||[]).filter(l=>l!==t);
+    if(fbOK){try{await DB.ref('enrollments/'+id+'/labels').set(labels);}catch(e){}}
+    S.enrollments[idx].labels=labels;S.current=S.enrollments[idx];
+    renderModalLabels();renderAll();
+}
+function renderModalLabels(){
+    const labels=S.current?.labels||[];
+    document.getElementById('modal-labels').innerHTML=labels.length
+        ?labels.map((l,i)=>`<span class="label-chip ${LABEL_COLORS[i%LABEL_COLORS.length]}">${l}<button onclick="removeLabel('${l.replace(/'/g,"\\'")}')" class="ml-1 hover:opacity-60 leading-none text-sm">×</button></span>`).join('')
+        :'<span class="text-xs text-slate-400 italic">No labels yet</span>';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCHEDULE
+═══════════════════════════════════════════════════════════ */
+async function saveSchedule(){
+    if(!S.current)return;
+    const dt=document.getElementById('sched-date').value;
+    const note=document.getElementById('sched-note').value.trim();
+    if(!dt){toast('Pick a date first','error');return;}
+    const id=S.current.id;const idx=S.enrollments.findIndex(e=>e.id===id);
+    const sd={date:dt,note};
+    if(fbOK){try{await DB.ref('enrollments/'+id+'/schedule').set(sd);}catch(e){}}
+    S.enrollments[idx].schedule=sd;S.current=S.enrollments[idx];
+    renderSchedDisplay();toast('Appointment saved!','success');
+}
+function renderSchedDisplay(){
+    const s=S.current?.schedule;const el=document.getElementById('sched-display');
+    if(s&&s.date){
+        const d=new Date(s.date);
+        el.innerHTML=`<span class="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">📅 ${d.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})}${s.note?' — '+s.note:''}</span>`;
+    }else{el.innerHTML='<span class="text-xs text-slate-400">No appointment set</span>';}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MANAGE STEPS MODAL
+═══════════════════════════════════════════════════════════ */
+function openStepsModal(){S.tempSteps=JSON.parse(JSON.stringify(S.processSteps));renderTempSteps();document.getElementById('steps-modal').classList.remove('hidden');}
+function closeStepsModal(){document.getElementById('steps-modal').classList.add('hidden');}
+function renderTempSteps(){
+    document.getElementById('steps-list').innerHTML=S.tempSteps.map((s,i)=>`
+        <div class="flex items-center gap-2 p-3 bg-white border border-slate-200 rounded-lg">
+            <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center flex-shrink-0">${i+1}</span>
+            <div class="flex-1 min-w-0">
+                <input type="text" value="${s.label}" onchange="S.tempSteps[${i}].label=this.value" class="w-full text-sm font-semibold text-slate-800 bg-transparent border-none outline-none">
+                <input type="text" value="${s.desc||''}" onchange="S.tempSteps[${i}].desc=this.value" class="w-full text-xs text-slate-400 bg-transparent border-none outline-none mt-0.5" placeholder="Description (shown to parent)...">
+            </div>
+            <button onclick="S.tempSteps.splice(${i},1);renderTempSteps()" class="text-rose-400 hover:text-rose-600"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>`).join('');
+}
+function addStep(){
+    const lbl=document.getElementById('new-step-label').value.trim();
+    const desc=document.getElementById('new-step-desc').value.trim();
+    if(!lbl)return;
+    S.tempSteps.push({id:'c_'+Date.now(),label:lbl,desc});
+    document.getElementById('new-step-label').value='';document.getElementById('new-step-desc').value='';
+    renderTempSteps();
+}
+async function saveSteps(){
+    S.processSteps=[...S.tempSteps];
+    if(fbOK){try{await DB.ref('config/process_steps').set(S.processSteps);}catch(e){}}
+    closeStepsModal();renderAll();toast('Steps saved!','success');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MANAGE REQUIRED DOCS CONFIG
+═══════════════════════════════════════════════════════════ */
+function openDocsConfigModal(){S.tempDocs=JSON.parse(JSON.stringify(S.requiredDocs));renderTempDocs();document.getElementById('docs-modal').classList.remove('hidden');}
+function closeDocsConfigModal(){document.getElementById('docs-modal').classList.add('hidden');}
+function renderTempDocs(){
+    document.getElementById('docs-config-list').innerHTML=S.tempDocs.map((d,i)=>`
+        <div class="flex items-center gap-2 p-3 bg-white border border-slate-200 rounded-lg">
+            <div class="w-6 h-6 rounded bg-violet-100 flex items-center justify-center flex-shrink-0">
+                <svg class="h-3 w-3 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <input type="text" value="${d.label}" onchange="S.tempDocs[${i}].label=this.value" class="w-full text-sm font-semibold text-slate-800 bg-transparent border-none outline-none">
+                <input type="text" value="${d.hint||''}" onchange="S.tempDocs[${i}].hint=this.value" class="w-full text-xs text-slate-400 bg-transparent border-none outline-none mt-0.5" placeholder="Hint for parent (optional)...">
+            </div>
+            <button onclick="S.tempDocs.splice(${i},1);renderTempDocs()" class="text-rose-400 hover:text-rose-600"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>`).join('');
+}
+function addRequiredDoc(){
+    const lbl=document.getElementById('new-doc-label').value.trim();
+    const hint=document.getElementById('new-doc-hint').value.trim();
+    if(!lbl)return;
+    const id='doc_'+lbl.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')+'_'+Date.now();
+    S.tempDocs.push({id,label:lbl,hint});
+    document.getElementById('new-doc-label').value='';document.getElementById('new-doc-hint').value='';
+    renderTempDocs();
+}
+async function saveRequiredDocs(){
+    S.requiredDocs=[...S.tempDocs];
+    if(fbOK){try{await DB.ref('config/required_docs').set(S.requiredDocs);}catch(e){}}
+    closeDocsConfigModal();toast('Required documents saved!','success');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHAT
+═══════════════════════════════════════════════════════════ */
+function initChat(eid){
+    const msgsEl=document.getElementById('chat-msgs');
+    if(!fbOK){msgsEl.innerHTML='<p class="text-xs text-center text-slate-400 py-6">Chat requires Firebase.</p>';return;}
+    const ref=DB.ref('chats/'+eid);
+    const h=ref.orderByChild('ts').limitToLast(60).on('value',snap=>{
+        const msgs=snap.val();
+        msgsEl.innerHTML='';
+        if(!msgs){msgsEl.innerHTML='<p class="text-xs text-center text-slate-400 py-6">No messages yet.</p>';return;}
+        Object.values(msgs).sort((a,b)=>a.ts-b.ts).forEach(m=>{
+            const isA=m.sender==='admin';
+            const d=document.createElement('div');
+            d.className='flex flex-col '+(isA?'items-end':'items-start')+' msg-in';
+            d.innerHTML=`<div class="max-w-[90%] px-3 py-1.5 text-xs rounded-xl ${isA?'bg-slate-800 text-white rounded-br-sm':'bg-slate-100 text-slate-800 rounded-bl-sm'}">${m.text}</div><span class="text-[10px] text-slate-400 mt-0.5 px-1">${fmtTime(m.ts)}</span>`;
+            msgsEl.appendChild(d);
+        });
+        msgsEl.scrollTop=msgsEl.scrollHeight;
+    });
+    S.chatUnsub=()=>ref.off('value',h);
+}
+
+async function sendMsg(){
+    if(!S.current||!fbOK)return;
+    const input=document.getElementById('chat-input');
+    const text=input.value.trim();if(!text)return;input.value='';
+    try{await DB.ref('chats/'+S.current.id).push({text,sender:'admin',ts:Date.now()});}
+    catch(e){toast('Could not send','error');}
+}
+
+function watchParent(id){
+    if(!fbOK)return;
+    DB.ref('presence/parents/'+id).on('value',snap=>{
+        const d=snap.val();const on=d&&d.online;
+        document.getElementById('parent-dot').classList.toggle('offline',!on);
+        document.getElementById('parent-lbl').textContent=on?'Parent Online':'Offline';
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════ */
+function setLoading(v){document.getElementById('loading-state').classList.toggle('hidden',!v);}
+function fmtDate(iso){if(!iso)return'—';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function fmtTime(ts){return new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});}
+
+function toast(msg,type='info'){
+    const c={success:'bg-emerald-600',error:'bg-rose-600',info:'bg-slate-800'};
+    const el=document.createElement('div');
+    el.className=`fixed bottom-4 right-4 ${c[type]||c.info} text-white px-4 py-2.5 rounded-lg shadow-xl text-sm font-medium z-[300] transform transition-all duration-300 translate-y-10 opacity-0`;
+    el.textContent=msg;document.body.appendChild(el);
+    requestAnimationFrame(()=>el.classList.remove('translate-y-10','opacity-0'));
+    setTimeout(()=>{el.classList.add('translate-y-10','opacity-0');setTimeout(()=>el.remove(),300);},3000);
+}
+
+function exportCSV(){
+    if(!S.enrollments.length){toast('No data','error');return;}
+    const hdr=['ID','Student','Parent','Email','Phone','Grade','Control#','Queue#','Date','Status','Stage','Docs Uploaded','Labels'];
+    const rows=S.enrollments.map(e=>{
+        const docs=e.documents||{};
+        const up=S.requiredDocs.filter(d=>docs[d.id]).length;
+        const step=e.process_step!==undefined&&S.processSteps[e.process_step]?S.processSteps[e.process_step].label:'';
+        return[e.id,`"${e.student_name||''}"`,`"${e.parent_name||''}"`,e.email||'',e.phone||'',e.grade||'',e.control_number||'',e.queue_number||'',fmtDate(e.enrollment_date),e.status||'',`"${step}"`,`${up}/${S.requiredDocs.length}`,`"${(e.labels||[]).join(', ')}"`];
+    });
+    const csv=[hdr,...rows].map(r=>r.join(',')).join('\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+    a.download=`enrollments_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+    toast('CSV exported!','success');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EVENTS
+═══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+    init();
+    document.querySelectorAll('#filter-tabs button').forEach(btn=>{
+        btn.addEventListener('click',e=>{
+            document.querySelectorAll('#filter-tabs button').forEach(b=>b.className='px-3 py-1.5 rounded-md text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50');
+            e.target.className='px-3 py-1.5 rounded-md text-sm font-medium bg-slate-900 text-white shadow-sm';
+            S.filter=e.target.dataset.status;renderAll();
+        });
+    });
+    document.getElementById('search-input').addEventListener('input',e=>{S.search=e.target.value;renderAll();});
+    document.getElementById('grade-filter').addEventListener('change',e=>{S.grade=e.target.value;renderAll();});
+});
+</script>
 </body>
 </html>
