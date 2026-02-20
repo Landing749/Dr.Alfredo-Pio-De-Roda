@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enrollment Verification – Dr. Alfredo Pio De Roda School</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  :root{--navy:#1a1a3e;--navy2:#2d2654;--navy3:#4a3f7a;--gold:#D4AF37;--goldd:#B8860B;--cream:#F6F4EF}
+  body{font-family:'EB Garamond',Georgia,serif;background:var(--cream);color:var(--navy);min-height:100vh;display:flex;flex-direction:column}
+
+  @keyframes riseIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes expandLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes pulseGreen{0%,100%{box-shadow:0 0 0 2px white,0 0 6px #22c55e}50%{box-shadow:0 0 0 2px white,0 0 14px #22c55e}}
+  @keyframes callPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  nav{background:rgba(246,244,239,.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(212,175,55,.18);padding:0 1.5rem;height:72px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .nav-nm{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);line-height:1.2;text-decoration:none}
+  .nav-d{font-family:'Cinzel Decorative',serif;color:var(--gold)}
+  .nav-sub{display:block;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(26,26,62,.45)}
+  .nav-back{display:flex;align-items:center;gap:.4rem;font-family:'EB Garamond',serif;font-size:.9rem;color:rgba(26,26,62,.65);text-decoration:none;transition:color .2s}
+  .nav-back:hover{color:var(--gold)}
+  .nav-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* HERO */
+  .hero{background:linear-gradient(135deg,#1a1a3e,#2d2654,#4a3f7a);padding:4rem 1.5rem 3.5rem;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(212,175,55,.12),transparent 70%);pointer-events:none}
+  .hero-logo{width:80px;height:80px;border-radius:50%;background:rgba(212,175,55,.12);border:2px solid rgba(212,175,55,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+  .hero-logo img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+  .hero-tag{display:inline-block;padding:.3rem 1rem;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.3);border-radius:9999px;color:var(--gold);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem;animation:riseIn .7s ease-out .2s both}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,3rem);color:var(--cream);margin-bottom:.6rem;animation:riseIn .8s ease-out .3s both}
+  .hero h1 em{font-style:italic;color:var(--gold)}
+  .hero-div{width:5rem;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:.9rem auto 1rem;transform:scaleX(0);animation:expandLine .8s ease-out .6s forwards}
+  .hero p{color:rgba(246,244,239,.7);font-size:1rem;max-width:500px;margin:0 auto;animation:riseIn .8s ease-out .5s both}
+
+  main{flex:1;max-width:640px;width:100%;margin:0 auto;padding:3rem 1.5rem}
+
+  /* SEARCH CARD */
+  .search-card{background:white;border-radius:1.25rem;padding:2.25rem 2rem;box-shadow:0 12px 40px rgba(0,0,0,.08);border:1px solid rgba(212,175,55,.12);animation:riseIn .7s ease-out .2s both}
+  .search-card h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--navy);margin-bottom:.4rem}
+  .search-card > p{color:rgba(26,26,62,.55);font-size:.9rem;margin-bottom:1.5rem}
+  .inp-wrap{position:relative;margin-bottom:1rem}
+  .inp-wrap input{width:100%;padding:.9rem 1.2rem;padding-right:3rem;background:var(--cream);border:1.5px solid rgba(26,26,62,.12);border-radius:.8rem;color:var(--navy);font-family:'EB Garamond',serif;font-size:1rem;outline:none;transition:border-color .3s,box-shadow .3s;letter-spacing:.05em}
+  .inp-wrap input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.15)}
+  .inp-wrap input::placeholder{color:rgba(26,26,62,.35);letter-spacing:0}
+  .inp-icon{position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:rgba(26,26,62,.3);pointer-events:none}
+  .inp-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .btn-check{width:100%;padding:.9rem;border-radius:.8rem;background:linear-gradient(135deg,var(--gold),var(--goldd));color:white;border:none;font-family:'EB Garamond',serif;font-size:1rem;font-weight:600;letter-spacing:.05em;cursor:pointer;transition:all .3s;box-shadow:0 8px 20px rgba(212,175,55,.3);display:flex;align-items:center;justify-content:center;gap:.5rem}
+  .btn-check:hover{transform:scale(1.02);box-shadow:0 12px 28px rgba(212,175,55,.45)}
+  .btn-check:disabled{opacity:.6;transform:none;cursor:not-allowed}
+  .sp{border:2.5px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;width:18px;height:18px;animation:spin 1s linear infinite}
+
+  /* RESULT */
+  #result{margin-top:1.75rem;display:none}
+  .r-notfound{background:#fef2f2;border:1px solid #fecaca;border-radius:1rem;padding:1.5rem;text-align:center}
+  .r-notfound svg{width:44px;height:44px;color:#ef4444;margin:0 auto .75rem;display:block}
+  .r-notfound h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:#991b1b;margin-bottom:.35rem}
+  .r-notfound p{color:#b91c1c;font-size:.88rem}
+
+  /* FOUND CARD */
+  .r-found{background:white;border:1.5px solid rgba(212,175,55,.35);border-radius:1rem;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.07)}
+  .r-header{background:linear-gradient(135deg,#1a1a3e,#2d2654);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem}
+  .r-icon{width:3rem;height:3rem;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .r-icon.pending{background:rgba(245,158,11,.2);border:1.5px solid rgba(245,158,11,.5)}
+  .r-icon.under_review{background:rgba(59,130,246,.2);border:1.5px solid rgba(59,130,246,.5)}
+  .r-icon.approved,.r-icon.enrolled{background:rgba(16,185,129,.2);border:1.5px solid rgba(16,185,129,.5)}
+  .r-icon.rejected{background:rgba(239,68,68,.2);border:1.5px solid rgba(239,68,68,.5)}
+  .r-icon.being_called{background:rgba(168,85,247,.2);border:1.5px solid rgba(168,85,247,.5);animation:callPulse 1.2s ease-in-out infinite}
+  .r-icon svg{width:22px;height:22px}
+  .r-title{flex:1}
+  .r-title h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--cream);margin-bottom:.2rem}
+  .r-title p{font-size:.75rem;color:rgba(246,244,239,.55);letter-spacing:.05em}
+  .status-badge{padding:.3rem .85rem;border-radius:9999px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
+  .status-badge.pending{background:rgba(245,158,11,.2);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+  .status-badge.under_review{background:rgba(59,130,246,.2);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+  .status-badge.approved,.status-badge.enrolled{background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+  .status-badge.rejected{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+  .status-badge.being_called{background:rgba(168,85,247,.2);color:#c084fc;border:1px solid rgba(168,85,247,.4);animation:callPulse 1.2s ease-in-out infinite}
+
+  .r-body{padding:1.5rem}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  @media(max-width:480px){.detail-grid{grid-template-columns:1fr}}
+  .detail-item label{display:block;font-size:.62rem;color:rgba(26,26,62,.42);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.25rem}
+  .detail-item p{font-weight:700;color:var(--navy);font-size:.92rem;line-height:1.4}
+  .detail-item.full{grid-column:1/-1}
+  .divider{height:1px;background:rgba(212,175,55,.15);margin:1.25rem 0}
+  .ctrl-display{font-family:'Courier New',monospace;background:linear-gradient(135deg,#1a1a3e,#2d2654);color:var(--gold);padding:.5rem 1rem;border-radius:.5rem;font-size:1rem;font-weight:700;letter-spacing:.1em;display:inline-block}
+  .queue-display{background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:.5rem 1rem;border-radius:.5rem;font-size:1rem;font-weight:700;display:inline-block}
+
+  /* BEING CALLED BANNER */
+  .calling-banner{border-radius:.75rem;background:linear-gradient(135deg,#7e22ce,#9333ea);padding:1rem 1.25rem;margin-bottom:1rem;animation:callPulse 1.2s ease-in-out infinite;position:relative;overflow:hidden}
+  .calling-banner-inner{display:flex;align-items:center;gap:.75rem;position:relative;z-index:1}
+  .calling-banner svg{width:28px;height:28px;stroke:white;fill:none;stroke-width:2;flex-shrink:0}
+  .calling-banner h4{font-family:'Playfair Display',serif;color:white;font-size:1rem}
+  .calling-banner p{color:rgba(255,255,255,.8);font-size:.82rem;margin-top:.1rem}
+
+  /* PROCESS STEPS */
+  .process-section{margin-top:1.5rem;background:white;border-radius:1rem;overflow:hidden;border:1.5px solid rgba(212,175,55,.2);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+  .process-header{background:linear-gradient(135deg,#1a1a3e,#2d2654);padding:1rem 1.5rem;display:flex;align-items:center;gap:.6rem}
+  .process-header h3{font-family:'Playfair Display',serif;font-size:1rem;color:white}
+  .process-header span{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(212,175,55,.8)}
+  .process-body{padding:1.5rem}
+  .step{display:flex;gap:1rem;position:relative}
+  .step:not(:last-child)::before{content:'';position:absolute;left:1.1rem;top:2.5rem;bottom:0;width:2px;background:#e2e8f0;z-index:0}
+  .step.done::before{background:linear-gradient(to bottom,#10b981,#e2e8f0)}
+  .step-icon{width:2.25rem;height:2.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;border:2px solid #e2e8f0;background:white}
+  .step.done .step-icon{background:#10b981;border-color:#10b981}
+  .step.active .step-icon{background:linear-gradient(135deg,#D4AF37,#B8860B);border-color:#D4AF37;box-shadow:0 0 0 4px rgba(212,175,55,.15)}
+  .step.inactive .step-icon{background:#f8fafc;border-color:#e2e8f0}
+  .step-icon svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .step.inactive .step-icon svg{stroke:#cbd5e1}
+  .step-content{padding:.4rem 0 1.5rem}
+  .step-title{font-size:.9rem;font-weight:700;color:#1a1a3e;margin-bottom:.15rem}
+  .step.inactive .step-title{color:#94a3b8}
+  .step-desc{font-size:.78rem;color:rgba(26,26,62,.5);line-height:1.5}
+  .step.active .step-desc{color:rgba(26,26,62,.65)}
+  .step-badge{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .5rem;border-radius:9999px;margin-left:.4rem;vertical-align:middle}
+  .badge-done{background:#dcfce7;color:#166534}
+  .badge-active{background:rgba(212,175,55,.15);color:#92400e}
+  .badge-pending{background:#f1f5f9;color:#94a3b8}
+
+  /* SCHEDULE CARD */
+  .sched-card{background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #6ee7b7;border-radius:.75rem;padding:.9rem 1.1rem;margin-top:1rem;display:flex;align-items:center;gap:.75rem}
+  .sched-card svg{width:20px;height:20px;stroke:#065f46;fill:none;stroke-width:2;flex-shrink:0}
+  .sched-card h4{font-family:'Playfair Display',serif;font-size:.88rem;color:#065f46;margin-bottom:.15rem}
+  .sched-card p{font-size:.82rem;color:#047857}
+
+  /* LABELS */
+  .labels-section{margin-top:.75rem}
+  .label-chip{display:inline-block;padding:.2rem .65rem;border-radius:9999px;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+
+  /* DOCUMENT UPLOAD */
+  .upload-section{margin-top:1.5rem;background:white;border-radius:1rem;overflow:hidden;border:1.5px solid rgba(212,175,55,.2);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+  .upload-header{background:linear-gradient(135deg,#1a1a3e,#2d2654);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+  .upload-header h3{font-family:'Playfair Display',serif;font-size:1rem;color:white}
+  .upload-header-icon{display:flex;align-items:center;gap:.5rem}
+  .upload-body{padding:1.25rem;display:flex;flex-direction:column;gap:.75rem}
+  .doc-item{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;background:#f8fafc;border-radius:.65rem;border:1px solid #e2e8f0;gap:.75rem;transition:border-color .2s}
+  .doc-item.uploaded{background:white;border-color:#a7f3d0}
+  .doc-item-left{display:flex;align-items:center;gap:.65rem;flex:1;min-width:0}
+  .doc-icon{width:2rem;height:2rem;border-radius:.4rem;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .doc-icon svg{width:14px;height:14px;stroke:#64748b;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .doc-icon.ok{background:#dcfce7}
+  .doc-icon.ok svg{stroke:#16a34a}
+  .doc-name{font-size:.85rem;font-weight:600;color:#1a1a3e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .doc-hint{font-size:.7rem;color:#94a3b8;margin-top:.1rem}
+  .doc-hint.ok{color:#16a34a}
+  .doc-actions{display:flex;gap:.4rem;flex-shrink:0;align-items:center}
+  .btn-upload{font-size:.75rem;font-weight:600;padding:.35rem .75rem;border-radius:.4rem;border:1.5px solid #D4AF37;color:#B8860B;background:white;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .btn-upload:hover{background:#D4AF37;color:white}
+  .btn-upload:disabled{opacity:.5;cursor:not-allowed}
+  .btn-view-doc{font-size:.75rem;font-weight:600;padding:.35rem .75rem;border-radius:.4rem;border:1.5px solid #3b82f6;color:#2563eb;background:white;cursor:pointer;transition:all .2s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:.25rem}
+  .btn-view-doc:hover{background:#3b82f6;color:white}
+  .doc-thumb{width:42px;height:32px;object-fit:cover;border-radius:.3rem;border:1px solid #e2e8f0;cursor:zoom-in}
+  .upload-input{display:none}
+  .upload-progress{height:3px;background:#e2e8f0;border-radius:9999px;margin-top:.4rem;overflow:hidden;display:none}
+  .upload-progress-bar{height:100%;background:linear-gradient(to right,#D4AF37,#10b981);border-radius:9999px;width:0%;transition:width .3s}
+  .upload-note{font-size:.72rem;color:rgba(26,26,62,.4);text-align:center;padding:.25rem 0 .5rem}
+
+  /* EDITABLE INFO SECTION */
+  .edit-section{margin-top:1.5rem;background:white;border-radius:1rem;overflow:hidden;border:1.5px solid rgba(212,175,55,.2);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+  .edit-header{background:linear-gradient(135deg,#1a1a3e,#2d2654);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+  .edit-header h3{font-family:'Playfair Display',serif;font-size:1rem;color:white}
+  .edit-body{padding:1.25rem 1.5rem}
+  .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+  @media(max-width:480px){.edit-grid{grid-template-columns:1fr}}
+  .edit-field{display:flex;flex-direction:column;gap:.3rem}
+  .edit-field.full{grid-column:1/-1}
+  .edit-field label{font-size:.62rem;color:rgba(26,26,62,.42);text-transform:uppercase;letter-spacing:.1em}
+  .edit-field input,.edit-field select{padding:.6rem .85rem;border:1.5px solid rgba(26,26,62,.12);border-radius:.6rem;font-family:'EB Garamond',serif;font-size:.95rem;color:var(--navy);background:var(--cream);outline:none;transition:border-color .2s,box-shadow .2s}
+  .edit-field input:focus,.edit-field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
+  .edit-field input:read-only{background:#f1f5f9;color:rgba(26,26,62,.5);cursor:not-allowed}
+  .edit-actions{display:flex;gap:.65rem;margin-top:1.1rem}
+  .btn-save{flex:1;padding:.7rem;border-radius:.6rem;background:linear-gradient(135deg,var(--gold),var(--goldd));color:white;border:none;font-family:'EB Garamond',serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:.4rem}
+  .btn-save:hover{transform:scale(1.02);box-shadow:0 6px 18px rgba(212,175,55,.35)}
+  .btn-save:disabled{opacity:.6;transform:none;cursor:not-allowed}
+  .btn-cancel-edit{padding:.7rem 1.1rem;border-radius:.6rem;background:white;border:1.5px solid rgba(26,26,62,.15);color:rgba(26,26,62,.55);font-family:'EB Garamond',serif;font-size:.95rem;cursor:pointer;transition:all .2s}
+  .btn-cancel-edit:hover{border-color:rgba(26,26,62,.35);color:var(--navy)}
+  .edit-mode-btn{padding:.3rem .85rem;border-radius:9999px;font-size:.68rem;font-weight:700;letter-spacing:.06em;background:rgba(212,175,55,.15);color:#92400e;border:1px solid rgba(212,175,55,.3);cursor:pointer;transition:all .2s;font-family:'EB Garamond',serif}
+  .edit-mode-btn:hover{background:rgba(212,175,55,.3)}
+  .save-msg{font-size:.78rem;text-align:center;padding:.4rem;border-radius:.4rem;margin-top:.5rem;display:none}
+  .save-msg.ok{display:block;background:#dcfce7;color:#166534}
+  .save-msg.err{display:block;background:#fee2e2;color:#991b1b}
+
+  /* FOOTER INFO */
+  .r-footer{background:#f8fafc;border-top:1px solid rgba(212,175,55,.1);padding:1rem 1.5rem}
+  .r-footer p{font-size:.78rem;color:rgba(26,26,62,.5);line-height:1.5}
+
+  /* TIPS */
+  .tips{margin-top:1.5rem;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);border-radius:.9rem;padding:1.25rem 1.5rem}
+  .tips h4{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--navy);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+  .tips ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+  .tips ul li{font-size:.85rem;color:rgba(26,26,62,.62);display:flex;align-items:flex-start;gap:.5rem;line-height:1.5}
+  .tips ul li::before{content:'•';color:var(--gold);font-weight:700;flex-shrink:0}
+  footer{text-align:center;padding:2rem 1.5rem;border-top:1px solid rgba(212,175,55,.12);color:rgba(26,26,62,.4);font-size:.8rem}
+  footer a{color:var(--gold);text-decoration:none}
+
+  /* CHAT WIDGET */
+  .chat-widget{position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;font-family:'Inter',system-ui,sans-serif;display:none}
+  .chat-fab{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#1a1a3e,#2d2654);border:2px solid rgba(212,175,55,.45);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 24px rgba(26,26,62,.35);transition:all .2s;position:relative}
+  .chat-fab:hover{transform:scale(1.08)}
+  .chat-fab svg{width:22px;height:22px;stroke:#D4AF37;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .chat-fab-dot{position:absolute;top:1px;right:1px;width:11px;height:11px;border-radius:50%;background:#22c55e;border:2px solid white;animation:pulseGreen 2s infinite}
+  .chat-fab-dot.offline{background:#94a3b8;animation:none}
+  .chat-unread{position:absolute;top:-3px;left:-3px;background:#ef4444;color:white;border-radius:50%;width:18px;height:18px;font-size:.6rem;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid white}
+  .chat-window{position:absolute;bottom:64px;right:0;width:290px;background:white;border-radius:1rem;box-shadow:0 16px 48px rgba(0,0,0,.2);border:1.5px solid rgba(212,175,55,.2);overflow:hidden;flex-direction:column;display:none;animation:slideUp .2s ease-out}
+  .chat-window.open{display:flex}
+  .cw-header{background:linear-gradient(135deg,#1a1a3e,#2d2654);padding:.85rem 1rem;display:flex;align-items:center;justify-content:space-between}
+  .cw-header h4{font-family:'Playfair Display',serif;font-size:.88rem;color:white}
+  .cw-status{display:flex;align-items:center;gap:.35rem}
+  .admin-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulseGreen 2s infinite;flex-shrink:0}
+  .admin-dot.offline{background:#94a3b8;animation:none}
+  .cw-body{height:210px;overflow-y:auto;padding:.65rem;display:flex;flex-direction:column;gap:.4rem;background:#f8fafc}
+  .cw-msg{max-width:86%;padding:.45rem .7rem;border-radius:.65rem;font-size:.78rem;line-height:1.4;animation:slideUp .15s ease-out}
+  .cw-msg.admin{background:#1e293b;color:white;align-self:flex-start;border-radius:.65rem .65rem .65rem .1rem}
+  .cw-msg.parent{background:#D4AF37;color:#1a1a3e;align-self:flex-end;border-radius:.65rem .65rem .1rem .65rem;font-weight:500}
+  .cw-msg-time{font-size:.58rem;opacity:.5;margin-top:.1rem;display:block}
+  .cw-input{padding:.6rem .7rem;border-top:1px solid #e2e8f0;display:flex;gap:.4rem;background:white}
+  .cw-input input{flex:1;font-size:.8rem;padding:.4rem .7rem;border:1px solid #e2e8f0;border-radius:.4rem;outline:none;font-family:inherit}
+  .cw-input input:focus{border-color:#D4AF37}
+  .cw-send{width:30px;height:30px;border-radius:.4rem;background:linear-gradient(135deg,#1a1a3e,#2d2654);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cw-send svg{width:13px;height:13px;stroke:#D4AF37;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+  /* IMAGE LIGHTBOX */
+  #lightbox{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.9);cursor:zoom-out}
+  #lightbox.open{display:flex}
+  #lb-img{max-width:90vw;max-height:90vh;border-radius:.75rem;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-nm">
+    <span class="nav-d">D</span>r. Alfredo Pio De Roda
+    <span class="nav-sub">Elementary School</span>
+  </a>
+  <a href="index.html" class="nav-back">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to Home
+  </a>
+</nav>
+
+<div class="hero">
+  <div class="hero-logo"><img src="school-logo.png" alt="Logo" crossorigin="anonymous"/></div>
+  <div class="hero-tag">Enrollment Portal</div>
+  <h1>Enrollment <em>Verification</em></h1>
+  <div class="hero-div"></div>
+  <p>Enter your control number to check the status of your enrollment application and upload required documents.</p>
+</div>
+
+<main>
+  <div class="search-card">
+    <h2>Check Your Application</h2>
+    <p>Your control number was provided upon submission of your enrollment form.</p>
+    <div class="inp-wrap">
+      <input type="text" id="ctrl-input" placeholder="e.g. 20260220-4821" maxlength="14" autocomplete="off" spellcheck="false"/>
+      <span class="inp-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+    </div>
+    <button class="btn-check" id="check-btn" onclick="checkEnrollment()">
+      <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Verify Enrollment
+    </button>
+
+    <div id="result">
+      <!-- NOT FOUND -->
+      <div id="r-notfound" class="r-notfound" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <h3>No Record Found</h3>
+        <p>No enrollment found for that control number. Please double-check and try again, or contact the school office.</p>
+      </div>
+
+      <!-- FOUND -->
+      <div id="r-found" style="display:none">
+
+        <!-- Status card -->
+        <div class="r-found">
+          <div class="r-header">
+            <div class="r-icon" id="r-icon"><svg id="r-icon-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></svg></div>
+            <div class="r-title"><h3>Enrollment Record Found</h3><p id="r-sub">Application status</p></div>
+            <span class="status-badge" id="r-badge"></span>
+          </div>
+          <div class="r-body">
+            <!-- Being Called Banner -->
+            <div id="calling-banner" class="calling-banner" style="display:none">
+              <div class="calling-banner-inner">
+                <svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                <div><h4>📞 The admissions office is calling you!</h4><p>Please answer your phone. They are trying to reach you right now.</p></div>
+              </div>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item full"><label>Control Number</label><div id="r-ctrl" class="ctrl-display"></div></div>
+              <div class="detail-item full" style="margin-top:.25rem"><label>Queue Position</label><div id="r-queue" class="queue-display"></div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="detail-grid">
+              <div class="detail-item"><label>Student Name</label><p id="r-student"></p></div>
+              <div class="detail-item"><label>Grade Level</label><p id="r-grade"></p></div>
+              <div class="detail-item"><label>Parent / Guardian</label><p id="r-parent"></p></div>
+              <div class="detail-item"><label>Phone</label><p id="r-phone"></p></div>
+              <div class="detail-item full"><label>Email</label><p id="r-email"></p></div>
+              <div class="detail-item"><label>Date Filed</label><p id="r-date"></p></div>
+              <div class="detail-item"><label>Status</label><p id="r-status-txt"></p></div>
+            </div>
+            <!-- Admin labels -->
+            <div id="labels-sec" class="labels-section" style="display:none">
+              <div class="divider" style="margin:.75rem 0"></div>
+              <label style="font-size:.62rem;color:rgba(26,26,62,.42);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.5rem">Notes from Admissions</label>
+              <div id="r-labels" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+            </div>
+            <!-- Schedule -->
+            <div id="sched-sec" style="display:none">
+              <div class="sched-card" id="sched-card">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div><h4>Scheduled Appointment</h4><p id="sched-text"></p></div>
+              </div>
+            </div>
+          </div>
+          <div class="r-footer"><p id="r-footer-msg"></p></div>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="process-section" id="process-section" style="display:none">
+          <div class="process-header">
+            <svg width="18" height="18" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            <h3>Enrollment Progress</h3>
+            <span id="step-label"></span>
+          </div>
+          <div class="process-body"><div id="process-steps"></div></div>
+        </div>
+
+        <!-- Document Upload -->
+        <div class="upload-section" id="upload-section" style="display:none">
+          <div class="upload-header">
+            <div class="upload-header-icon">
+              <svg width="18" height="18" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <h3>Required Documents</h3>
+            </div>
+            <span id="doc-progress-badge" style="font-size:.68rem;font-weight:700;color:#D4AF37;background:rgba(212,175,55,.15);padding:.2rem .65rem;border-radius:9999px;border:1px solid rgba(212,175,55,.3)"></span>
+          </div>
+          <div class="upload-body" id="doc-list"></div>
+        </div>
+
+        <!-- Editable Info -->
+        <div class="edit-section" id="edit-section" style="display:none">
+          <div class="edit-header">
+            <h3>📋 Your Submitted Information</h3>
+            <button class="edit-mode-btn" id="edit-toggle-btn" onclick="toggleEditMode()">✏️ Edit</button>
+          </div>
+          <div class="edit-body">
+            <div class="edit-grid">
+              <div class="edit-field full">
+                <label>Student Name</label>
+                <input type="text" id="ef-student" readonly/>
+              </div>
+              <div class="edit-field">
+                <label>Grade Level</label>
+                <select id="ef-grade" disabled>
+                  <option value="kindergarten">Kindergarten</option>
+                  <option value="1st">Grade 1</option>
+                  <option value="2nd">Grade 2</option>
+                  <option value="3rd">Grade 3</option>
+                  <option value="4th">Grade 4</option>
+                  <option value="5th">Grade 5</option>
+                  <option value="6th">Grade 6</option>
+                </select>
+              </div>
+              <div class="edit-field">
+                <label>Parent / Guardian Name</label>
+                <input type="text" id="ef-parent" readonly/>
+              </div>
+              <div class="edit-field">
+                <label>Phone Number</label>
+                <input type="text" id="ef-phone" readonly/>
+              </div>
+              <div class="edit-field full">
+                <label>Email Address</label>
+                <input type="email" id="ef-email" readonly/>
+              </div>
+            </div>
+            <div id="edit-actions" class="edit-actions" style="display:none">
+              <button class="btn-cancel-edit" onclick="cancelEditMode()">Cancel</button>
+              <button class="btn-save" id="ef-save-btn" onclick="saveEditedInfo()">
+                <svg width="15" height="15" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                Save Changes
+              </button>
+            </div>
+            <div id="edit-save-msg" class="save-msg"></div>
+          </div>
+        </div>
+
+      </div><!-- /#r-found -->
+    </div><!-- /#result -->
+  </div>
+
+  <div class="tips">
+    <h4>💡 Tips</h4>
+    <ul>
+      <li>Control numbers are formatted as <strong>YYYYMMDD-XXXX</strong> (e.g. 20260220-4821)</li>
+      <li>Control numbers are case-sensitive — enter exactly as shown on your receipt</li>
+      <li>Upload all required documents as JPG, PNG, or PDF (max 10MB each)</li>
+      <li>Use the chat button at bottom-right to message the admissions team directly</li>
+    </ul>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 Dr. Alfredo Pio De Roda Elementary School &nbsp;•&nbsp; <a href="index.html">Back to Main Site</a></p>
+</footer>
+
+<!-- CHAT WIDGET -->
+<div class="chat-widget" id="chat-widget">
+  <div class="chat-window" id="chat-window">
+    <div class="cw-header">
+      <h4>Admissions Office</h4>
+      <div class="cw-status">
+        <span class="admin-dot offline" id="admin-dot"></span>
+        <span style="font-size:.68rem;color:rgba(246,244,239,.6)" id="admin-lbl">Checking...</span>
+      </div>
+    </div>
+    <div class="cw-body" id="cw-body"><p style="font-size:.78rem;text-align:center;color:#94a3b8;padding:1rem 0">Loading messages...</p></div>
+    <div class="cw-input">
+      <input type="text" id="cw-input" placeholder="Message the office..." maxlength="300" onkeydown="if(event.key==='Enter')sendParentMsg()"/>
+      <button class="cw-send" onclick="sendParentMsg()"><svg viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
+    </div>
+  </div>
+  <div class="chat-fab" id="chat-fab" onclick="toggleChat()">
+    <svg viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+    <span class="chat-fab-dot offline" id="fab-dot"></span>
+    <span class="chat-unread" id="chat-badge">0</span>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="this.classList.remove('open')"><img id="lb-img" src=""></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+const FB={apiKey:"AIzaSyB6FAMgqHcccsqce4R5nd8y0YVggc3aHbY",authDomain:"clinique-parfum.firebaseapp.com",databaseURL:"https://clinique-parfum-default-rtdb.firebaseio.com",projectId:"clinique-parfum",storageBucket:"clinique-parfum.firebasestorage.app",messagingSenderId:"569473208892",appId:"1:569473208892:web:f009390a8631fc164ce939"};
+const CLOUD_NAME='damr6r9op';
+const CLOUD_PRESET='org-resources';
+
+const DEFAULT_STEPS=[
+    {id:'submitted',label:'Application Submitted',desc:'Your enrollment form has been received by the school.'},
+    {id:'documents',label:'Document Submission',desc:'Upload all required documents for verification.'},
+    {id:'review',label:'Under Review',desc:'The admissions office is reviewing your application and documents.'},
+    {id:'approved',label:'Enrollment Approved',desc:'Your application has been approved. Visit the school to finalize.'},
+    {id:'enrolled',label:'Fully Enrolled',desc:'Welcome to Dr. Alfredo Pio De Roda Elementary School!'},
+];
+const DEFAULT_DOCS=[
+    {id:'birth_cert',label:'PSA Birth Certificate',hint:'Clear scan or photo'},
+    {id:'report_card',label:'Report Card (Form 138)',hint:'Latest school year'},
+    {id:'good_moral',label:'Certificate of Good Moral Character',hint:'From previous school'},
+    {id:'id_picture',label:'2x2 ID Picture',hint:'White background, recent'},
+    {id:'medical_cert',label:'Medical Certificate',hint:'From licensed physician'},
+];
+
+const LABEL_COLORS=['background:#dbeafe;color:#1e40af','background:#ede9fe;color:#5b21b6','background:#fef3c7;color:#92400e','background:#d1fae5;color:#065f46','background:#fee2e2;color:#991b1b','background:#ccfbf1;color:#0f766e'];
+
+let db,fbOK=false;
+let processSteps=[...DEFAULT_STEPS];
+let requiredDocs=[...DEFAULT_DOCS];
+let currentCtrl=null;
+let chatOpen=false;
+let unread=0;
+let chatInited=false;
+
+try{firebase.initializeApp(FB);db=firebase.database();fbOK=true;}catch(e){console.warn('Firebase error',e);}
+
+/* ═══════════════════════════════════════════
+   LOAD CONFIG FROM FIREBASE
+═══════════════════════════════════════════ */
+function fbTimeout(ms){return new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms));}
+
+async function loadConfig(){
+    if(!fbOK)return;
+    try{
+        const snap=await Promise.race([db.ref('config').once('value'),fbTimeout(5000)]);
+        const cfg=snap.val()||{};
+        if(cfg.process_steps&&cfg.process_steps.length) processSteps=cfg.process_steps;
+        if(cfg.required_docs&&cfg.required_docs.length) requiredDocs=cfg.required_docs;
+    }catch(e){}
+}
+
+/* ═══════════════════════════════════════════
+   INPUT FORMATTING
+═══════════════════════════════════════════ */
+document.getElementById('ctrl-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkEnrollment();});
+document.getElementById('ctrl-input').addEventListener('input',function(){
+    var v=this.value.replace(/[^0-9]/g,'');
+    if(v.length>8)v=v.slice(0,8)+'-'+v.slice(8,12);
+    this.value=v;
+});
+
+/* ═══════════════════════════════════════════
+   VERIFY
+═══════════════════════════════════════════ */
+async function checkEnrollment(){
+    const ctrl=document.getElementById('ctrl-input').value.trim();
+    if(!ctrl){document.getElementById('ctrl-input').focus();return;}
+    currentCtrl=ctrl;
+
+    const btn=document.getElementById('check-btn');
+    btn.disabled=true;btn.innerHTML='<div class="sp"></div> Checking…';
+
+    document.getElementById('result').style.display='none';
+    document.getElementById('r-notfound').style.display='none';
+    document.getElementById('r-found').style.display='none';
+    document.getElementById('process-section').style.display='none';
+    document.getElementById('upload-section').style.display='none';
+    document.getElementById('edit-section').style.display='none';
+    document.getElementById('chat-widget').style.display='none';
+
+    await loadConfig();
+
+    try{
+        if(!fbOK)throw new Error('Firebase not available');
+        const snap=await Promise.race([db.ref('enrollments/'+ctrl).once('value'),fbTimeout(8000)]);
+        const data=snap.val();
+        if(data)showResult(data);
+        else showNotFound();
+    }catch(e){
+        if(ctrl==='20260220-0001'){
+            showResult({control_number:'20260220-0001',queue_number:1,student_name:'Juan Dela Cruz',parent_name:'Maria Dela Cruz',grade:'1st',email:'maria@email.com',phone:'+63 912 345 6789',enrollment_date:new Date().toISOString(),status:'pending',documents:{},labels:[]});
+        }else{showNotFound();}
+    }finally{
+        btn.disabled=false;
+        btn.innerHTML='<svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Verify Enrollment';
+    }
+}
+
+function showNotFound(){
+    document.getElementById('result').style.display='block';
+    document.getElementById('r-notfound').style.display='block';
+}
+
+function showResult(data){
+    document.getElementById('result').style.display='block';
+    document.getElementById('result').style.animation='riseIn .5s ease-out both';
+    document.getElementById('r-found').style.display='block';
+    document.getElementById('process-section').style.display='block';
+    document.getElementById('upload-section').style.display='block';
+    document.getElementById('edit-section').style.display='block';
+
+    const statusRaw=Array.isArray(data.status)?data.status[0]:data.status||'pending';
+    const isCalling=statusRaw==='being_called';
+    const status=statusRaw;
+
+    // Status icon + badge
+    const icon=document.getElementById('r-icon');
+    const iconSvg=document.getElementById('r-icon-svg');
+    const badge=document.getElementById('r-badge');
+    const sub=document.getElementById('r-sub');
+    const footer=document.getElementById('r-footer-msg');
+    const statusTxt=document.getElementById('r-status-txt');
+
+    icon.className='r-icon '+status;
+    badge.className='status-badge '+status;
+
+    const MAP={
+        pending:      {stroke:'#fbbf24',svg:'<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',lbl:'Pending',sub:'Application is being reviewed',txt:'Pending Review',color:'#d97706',footer:'Please upload all required documents below to proceed with your enrollment.'},
+        under_review: {stroke:'#60a5fa',svg:'<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',lbl:'Under Review',sub:'Documents under review',txt:'Under Review',color:'#2563eb',footer:'The admissions office is reviewing your application. We will contact you soon.'},
+        approved:     {stroke:'#34d399',svg:'<path d="M20 6L9 17l-5-5"/>',lbl:'Approved',sub:'Application approved',txt:'Approved ✓',color:'#059669',footer:'Congratulations! Please visit the school office to complete the enrollment process.'},
+        rejected:     {stroke:'#f87171',svg:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',lbl:'Rejected',sub:'Application not approved',txt:'Rejected',color:'#dc2626',footer:'Please contact the school office for more information about your application.'},
+        being_called: {stroke:'#c084fc',svg:'<path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>',lbl:'📞 Being Called',sub:'The office is calling you now!',txt:'📞 Being Called — Please Answer',color:'#9333ea',footer:'The admissions office is trying to reach you by phone right now. Please answer!'},
+        enrolled:     {stroke:'#34d399',svg:'<path d="M20 6L9 17l-5-5"/>',lbl:'Enrolled',sub:'Successfully enrolled',txt:'Fully Enrolled ✓',color:'#059669',footer:'Welcome to Dr. Alfredo Pio De Roda Elementary School! 🎉'},
+    };
+    const st=MAP[status]||MAP.pending;
+    iconSvg.setAttribute('stroke',st.stroke);iconSvg.innerHTML=st.svg;
+    badge.textContent=st.lbl;sub.textContent=st.sub;
+    statusTxt.textContent=st.txt;statusTxt.style.color=st.color;
+    footer.textContent=st.footer;
+
+    // Being called banner
+    document.getElementById('calling-banner').style.display=isCalling?'block':'none';
+
+    // Core fields
+    document.getElementById('r-ctrl').textContent=data.control_number||'—';
+    document.getElementById('r-queue').textContent='#'+(data.queue_number||'—');
+    document.getElementById('r-student').textContent=data.student_name||'—';
+    document.getElementById('r-grade').textContent=fmtGrade(data.grade);
+    document.getElementById('r-parent').textContent=data.parent_name||'—';
+    document.getElementById('r-phone').textContent=data.phone||'—';
+    document.getElementById('r-email').textContent=data.email||'—';
+    document.getElementById('r-date').textContent=fmtDate(data.enrollment_date);
+
+    // Labels from admin
+    const labels=data.labels||[];
+    const labelSec=document.getElementById('labels-sec');
+    const labelWrap=document.getElementById('r-labels');
+    if(labels.length){
+        labelSec.style.display='block';
+        labelWrap.innerHTML=labels.map((l,i)=>`<span class="label-chip" style="${LABEL_COLORS[i%LABEL_COLORS.length]}">${l}</span>`).join('');
+    }else{labelSec.style.display='none';}
+
+    // Schedule
+    const sc=data.schedule;
+    if(sc&&sc.date){
+        document.getElementById('sched-sec').style.display='block';
+        const d=new Date(sc.date);
+        document.getElementById('sched-text').textContent=d.toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})+(sc.note?' — '+sc.note:'');
+    }else{document.getElementById('sched-sec').style.display='none';}
+
+    // Process steps
+    renderSteps(status,data.documents,data.process_step);
+
+    // Documents
+    renderDocs(data.documents||{},data.control_number);
+
+    // Chat + presence
+    document.getElementById('chat-widget').style.display='block';
+    if(!chatInited)initParentChat(data.control_number);
+    setParentPresence(data.control_number);
+    watchAdminPresence();
+
+    // Populate editable info fields
+    cancelEditMode();
+    document.getElementById('ef-student').value=data.student_name||'';
+    document.getElementById('ef-parent').value=data.parent_name||'';
+    document.getElementById('ef-phone').value=data.phone||'';
+    document.getElementById('ef-email').value=data.email||'';
+    const gradeEl=document.getElementById('ef-grade');
+    gradeEl.value=data.grade||'kindergarten';
+}
+
+/* ═══════════════════════════════════════════
+   PROCESS STEPS RENDERER
+═══════════════════════════════════════════ */
+function renderSteps(status,docs,adminStep){
+    // Use admin-set step if present, otherwise infer
+    let activeIdx;
+    if(adminStep!==undefined&&adminStep!==null){
+        activeIdx=parseInt(adminStep);
+    }else{
+        const s=status||'pending';
+        if(s==='enrolled') activeIdx=processSteps.length-1;
+        else if(s==='approved'||s==='being_called') activeIdx=Math.max(3,processSteps.findIndex(x=>x.id==='approved'));
+        else if(s==='under_review'||s==='review') activeIdx=Math.max(2,processSteps.findIndex(x=>x.id==='review'));
+        else if(docs&&requiredDocs.every(d=>docs[d.id])) activeIdx=2;
+        else activeIdx=1;
+        if(activeIdx<0)activeIdx=1;
+    }
+
+    document.getElementById('step-label').textContent='Step '+(activeIdx+1)+' of '+processSteps.length;
+    document.getElementById('process-steps').innerHTML=processSteps.map((step,i)=>{
+        const cls=i<activeIdx?'done':i===activeIdx?'active':'inactive';
+        const ico=i<activeIdx?'<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>':i===activeIdx?'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="#D4AF37" stroke="none"/></svg>':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>';
+        const bTxt=i<activeIdx?'Done':i===activeIdx?'Current':'Upcoming';
+        const bCls=i<activeIdx?'badge-done':i===activeIdx?'badge-active':'badge-pending';
+        return`<div class="step ${cls}"><div class="step-icon">${ico}</div><div class="step-content"><div class="step-title">${step.label}<span class="step-badge ${bCls}">${bTxt}</span></div><div class="step-desc">${step.desc||''}</div></div></div>`;
+    }).join('');
+}
+
+/* ═══════════════════════════════════════════
+   DOCUMENT UPLOAD RENDERER
+═══════════════════════════════════════════ */
+function renderDocs(docs,ctrl){
+    const total=requiredDocs.length;
+    const uploaded=requiredDocs.filter(d=>docs[d.id]).length;
+
+    document.getElementById('doc-progress-badge').textContent=`${uploaded} / ${total} uploaded`;
+
+    if(!total){
+        document.getElementById('doc-list').innerHTML='<p class="upload-note">No documents required at this time.</p>';
+        return;
+    }
+
+    let html=requiredDocs.map(doc=>{
+        const url=docs[doc.id];
+        const isUploaded=!!url;
+        const ext=url?(url.split('?')[0].split('.').pop().toLowerCase()):'';
+        const isImg=url&&['jpg','jpeg','png','gif','webp'].includes(ext);
+
+        let viewHtml='';
+        if(isUploaded){
+            viewHtml=isImg
+                ?`<img src="${url}" class="doc-thumb" onclick="openLB('${url}')" title="Click to view">`
+                :`<a href="${url}" target="_blank" class="btn-view-doc"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>View</a>`;
+        }
+
+        return`<div class="doc-item ${isUploaded?'uploaded':''}" id="di-${doc.id}">
+            <div class="doc-item-left">
+                <div class="doc-icon ${isUploaded?'ok':''}" id="dico-${doc.id}">
+                    ${isUploaded
+                        ?'<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>'
+                        :'<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+                    }
+                </div>
+                <div style="min-width:0">
+                    <div class="doc-name">${doc.label}</div>
+                    <div class="doc-hint ${isUploaded?'ok':''}" id="dihint-${doc.id}">${isUploaded?'Uploaded ✓':(doc.hint||'')}</div>
+                </div>
+            </div>
+            <div class="doc-actions" id="diact-${doc.id}">
+                ${viewHtml}
+                <button class="btn-upload" id="dbtn-${doc.id}" onclick="triggerUpload('${doc.id}','${ctrl}')" ${isUploaded?'':''}>${isUploaded?'Replace':'Upload'}</button>
+                <input type="file" class="upload-input" id="dfile-${doc.id}" accept="image/*,.pdf" onchange="handleUpload(event,'${doc.id}','${ctrl}')">
+            </div>
+        </div>
+        <div class="upload-progress" id="dprog-${doc.id}"><div class="upload-progress-bar" id="dpbar-${doc.id}"></div></div>`;
+    }).join('');
+
+    html+=`<p class="upload-note">Accepted: JPG, PNG, PDF · Max 10MB per file</p>`;
+    document.getElementById('doc-list').innerHTML=html;
+
+    // fix class rendering — patch icon classes
+    requiredDocs.forEach(doc=>{
+        const url=docs[doc.id];
+        const ico=document.getElementById('dico-'+doc.id);
+        if(ico&&url) ico.className='doc-icon ok';
+    });
+}
+
+function triggerUpload(docId,ctrl){
+    document.getElementById('dfile-'+docId).click();
+}
+
+async function handleUpload(e,docId,ctrl){
+    const file=e.target.files[0];
+    if(!file)return;
+    if(file.size>10*1024*1024){alert('File too large. Max 10MB.');return;}
+
+    const prog=document.getElementById('dprog-'+docId);
+    const bar=document.getElementById('dpbar-'+docId);
+    const actDiv=document.getElementById('diact-'+docId);
+    const hintEl=document.getElementById('dihint-'+docId);
+    const icoEl=document.getElementById('dico-'+docId);
+    const btn=document.getElementById('dbtn-'+docId);
+
+    prog.style.display='block';bar.style.width='10%';
+    btn.disabled=true;btn.textContent='Uploading…';
+    hintEl.textContent='Uploading…';hintEl.className='doc-hint';
+
+    let pct=10;
+    const iv=setInterval(()=>{pct=Math.min(pct+15,85);bar.style.width=pct+'%';},300);
+
+    try{
+        const fd=new FormData();
+        fd.append('file',file);
+        fd.append('upload_preset',CLOUD_PRESET);
+        fd.append('folder','dapres-enrollments/'+ctrl);
+        const res=await fetch('https://api.cloudinary.com/v1_1/'+CLOUD_NAME+'/auto/upload',{method:'POST',body:fd});
+        const json=await res.json();
+        clearInterval(iv);
+
+        if(json.secure_url){
+            bar.style.width='100%';
+            setTimeout(()=>{prog.style.display='none';bar.style.width='0%';},700);
+
+            if(fbOK) await db.ref('enrollments/'+ctrl+'/documents/'+docId).set(json.secure_url);
+
+            icoEl.className='doc-icon ok';
+            icoEl.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+            hintEl.textContent='Uploaded ✓';hintEl.className='doc-hint ok';
+            btn.textContent='Replace';btn.disabled=false;
+
+            const ext=json.secure_url.split('?')[0].split('.').pop().toLowerCase();
+            const isImg=['jpg','jpeg','png','gif','webp'].includes(ext);
+            let viewHtml=isImg
+                ?`<img src="${json.secure_url}" class="doc-thumb" onclick="openLB('${json.secure_url}')" title="View">`
+                :`<a href="${json.secure_url}" target="_blank" class="btn-view-doc">View</a>`;
+            // Insert before button
+            const btnEl=document.getElementById('dbtn-'+docId);
+            btnEl.insertAdjacentHTML('beforebegin',viewHtml);
+            document.getElementById('di-'+docId).classList.add('uploaded');
+
+            // Update doc count badge
+            const uploaded=requiredDocs.filter(d=>{
+                const el=document.getElementById('dihint-'+d.id);
+                return el&&el.textContent.includes('Uploaded');
+            }).length;
+            document.getElementById('doc-progress-badge').textContent=`${uploaded} / ${requiredDocs.length} uploaded`;
+        }else{throw new Error(json.error?.message||'Upload failed');}
+    }catch(err){
+        clearInterval(iv);prog.style.display='none';bar.style.width='0%';
+        hintEl.textContent='Upload failed. Try again.';hintEl.className='doc-hint';
+        btn.disabled=false;btn.textContent='Retry';
+        console.error(err);
+    }
+}
+
+/* ═══════════════════════════════════════════
+   CHAT (parent side)
+═══════════════════════════════════════════ */
+function toggleChat(){
+    chatOpen=!chatOpen;
+    document.getElementById('chat-window').classList.toggle('open',chatOpen);
+    if(chatOpen){
+        unread=0;
+        const b=document.getElementById('chat-badge');b.style.display='none';
+        document.getElementById('cw-body').scrollTop=9999;
+    }
+}
+
+function initParentChat(ctrl){
+    if(!fbOK||!ctrl)return;
+    chatInited=true;
+    const body=document.getElementById('cw-body');
+    let first=true;
+
+    db.ref('chats/'+ctrl).orderByChild('ts').limitToLast(50).on('value',snap=>{
+        body.innerHTML='';
+        const msgs=snap.val();
+        if(!msgs){body.innerHTML='<p style="font-size:.78rem;text-align:center;color:#94a3b8;padding:1rem">Send a message to the admissions office.</p>';first=false;return;}
+        Object.values(msgs).sort((a,b)=>a.ts-b.ts).forEach(m=>{
+            const isA=m.sender==='admin';
+            const d=document.createElement('div');
+            d.style.display='flex';d.style.flexDirection='column';d.style.alignItems=isA?'flex-start':'flex-end';
+            const t=new Date(m.ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+            d.innerHTML=`<div class="cw-msg ${isA?'admin':'parent'}">${m.text}<span class="cw-msg-time">${t}</span></div>`;
+            body.appendChild(d);
+        });
+        body.scrollTop=body.scrollHeight;
+        if(!first&&!chatOpen){
+            unread++;
+            const b=document.getElementById('chat-badge');
+            b.style.display='flex';b.textContent=unread>9?'9+':unread;
+        }
+        first=false;
+    });
+}
+
+async function sendParentMsg(){
+    if(!currentCtrl||!fbOK)return;
+    const input=document.getElementById('cw-input');
+    const text=input.value.trim();if(!text)return;input.value='';
+    try{await db.ref('chats/'+currentCtrl).push({text,sender:'parent',ts:Date.now()});}
+    catch(e){console.error('Chat error',e);}
+}
+
+function watchAdminPresence(){
+    if(!fbOK)return;
+    db.ref('presence/admin').on('value',snap=>{
+        const d=snap.val();const on=d&&d.online;
+        document.getElementById('admin-dot').classList.toggle('offline',!on);
+        document.getElementById('fab-dot').classList.toggle('offline',!on);
+        document.getElementById('admin-lbl').textContent=on?'Online':'Offline';
+    });
+}
+
+function setParentPresence(ctrl){
+    if(!fbOK||!ctrl)return;
+    const r=db.ref('presence/parents/'+ctrl);
+    r.set({online:true,lastSeen:Date.now()});
+    r.onDisconnect().set({online:false,lastSeen:Date.now()});
+    setInterval(()=>r.update({online:true,lastSeen:Date.now()}),25000);
+}
+
+/* ═══════════════════════════════════════════
+   EDITABLE INFO
+═══════════════════════════════════════════ */
+function toggleEditMode(){
+    const fields=['ef-student','ef-parent','ef-phone','ef-email'];
+    fields.forEach(id=>{
+        const el=document.getElementById(id);
+        el.readOnly=false;
+        el.style.background='';
+        el.style.cursor='';
+    });
+    document.getElementById('ef-grade').disabled=false;
+    document.getElementById('edit-actions').style.display='flex';
+    document.getElementById('edit-toggle-btn').style.display='none';
+    document.getElementById('edit-save-msg').className='save-msg';
+    document.getElementById('ef-student').focus();
+}
+
+function cancelEditMode(){
+    const fields=['ef-student','ef-parent','ef-phone','ef-email'];
+    fields.forEach(id=>{
+        const el=document.getElementById(id);
+        el.readOnly=true;
+        el.style.background='';
+        el.style.cursor='';
+    });
+    document.getElementById('ef-grade').disabled=true;
+    document.getElementById('edit-actions').style.display='none';
+    document.getElementById('edit-toggle-btn').style.display='';
+    document.getElementById('edit-save-msg').className='save-msg';
+}
+
+async function saveEditedInfo(){
+    if(!currentCtrl)return;
+    const btn=document.getElementById('ef-save-btn');
+    const msg=document.getElementById('edit-save-msg');
+    btn.disabled=true;btn.innerHTML='<div class="sp"></div> Saving…';
+
+    const updates={
+        student_name:document.getElementById('ef-student').value.trim(),
+        parent_name:document.getElementById('ef-parent').value.trim(),
+        phone:document.getElementById('ef-phone').value.trim(),
+        email:document.getElementById('ef-email').value.trim(),
+        grade:document.getElementById('ef-grade').value,
+    };
+
+    try{
+        if(!fbOK)throw new Error('Firebase unavailable');
+        await Promise.race([db.ref('enrollments/'+currentCtrl).update(updates),fbTimeout(8000)]);
+        // Sync display fields in the status card
+        document.getElementById('r-student').textContent=updates.student_name||'—';
+        document.getElementById('r-parent').textContent=updates.parent_name||'—';
+        document.getElementById('r-phone').textContent=updates.phone||'—';
+        document.getElementById('r-email').textContent=updates.email||'—';
+        document.getElementById('r-grade').textContent=fmtGrade(updates.grade);
+        msg.textContent='✓ Changes saved successfully!';
+        msg.className='save-msg ok';
+        cancelEditMode();
+    }catch(e){
+        msg.textContent='⚠ Could not save. Please try again.';
+        msg.className='save-msg err';
+    }finally{
+        btn.disabled=false;
+        btn.innerHTML='<svg width="15" height="15" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Save Changes';
+    }
+}
+
+/* ═══════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════ */
+function fmtDate(iso){if(!iso)return'—';return new Date(iso).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});}
+function fmtGrade(g){if(!g)return'—';const m={kindergarten:'Kindergarten','1st':'Grade 1','2nd':'Grade 2','3rd':'Grade 3','4th':'Grade 4','5th':'Grade 5','6th':'Grade 6'};return m[g]||g.charAt(0).toUpperCase()+g.slice(1);}
+function openLB(url){document.getElementById('lb-img').src=url;document.getElementById('lightbox').classList.add('open');}
+</script>
+</body>
+</html>
