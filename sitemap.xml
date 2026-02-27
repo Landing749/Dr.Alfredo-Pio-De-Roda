@@ -57,13 +57,5 @@
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
-  
-  <!-- GitHub Repository -->
-  <url>
-    <loc>https://github.com/Landing749/Dr.Alfredo-Pio-De-Roda/tree/main</loc>
-    <lastmod>2026-01-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
 
 </urlset>
