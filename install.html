@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DAPR ES — QR Attendance System Installer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#0f2044;
+  --navy2:#1a3260;
+  --navy3:#1e3d75;
+  --gold:#c8992b;
+  --gold2:#e0b84a;
+  --gold3:#f5d87a;
+  --cream:#faf8f3;
+  --cream2:#f2ede0;
+  --cream3:#e8e0cc;
+  --txt:#1a1a2e;
+  --txt2:#3d4068;
+  --txt3:#6b7080;
+  --green:#1a6b3c;
+  --green2:#22883f;
+  --red:#c0392b;
+  --border:rgba(15,32,68,.12);
+  --font-serif:'Crimson Pro',serif;
+  --font-sans:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--cream);color:var(--txt);min-height:100vh}
+
+/* ── Page stripe header ── */
+.stripe{height:5px;background:linear-gradient(90deg,var(--navy),var(--navy3) 40%,var(--gold) 70%,var(--gold3))}
+
+/* ── Hero ── */
+.hero{background:var(--navy);color:#fff;padding:52px 24px 48px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 110%,rgba(200,153,43,.1) 0%,transparent 65%)}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.seal-ring{width:88px;height:88px;border-radius:50%;border:2.5px solid rgba(200,153,43,.5);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;position:relative;flex-shrink:0}
+.seal-ring::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(200,153,43,.2)}
+.seal-icon{font-size:36px;line-height:1}
+.dept-label{font-family:var(--font-sans);font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,153,43,.9);margin-bottom:6px}
+.hero h1{font-family:var(--font-serif);font-size:clamp(24px,5vw,38px);font-weight:700;line-height:1.18;letter-spacing:-.01em;margin-bottom:8px}
+.hero h1 span{color:var(--gold2)}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.55);letter-spacing:.04em;text-transform:uppercase;margin-bottom:26px}
+.ver-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(200,153,43,.3);border-radius:20px;padding:6px 16px;font-size:12px;color:rgba(255,255,255,.75);margin-bottom:30px}
+.ver-dot{width:6px;height:6px;border-radius:50%;background:var(--gold2)}
+
+/* ── Download card ── */
+.dl-wrap{max-width:520px;margin:0 auto;padding:0 16px;transform:translateY(36px);position:relative;z-index:10}
+.dl-card{background:#fff;border-radius:16px;border:1px solid var(--border);box-shadow:0 12px 48px rgba(15,32,68,.18),0 2px 8px rgba(15,32,68,.08);overflow:hidden}
+.dl-header{background:var(--navy);padding:16px 22px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}
+.dl-header-icon{width:36px;height:36px;border-radius:8px;background:rgba(200,153,43,.2);border:1px solid rgba(200,153,43,.3);display:grid;place-items:center;font-size:17px;flex-shrink:0}
+.dl-header-txt .dl-filename{font-size:13px;font-weight:600;color:#fff}
+.dl-header-txt .dl-ext{font-size:11px;color:rgba(255,255,255,.45);margin-top:1px}
+.dl-body{padding:20px 22px}
+.dl-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.meta-chip{display:flex;align-items:center;gap:5px;background:var(--cream);border:1px solid var(--cream3);border-radius:6px;padding:5px 10px;font-size:11.5px;color:var(--txt2)}
+.meta-chip span{font-weight:600;color:var(--txt)}
+.dl-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border-radius:10px;background:var(--navy);color:#fff;font-family:var(--font-sans);font-size:14px;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:all .2s;position:relative;overflow:hidden;letter-spacing:.01em}
+.dl-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,153,43,.15),transparent 60%);opacity:0;transition:opacity .2s}
+.dl-btn:hover{background:var(--navy2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(15,32,68,.3)}
+.dl-btn:hover::before{opacity:1}
+.dl-btn:active{transform:translateY(0);box-shadow:none}
+.dl-icon{width:20px;height:20px;flex-shrink:0}
+.dl-arrow{font-size:16px;margin-left:auto;opacity:.7}
+.dl-note{margin-top:12px;font-size:11.5px;color:var(--txt3);display:flex;align-items:center;gap:5px}
+.dl-note svg{flex-shrink:0;opacity:.6}
+
+/* ── Main content ── */
+.main{max-width:760px;margin:0 auto;padding:80px 24px 60px}
+
+/* ── Section heading style ── */
+.section{margin-bottom:44px}
+.sec-label{font-family:var(--font-sans);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.sec-title{font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--navy);margin-bottom:16px;padding-bottom:10px;border-bottom:1.5px solid var(--cream2)}
+
+/* ── Requirements table ── */
+.req-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.req-grid{grid-template-columns:1fr}}
+.req-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:11px}
+.req-item.ok .req-dot{background:var(--green);box-shadow:0 0 0 3px rgba(26,107,60,.12)}
+.req-item.warn .req-dot{background:#e07b1a;box-shadow:0 0 0 3px rgba(224,123,26,.12)}
+.req-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.req-title{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:2px}
+.req-desc{font-size:11.5px;color:var(--txt3);line-height:1.5}
+
+/* ── Steps ── */
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:18px;padding-bottom:28px;position:relative}
+.step::before{content:'';position:absolute;left:17px;top:36px;bottom:0;width:1.5px;background:var(--cream3)}
+.step:last-child::before{display:none}
+.step:last-child{padding-bottom:0}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;font-family:var(--font-sans);font-size:13px;font-weight:600;display:grid;place-items:center;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--cream)}
+.step-body{padding-top:6px;flex:1}
+.step-title{font-size:14px;font-weight:600;color:var(--txt);margin-bottom:5px}
+.step-desc{font-size:13px;color:var(--txt2);line-height:1.65}
+.step-note{margin-top:8px;background:var(--cream);border:1px solid var(--cream3);border-left:3px solid var(--gold);border-radius:0 7px 7px 0;padding:8px 12px;font-size:12px;color:var(--txt2);line-height:1.55}
+
+/* ── Features grid ── */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.feat-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.feat-grid{grid-template-columns:1fr}}
+.feat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 14px 12px}
+.feat-icon{font-size:20px;margin-bottom:8px}
+.feat-title{font-size:12.5px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.feat-desc{font-size:11px;color:var(--txt3);line-height:1.5}
+
+/* ── Support box ── */
+.support-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.support-seal{width:44px;height:44px;border-radius:50%;background:var(--cream2);border:1px solid var(--cream3);display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.support-txt .s-title{font-size:14px;font-weight:600;color:var(--txt);margin-bottom:2px}
+.support-txt .s-desc{font-size:12px;color:var(--txt3)}
+
+/* ── Footer ── */
+footer{background:var(--navy);color:rgba(255,255,255,.45);text-align:center;padding:24px;font-size:11.5px;letter-spacing:.02em;line-height:1.8}
+footer strong{color:rgba(255,255,255,.75);font-weight:600}
+</style>
+</head>
+<body>
+<div class="stripe"></div>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="seal-ring"><div class="seal-icon">📋</div></div>
+  <div class="dept-label">Department of Education · Dr. Alfredo Pio De Roda ES</div>
+  <h1>QR Code <span>Attendance</span><br>System</h1>
+  <div class="hero-sub">Official School Software · Version ULTIMATE ENHANCED v20</div>
+  <div class="ver-badge"><div class="ver-dot"></div>Latest Release · March 2026</div>
+</div>
+
+<!-- ── Download card (overlapping hero) ── -->
+<div class="dl-wrap">
+  <div class="dl-card">
+    <div class="dl-header">
+      <div class="dl-header-icon">💾</div>
+      <div class="dl-header-txt">
+        <div class="dl-filename">DAPR_AttendanceSystem_v20.exe</div>
+        <div class="dl-ext">Windows Executable · Self-contained installer</div>
+      </div>
+    </div>
+    <div class="dl-body">
+      <div class="dl-meta">
+        <div class="meta-chip">📁 Size: <span>~95 MB</span></div>
+        <div class="meta-chip">🖥 Platform: <span>Windows 10 / 11</span></div>
+        <div class="meta-chip">☁️ Host: <span>Google Drive</span></div>
+      </div>
+      <a class="dl-btn" href="https://drive.google.com/file/d/172d-5czBYTf1FvGo0V8_VhN1Lhnyeo-v/view?usp=sharing" target="_blank" rel="noopener">
+        <svg class="dl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Now — Free
+        <span class="dl-arrow">↗</span>
+      </a>
+      <div class="dl-note">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        File is hosted on Google Drive. No account needed to download.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main Content ── -->
+<div class="main">
+
+  <!-- System Requirements -->
+  <div class="section">
+    <div class="sec-label">Before You Install</div>
+    <div class="sec-title">System Requirements</div>
+    <div class="req-grid">
+      <div class="req-item ok"><div class="req-dot"></div><div><div class="req-title">Windows 10 or 11</div><div class="req-desc">64-bit only. Not compatible with Windows 7 or 8.</div></div></div>
+      <div class="req-item ok"><div class="req-dot"></div><div><div class="req-title">Webcam / USB Camera</div><div class="req-desc">Required for QR code scanning. Any standard camera works.</div></div></div>
+      <div class="req-item ok"><div class="req-dot"></div><div><div class="req-title">Internet Connection</div><div class="req-desc">Needed for license validation and SF2 portal uploads.</div></div></div>
+      <div class="req-item warn"><div class="req-dot"></div><div><div class="req-title">License Key Required</div><div class="req-desc">Contact your administrator to receive a valid license key on first run.</div></div></div>
+    </div>
+  </div>
+
+  <!-- Installation Steps -->
+  <div class="section">
+    <div class="sec-label">Getting Started</div>
+    <div class="sec-title">How to Install</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Download the file</div>
+          <div class="step-desc">Click the Download button above. The file will open in Google Drive — click the download icon (⬇) at the top right of that page.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Allow Windows to run it</div>
+          <div class="step-desc">Windows may show a "Windows protected your PC" warning. Click <strong>More info</strong>, then click <strong>Run anyway</strong>. This is normal for new software.</div>
+          <div class="step-note">💡 This warning appears because the app is not yet registered with Microsoft. The file is safe — it was built and distributed directly by the school.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Accept the license agreement</div>
+          <div class="step-desc">On first launch, you will be shown the End User License Agreement (EULA). Read and accept to continue.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Enter your license key</div>
+          <div class="step-desc">Enter the license key provided by your administrator. This is a one-time step — the key is saved permanently on your device.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Load your class Excel file and start scanning</div>
+          <div class="step-desc">Click <strong>Load Excel File</strong>, select your class list, then click <strong>Start Camera</strong> to begin taking attendance.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section">
+    <div class="sec-label">What's Included</div>
+    <div class="sec-title">Key Features</div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon">📷</div><div class="feat-title">QR Code Scanner</div><div class="feat-desc">Real-time camera scanning with fullscreen mode</div></div>
+      <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Charts & Reports</div><div class="feat-desc">Pie charts, bar graphs, and exportable .txt reports</div></div>
+      <div class="feat-card"><div class="feat-icon">💾</div><div class="feat-title">Auto-Save</div><div class="feat-desc">Every scan is saved immediately to Excel</div></div>
+      <div class="feat-card"><div class="feat-icon">☁️</div><div class="feat-title">SF2 Submission</div><div class="feat-desc">Send monthly reports directly to the admin portal</div></div>
+      <div class="feat-card"><div class="feat-icon">🔒</div><div class="feat-title">License Protected</div><div class="feat-desc">Firebase-based license validation per device</div></div>
+      <div class="feat-card"><div class="feat-icon">📤</div><div class="feat-title">Google Drive Backup</div><div class="feat-desc">Automatic backup of attendance files after each session</div></div>
+    </div>
+  </div>
+
+  <!-- Support -->
+  <div class="section" style="margin-bottom:0">
+    <div class="sec-label">Need Help?</div>
+    <div class="sec-title">Support</div>
+    <div class="support-box">
+      <div class="support-seal">🏫</div>
+      <div class="support-txt">
+        <div class="s-title">Dr. Alfredo Pio De Roda Elementary School</div>
+        <div class="s-desc">For license keys, technical issues, or questions — contact your school's ICT coordinator or system administrator.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Dr. Alfredo Pio De Roda Elementary School</strong><br>
+  QR Code Attendance System · Official Distribution Page · March 2026<br>
+  For authorized school personnel only
+</footer>
+</body>
+</html>
