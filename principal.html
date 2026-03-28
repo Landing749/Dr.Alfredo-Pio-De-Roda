@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SF2 Admin Portal — Dr. Alfredo Pio De Roda ES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg0:#0b0f18;--bg1:#111827;--bg2:#1a2236;--bg3:#1f2d44;--bg4:#243352;
+  --blue:#3b82f6;--blue2:#60a5fa;--blue3:#93c5fd;
+  --cyan:#06b6d4;--amber:#f59e0b;--red:#ef4444;--green:#10b981;--purple:#a855f7;
+  --txt1:#f1f5f9;--txt2:#94a3b8;--txt3:#475569;
+  --border:rgba(148,163,184,.08);--border2:rgba(148,163,184,.14);
+  --radius:14px;--r-sm:8px;
+  --font-ui:'Plus Jakarta Sans',sans-serif;--font-mono:'DM Mono',monospace;
+  --sb-w:268px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-ui);background:var(--bg0);color:var(--txt1);min-height:100vh;overflow-x:hidden}
+
+/* ── Ambient ── */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0}
+.ambient::before{content:'';position:absolute;top:-20%;left:-10%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(59,130,246,.07) 0%,transparent 65%);border-radius:50%}
+.ambient::after{content:'';position:absolute;bottom:-10%;right:-10%;width:50%;height:50%;background:radial-gradient(ellipse,rgba(6,182,212,.05) 0%,transparent 65%);border-radius:50%}
+
+/* ── Layout ── */
+.page{position:relative;z-index:1;display:grid;grid-template-columns:var(--sb-w) 1fr;min-height:100vh}
+
+/* ── Sidebar ── */
+aside{background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;width:var(--sb-w);height:100vh;overflow-y:auto;overflow-x:hidden;z-index:100;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.sidebar-logo{padding:18px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.logo-mark{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(140deg,var(--blue),var(--cyan));display:grid;place-items:center;font-size:16px}
+.logo-text .logo-name{font-size:12px;font-weight:700;letter-spacing:-.01em}
+.logo-text .logo-sub{font-size:9.5px;color:var(--txt3);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+.sb-close{display:none;margin-left:auto;background:none;border:none;color:var(--txt3);font-size:18px;cursor:pointer;padding:4px;line-height:1}
+
+.sb-nav{padding:10px 8px 4px}
+.sb-nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:none;background:none;color:var(--txt2);font-family:var(--font-ui);font-size:12.5px;font-weight:600;cursor:pointer;border-radius:var(--r-sm);transition:all .15s;text-align:left;margin-bottom:2px}
+.sb-nav-btn:hover{background:var(--bg3);color:var(--txt1)}
+.sb-nav-btn.active{background:rgba(59,130,246,.14);color:var(--blue2)}
+.sb-nav-icon{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;font-size:13px;flex-shrink:0;background:rgba(255,255,255,.04)}
+.sb-nav-btn.active .sb-nav-icon{background:rgba(59,130,246,.2)}
+
+.sb-section-label{padding:14px 16px 5px;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3)}
+#file-tree{padding:2px 0 12px}
+.tree-grade{margin:1px 8px}
+.tree-grade-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:none;color:var(--txt2);font-family:var(--font-ui);font-size:12px;font-weight:600;cursor:pointer;border-radius:var(--r-sm);transition:all .15s;text-align:left}
+.tree-grade-btn:hover{background:var(--bg3);color:var(--txt1)}
+.tree-grade-btn.open{background:rgba(59,130,246,.1);color:var(--blue2)}
+.tree-arrow{font-size:9px;margin-left:auto;transition:transform .2s;color:var(--txt3)}
+.tree-grade-btn.open .tree-arrow{transform:rotate(90deg);color:var(--blue2)}
+.tree-sections{display:none;padding-left:8px;margin-top:1px}
+.tree-grade.open .tree-sections{display:block}
+.tree-section{margin:1px 0}
+.tree-section-btn{display:flex;align-items:center;gap:7px;width:100%;padding:6px 10px;border:none;background:none;color:var(--txt3);font-family:var(--font-ui);font-size:11.5px;cursor:pointer;border-radius:6px;transition:all .15s;text-align:left}
+.tree-section-btn:hover{background:var(--bg3);color:var(--txt2)}
+.tree-section-btn.active{background:rgba(59,130,246,.15);color:var(--blue3);font-weight:600}
+.tree-months{display:none;padding-left:12px;margin-top:1px}
+.tree-section.open .tree-months{display:block}
+.tree-month-btn{display:flex;align-items:center;gap:7px;width:100%;padding:5px 10px;border:none;background:none;color:var(--txt3);font-family:var(--font-ui);font-size:11px;cursor:pointer;border-radius:6px;transition:all .15s;text-align:left}
+.tree-month-btn:hover{color:var(--txt2);background:rgba(255,255,255,.04)}
+.tree-month-btn.active{color:var(--amber);font-weight:600}
+.tree-count{margin-left:auto;font-family:var(--font-mono);font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.05);color:var(--txt3)}
+
+.sidebar-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--border)}
+.sb-status{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2.5s infinite}
+.sb-status-txt{font-size:10.5px;color:var(--txt3)}
+.sb-clock{font-family:var(--font-mono);font-size:10px;color:var(--txt3)}
+
+/* ── Main ── */
+main{margin-left:var(--sb-w);display:flex;flex-direction:column;min-height:100vh}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-bottom:1px solid var(--border);background:rgba(11,15,24,.88);backdrop-filter:blur(16px);position:sticky;top:0;z-index:50;gap:12px}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;color:var(--txt2);cursor:pointer;padding:6px;border-radius:7px;flex-shrink:0}
+.hamburger:hover{background:var(--bg3);color:var(--txt1)}
+.topbar-titles h1{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.topbar-titles p{font-size:11px;color:var(--txt3)}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.live-badge{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);font-size:11px;font-weight:600;color:var(--green)}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.clock-badge{font-family:var(--font-mono);font-size:10.5px;color:var(--txt2);background:var(--bg2);padding:5px 9px;border-radius:7px;border:1px solid var(--border2)}
+.btn-refresh{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:7px;font-size:11.5px;font-weight:600;font-family:var(--font-ui);cursor:pointer;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.1);color:var(--blue3);transition:all .15s}
+.btn-refresh:hover{background:rgba(59,130,246,.22)}
+
+/* ── Notification badge ── */
+.notif-btn{position:relative;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:none;border:1px solid var(--border2);cursor:pointer;transition:all .15s;color:var(--txt2)}
+.notif-btn:hover{background:var(--bg3);color:var(--txt1)}
+.notif-badge{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;font-family:var(--font-mono);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg0);display:none}
+.notif-badge.show{display:flex}
+
+/* ── Content ── */
+.content{padding:20px 22px;flex:1}
+
+/* ── Tabs ── */
+.view-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:4px;width:fit-content}
+.tab-btn{padding:7px 16px;border-radius:7px;border:none;background:none;color:var(--txt2);font-family:var(--font-ui);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.tab-btn:hover{color:var(--txt1)}
+.tab-btn.active{background:var(--bg4);color:var(--txt1)}
+.tab-btn .tab-icon{font-size:13px}
+
+/* ── Breadcrumb ── */
+.breadcrumb{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--txt3);margin-bottom:18px;flex-wrap:wrap}
+.breadcrumb span{cursor:pointer;transition:color .15s;padding:2px 4px;border-radius:4px}
+.breadcrumb span:hover{color:var(--txt1)}
+.breadcrumb span.active{color:var(--blue2);font-weight:600}
+.bc-sep{color:var(--txt3);opacity:.4;font-size:10px}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--radius) var(--radius) 0 0}
+.stat-card.c-blue::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.stat-card.c-cyan::before{background:linear-gradient(90deg,var(--cyan),#22d3ee)}
+.stat-card.c-amber::before{background:linear-gradient(90deg,var(--amber),#fbbf24)}
+.stat-card.c-green::before{background:linear-gradient(90deg,var(--green),#34d399)}
+.stat-card.c-red::before{background:linear-gradient(90deg,var(--red),#f87171)}
+.stat-icon{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;font-size:14px;margin-bottom:8px}
+.stat-card.c-blue .stat-icon{background:rgba(59,130,246,.12)}
+.stat-card.c-cyan .stat-icon{background:rgba(6,182,212,.12)}
+.stat-card.c-amber .stat-icon{background:rgba(245,158,11,.12)}
+.stat-card.c-green .stat-icon{background:rgba(16,185,129,.12)}
+.stat-card.c-red .stat-icon{background:rgba(239,68,68,.12)}
+.stat-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--txt3);margin-bottom:5px}
+.stat-val{font-size:24px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.stat-val.blue{color:var(--blue2)}.stat-val.cyan{color:var(--cyan)}.stat-val.amber{color:var(--amber)}.stat-val.green{color:var(--green)}.stat-val.red{color:var(--red)}
+
+/* ── Panel ── */
+.panel{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2);gap:10px;flex-wrap:wrap}
+.panel-title{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:7px;color:var(--txt1)}
+.panel-title-icon{width:24px;height:24px;border-radius:6px;background:rgba(59,130,246,.12);display:grid;place-items:center;font-size:12px;flex-shrink:0}
+.search-wrap{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:0 10px;transition:border-color .15s}
+.search-wrap:focus-within{border-color:rgba(59,130,246,.4)}
+.search-wrap span{font-size:11px;color:var(--txt3)}
+.search-wrap input{background:none;border:none;color:var(--txt1);font-family:var(--font-ui);font-size:12px;padding:6px 0;outline:none;width:150px}
+.search-wrap input::placeholder{color:var(--txt3)}
+
+/* ── File rows ── */
+.file-table{width:100%;overflow-x:auto}
+.file-row{display:grid;grid-template-columns:2fr 0.8fr 0.9fr 65px 90px 60px 95px;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--border);transition:background .12s;min-width:580px}
+.file-row:last-child{border-bottom:none}
+.file-row:hover{background:rgba(255,255,255,.02)}
+.file-row.hdr{background:var(--bg2);padding:8px 16px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3)}
+.file-row.hdr:hover{background:var(--bg2)}
+.file-name{font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px;color:var(--txt1)}
+.file-name-icon{width:24px;height:24px;border-radius:5px;background:rgba(59,130,246,.1);display:grid;place-items:center;font-size:11px;flex-shrink:0}
+.file-meta{font-family:var(--font-mono);font-size:10.5px;color:var(--txt2)}
+.file-meta.amber{color:var(--amber)}
+.file-size{font-family:var(--font-mono);font-size:10px;color:var(--txt3)}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:9.5px;font-weight:700;letter-spacing:.02em}
+.badge.new{background:rgba(59,130,246,.15);color:var(--blue3);border:1px solid rgba(59,130,246,.2)}
+.badge.ok{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.18)}
+.dl-btn{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--cyan);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid rgba(6,182,212,.2);background:rgba(6,182,212,.07);transition:all .15s;font-family:var(--font-ui)}
+.dl-btn:hover{background:rgba(6,182,212,.18);color:#fff}
+.view-btn{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--blue3);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid rgba(59,130,246,.2);background:rgba(59,130,246,.08);transition:all .15s;cursor:pointer;font-family:var(--font-ui)}
+.view-btn:hover{background:rgba(59,130,246,.2);color:#fff}
+
+/* ── Folder grid ── */
+.folder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;padding:16px}
+.folder-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.folder-card:hover{border-color:rgba(59,130,246,.35);background:var(--bg3)}
+.f-icon-wrap{width:38px;height:38px;border-radius:9px;background:rgba(59,130,246,.1);display:grid;place-items:center;font-size:18px;flex-shrink:0}
+.f-name{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.f-count{font-size:11px;color:var(--txt3)}
+
+/* ── Empty ── */
+.empty{padding:48px 24px;text-align:center;color:var(--txt3)}
+.e-icon{font-size:34px;margin-bottom:12px;opacity:.7}
+.empty p{font-size:13px;line-height:1.75}
+
+/* ── Spinner ── */
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--blue);border-radius:50%;animation:spin .65s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--bg3);border:1px solid var(--border2);padding:10px 15px;border-radius:10px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:999px}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal-overlay.hidden{display:none}
+.modal-box{background:var(--bg1);border:1px solid var(--border2);border-radius:var(--radius);width:min(96vw,1020px);height:min(90vh,720px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.modal-title{font-size:12.5px;font-weight:600;color:var(--txt1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70%;display:flex;align-items:center;gap:6px}
+.modal-actions{display:flex;gap:8px;flex-shrink:0}
+.modal-close{background:var(--bg3);border:1px solid var(--border);color:var(--txt2);font-size:13px;cursor:pointer;width:27px;height:27px;border-radius:6px;display:grid;place-items:center;transition:all .15s}
+.modal-close:hover{background:var(--red);border-color:var(--red);color:#fff}
+.modal-body{flex:1;overflow:hidden;background:#fff}
+.modal-body iframe{width:100%;height:100%;border:none}
+
+/* ── Sidebar overlay (mobile) ── */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99}
+
+/* ══════════════════════════════════════
+   SUBMISSION TRACKER
+══════════════════════════════════════ */
+.tracker-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.month-select{background:var(--bg2);border:1px solid var(--border2);color:var(--txt1);font-family:var(--font-ui);font-size:12.5px;padding:7px 12px;border-radius:8px;outline:none;cursor:pointer}
+.month-select option{background:var(--bg2)}
+.tracker-legend{display:flex;align-items:center;gap:14px;margin-left:auto;font-size:11.5px;color:var(--txt2)}
+.leg-item{display:flex;align-items:center;gap:5px}
+.leg-dot{width:9px;height:9px;border-radius:3px}
+.leg-dot.submitted{background:var(--green)}
+.leg-dot.missing{background:rgba(239,68,68,.4);border:1px solid var(--red)}
+.tracker-wrap{overflow-x:auto}
+.tracker-table{width:100%;border-collapse:separate;border-spacing:0;min-width:400px}
+.tracker-table th{background:var(--bg2);padding:9px 14px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);text-align:left;border-bottom:1px solid var(--border)}
+.tracker-table th:first-child{border-radius:8px 0 0 0;min-width:110px}
+.tracker-table th:last-child{border-radius:0 8px 0 0}
+.tracker-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tracker-table tr:last-child td{border-bottom:none}
+.tracker-table tr:hover td{background:rgba(255,255,255,.018)}
+.grade-cell{font-size:12.5px;font-weight:700;color:var(--txt1)}
+.section-cell{font-size:11.5px;color:var(--txt2)}
+.tracker-cell{display:flex;align-items:center;gap:7px}
+.tc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.tc-dot.ok{background:var(--green);box-shadow:0 0 5px rgba(16,185,129,.4)}
+.tc-dot.miss{background:rgba(239,68,68,.35);border:1.5px solid rgba(239,68,68,.5)}
+.tc-label{font-size:11.5px}
+.tc-label.ok{color:var(--green)}
+.tc-label.miss{color:rgba(239,68,68,.7)}
+.tc-time{font-family:var(--font-mono);font-size:10px;color:var(--txt3)}
+.tc-link{font-size:10px;color:var(--cyan);cursor:pointer;margin-left:4px;text-decoration:none}
+.tc-link:hover{color:#fff}
+.tracker-summary{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg2);border-top:1px solid var(--border);font-size:12px;color:var(--txt2)}
+.ts-bar{flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.ts-fill{height:100%;background:var(--green);border-radius:3px;transition:width .5s ease}
+
+/* ══════════════════════════════════════
+   MONTH FILTER VIEW
+══════════════════════════════════════ */
+.mf-controls{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.mf-label{font-size:12.5px;color:var(--txt2)}
+.month-pills{display:flex;gap:6px;flex-wrap:wrap}
+.month-pill{padding:5px 13px;border-radius:20px;border:1px solid var(--border2);background:none;color:var(--txt3);font-family:var(--font-ui);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s}
+.month-pill:hover{color:var(--txt1);border-color:var(--border)}
+.month-pill.active{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4);color:var(--amber)}
+.mf-grade-group{margin-bottom:14px}
+.mf-grade-hdr{font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;padding:8px 16px 6px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.mf-grade-hdr span{color:var(--txt2);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px}
+
+/* ══════════════════════════════════════
+   MOBILE NAV
+══════════════════════════════════════ */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:98;background:var(--bg1);border-top:1px solid var(--border);padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+.mobile-nav-inner{display:flex;justify-content:space-around}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;border:none;background:none;color:var(--txt3);font-family:var(--font-ui);font-size:10px;font-weight:600;cursor:pointer;transition:color .15s;border-radius:8px;min-width:60px}
+.mob-nav-btn.active{color:var(--blue2)}
+.mob-nav-icon{font-size:19px;line-height:1}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media(max-width:820px){
+  .page{grid-template-columns:1fr}
+  aside{transform:translateX(-100%)}
+  aside.open{transform:translateX(0)}
+  .sb-close{display:block}
+  .sb-overlay.show{display:block}
+  main{margin-left:0;padding-bottom:72px}
+  .hamburger{display:flex}
+  .clock-badge{display:none}
+  .live-badge span:last-child{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .content{padding:16px 14px}
+  .mobile-nav{display:block}
+  .view-tabs{display:none}
+  .tracker-legend{display:none}
+}
+@media(max-width:500px){
+  .topbar{padding:10px 14px}
+  .topbar-titles h1{font-size:14px}
+  .stats{gap:8px}
+  .tracker-controls{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<div class="page">
+  <!-- ── Sidebar ── -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">📋</div>
+      <div class="logo-text">
+        <div class="logo-name">Dr. APDR ES</div>
+        <div class="logo-sub">SF2 Admin Portal</div>
+      </div>
+      <button class="sb-close" onclick="closeSidebar()">✕</button>
+    </div>
+
+    <div class="sb-nav">
+      <button class="sb-nav-btn active" id="snav-files" onclick="switchTab('files')">
+        <div class="sb-nav-icon">📁</div> File Browser
+      </button>
+      <button class="sb-nav-btn" id="snav-tracker" onclick="switchTab('tracker')">
+        <div class="sb-nav-icon">📊</div> Submission Tracker
+      </button>
+      <button class="sb-nav-btn" id="snav-bymonth" onclick="switchTab('bymonth')">
+        <div class="sb-nav-icon">📅</div> By Month
+      </button>
+    </div>
+
+    <div class="sb-section-label">File Directory</div>
+    <div id="file-tree"><div style="padding:16px;font-size:12px;color:var(--txt3)"><span class="spinner"></span> Connecting…</div></div>
+
+    <div style="flex:1"></div>
+    <div class="sidebar-footer">
+      <div class="sb-status"><div class="sb-dot"></div><span class="sb-status-txt">Firebase · Cloudinary</span></div>
+      <div class="sb-clock" id="sb-clock"></div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main>
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="openSidebar()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-titles">
+          <h1 id="page-title">SF2 Records</h1>
+          <p id="page-subtitle">Connecting to Firebase…</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-badge"><div class="live-dot"></div><span>Live</span></div>
+        <button class="notif-btn" id="notif-btn" onclick="markAllRead()" title="New files since last visit">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notif-badge">0</span>
+        </button>
+        <span class="clock-badge" id="main-clock"></span>
+        <button class="btn-refresh" onclick="refreshAll()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Desktop tabs -->
+      <div class="view-tabs">
+        <button class="tab-btn active" id="tab-files" onclick="switchTab('files')"><span class="tab-icon">📁</span> File Browser</button>
+        <button class="tab-btn" id="tab-tracker" onclick="switchTab('tracker')"><span class="tab-icon">📊</span> Submission Tracker</button>
+        <button class="tab-btn" id="tab-bymonth" onclick="switchTab('bymonth')"><span class="tab-icon">📅</span> By Month</button>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats">
+        <div class="stat-card c-blue"><div class="stat-icon">📁</div><div class="stat-label">Total Files</div><div class="stat-val blue" id="stat-total">—</div></div>
+        <div class="stat-card c-cyan"><div class="stat-icon">🏫</div><div class="stat-label">Grades</div><div class="stat-val cyan" id="stat-grades">—</div></div>
+        <div class="stat-card c-green"><div class="stat-icon">✅</div><div class="stat-label">Submitted This Month</div><div class="stat-val green" id="stat-month">—</div></div>
+        <div class="stat-card c-red"><div class="stat-icon">⚠️</div><div class="stat-label">Missing This Month</div><div class="stat-val red" id="stat-missing">—</div></div>
+      </div>
+
+      <!-- ── FILE BROWSER VIEW ── -->
+      <div id="view-files">
+        <div class="breadcrumb" id="breadcrumb"><span class="active" onclick="showRoot()">🏫 All Grades</span></div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="panel-title-icon" id="panel-icon">📁</div>
+              <span id="panel-title-text">All Grades</span>
+            </div>
+            <div class="search-wrap">
+              <span>🔍</span>
+              <input type="text" id="search-box" placeholder="Search files…" oninput="applySearch(this.value)"/>
+            </div>
+          </div>
+          <div class="file-table" id="main-content">
+            <div class="empty"><div class="e-icon"><span class="spinner"></span></div><p>Loading records…</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SUBMISSION TRACKER VIEW ── -->
+      <div id="view-tracker" style="display:none">
+        <div class="tracker-controls">
+          <select class="month-select" id="tracker-month" onchange="renderTracker()"></select>
+          <div class="tracker-legend">
+            <div class="leg-item"><div class="leg-dot submitted"></div> Submitted</div>
+            <div class="leg-item"><div class="leg-dot missing"></div> Missing</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><div class="panel-title-icon">📊</div><span id="tracker-panel-title">Submission Tracker</span></div>
+          </div>
+          <div class="tracker-wrap">
+            <div id="tracker-content"><div class="empty"><div class="e-icon"><span class="spinner"></span></div><p>Loading…</p></div></div>
+          </div>
+          <div class="tracker-summary">
+            <span id="tracker-summary-txt">—</span>
+            <div class="ts-bar"><div class="ts-fill" id="tracker-bar" style="width:0%"></div></div>
+            <span id="tracker-pct" style="font-family:var(--font-mono);font-size:11px;color:var(--green)">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BY MONTH VIEW ── -->
+      <div id="view-bymonth" style="display:none">
+        <div class="mf-controls">
+          <span class="mf-label">Filter:</span>
+          <div class="month-pills" id="month-pills"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><div class="panel-title-icon">📅</div><span id="bymonth-title">All Months</span></div>
+            <div class="search-wrap">
+              <span>🔍</span>
+              <input type="text" id="search-box2" placeholder="Search…" oninput="applySearch2(this.value)"/>
+            </div>
+          </div>
+          <div class="file-table" id="bymonth-content">
+            <div class="empty"><div class="e-icon"><span class="spinner"></span></div><p>Loading…</p></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mob-nav-btn active" id="mob-files" onclick="switchTab('files')"><div class="mob-nav-icon">📁</div>Files</button>
+    <button class="mob-nav-btn" id="mob-tracker" onclick="switchTab('tracker')"><div class="mob-nav-icon">📊</div>Tracker</button>
+    <button class="mob-nav-btn" id="mob-bymonth" onclick="switchTab('bymonth')"><div class="mob-nav-icon">📅</div>By Month</button>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<!-- Viewer Modal -->
+<div class="modal-overlay hidden" id="viewer-modal" onclick="closeViewer(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <div class="modal-title"><span>📄</span><span id="viewer-title">Loading…</span></div>
+      <div class="modal-actions">
+        <a id="viewer-dl" class="dl-btn" href="#" target="_blank">⬇ Download</a>
+        <button class="modal-close" onclick="closeViewerBtn()">✕</button>
+      </div>
+    </div>
+    <div class="modal-body"><iframe id="viewer-frame" src="" allowfullscreen></iframe></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script>
+/* ── Firebase ── */
+const FB={apiKey:"AIzaSyDHOZkF310KaQphFda9rgKBWl2pPmM44Hc",authDomain:"licenses-5c397.firebaseapp.com",databaseURL:"https://licenses-5c397-default-rtdb.firebaseio.com",projectId:"licenses-5c397",storageBucket:"licenses-5c397.firebasestorage.app",messagingSenderId:"811265646295",appId:"1:811265646295:web:771cdfd0af3d3056309a92"};
+firebase.initializeApp(FB);
+const db=firebase.database();
+
+/* ── State ── */
+let SF2={},ALL=[],V={grade:null,section:null,month:null},SQ='',SQ2='';
+let ACTIVE_TAB='files', FILTER_MONTH='', LAST_VISIT=0;
+const MONTHS_ORDER=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const pad=n=>String(n).padStart(2,'0');
+const kl=k=>k.replace(/_/g,' ');
+const fmtB=b=>!b?'—':b<1048576?`${(b/1024).toFixed(1)} KB`:`${(b/1048576).toFixed(2)} MB`;
+const fmtD=iso=>{if(!iso)return'—';const d=new Date(iso);return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const isNew=iso=>iso&&(Date.now()-new Date(iso).getTime())<172800000;
+const isSinceVisit=iso=>iso&&new Date(iso).getTime()>LAST_VISIT;
+const TM=new Date().toLocaleString('en-PH',{month:'long'}),TY=new Date().getFullYear();
+
+/* ── Last-visit notification system ── */
+function loadLastVisit(){
+  try{LAST_VISIT=parseInt(localStorage.getItem('dapr_last_visit')||'0');}catch(e){LAST_VISIT=0;}
+}
+function saveVisit(){
+  try{localStorage.setItem('dapr_last_visit',Date.now());}catch(e){}
+}
+function updateNotifBadge(){
+  const n=ALL.filter(f=>isSinceVisit(f.uploaded_at)).length;
+  const badge=document.getElementById('notif-badge');
+  if(n>0){badge.textContent=n>99?'99+':n;badge.classList.add('show');}
+  else{badge.classList.remove('show');}
+}
+function markAllRead(){
+  saveVisit();LAST_VISIT=Date.now();
+  document.getElementById('notif-badge').classList.remove('show');
+  document.getElementById('mob-files').querySelector('.mob-nav-icon').style.position='';
+  showToast('✅ All notifications marked as read');
+}
+
+/* ── Sidebar mobile ── */
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sb-overlay').classList.add('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('show')}
+
+/* ── Tab switching ── */
+function switchTab(tab){
+  ACTIVE_TAB=tab;
+  ['files','tracker','bymonth'].forEach(t=>{
+    document.getElementById('view-'+t).style.display=t===tab?'block':'none';
+    const dt=document.getElementById('tab-'+t);if(dt)dt.classList.toggle('active',t===tab);
+    const st=document.getElementById('snav-'+t);if(st)st.classList.toggle('active',t===tab);
+    const mt=document.getElementById('mob-'+t);if(mt)mt.classList.toggle('active',t===tab);
+  });
+  if(tab==='files'){document.getElementById('page-title').textContent='SF2 Records';document.getElementById('page-subtitle').textContent='Browse by grade and section';}
+  if(tab==='tracker'){document.getElementById('page-title').textContent='Submission Tracker';document.getElementById('page-subtitle').textContent='Monthly overview — who has and hasn\'t submitted';renderTracker();}
+  if(tab==='bymonth'){document.getElementById('page-title').textContent='Browse by Month';document.getElementById('page-subtitle').textContent='See all submissions for a specific month';renderByMonth();}
+  closeSidebar();
+}
+
+/* ── Data ── */
+function refreshAll(){
+  showToast('⟳ Fetching from Firebase…');
+  db.ref('/sf2_records').on('value',snap=>{
+    SF2=snap.val()||{};ALL=flatten(SF2);
+    updateStats();buildTree();
+    populateTrackerMonths();populateMonthPills();
+    if(ACTIVE_TAB==='files')render();
+    else if(ACTIVE_TAB==='tracker')renderTracker();
+    else renderByMonth();
+    updateNotifBadge();
+    showToast('✅ Updated');
+  },e=>showToast('❌ '+e.message));
+}
+
+function flatten(data){
+  const out=[];
+  for(const[gk,ss]of Object.entries(data)){
+    if(!ss||typeof ss!=='object')continue;
+    for(const[sk,ms]of Object.entries(ss)){
+      if(!ms||typeof ms!=='object')continue;
+      for(const[mk,fs]of Object.entries(ms)){
+        if(!fs||typeof fs!=='object')continue;
+        for(const[tk,r]of Object.entries(fs)){
+          if(!r)continue;
+          const rec=typeof r==='object'?r:{};
+          out.push({...rec,_gk:gk,_sk:sk,_mk:mk,grade:rec.grade||kl(gk),section:rec.section||kl(sk),month:rec.month||kl(mk.replace('_',' '))});
+        }
+      }
+    }
+  }
+  return out.sort((a,b)=>new Date(b.uploaded_at||0)-new Date(a.uploaded_at||0));
+}
+
+function cntG(gk){return ALL.filter(f=>f._gk===gk).length}
+function cntS(gk,sk){return ALL.filter(f=>f._gk===gk&&f._sk===sk).length}
+function cntM(gk,sk,mk){return ALL.filter(f=>f._gk===gk&&f._sk===sk&&f._mk===mk).length}
+
+function updateStats(){
+  const gs=new Set(ALL.map(f=>f.grade)).size;
+  const submitted=ALL.filter(f=>f.month===TM&&String(f.year||'')===String(TY));
+  const submittedSections=new Set(submitted.map(f=>f.grade+'|'+f.section)).size;
+  const totalSections=new Set(ALL.map(f=>f.grade+'|'+f.section)).size;
+  const missing=Math.max(0,totalSections-submittedSections);
+  document.getElementById('stat-total').textContent=ALL.length;
+  document.getElementById('stat-grades').textContent=gs;
+  document.getElementById('stat-month').textContent=submittedSections;
+  document.getElementById('stat-missing').textContent=missing;
+}
+
+/* ── File tree ── */
+function buildTree(){
+  const t=document.getElementById('file-tree');
+  if(!Object.keys(SF2).length){t.innerHTML='<div style="padding:16px;font-size:12px;color:var(--txt3)">No files yet.</div>';return}
+  let h='';
+  for(const[gk,ss]of Object.entries(SF2)){
+    const gl=kl(gk),go=V.grade===gl?'open':'';
+    h+=`<div class="tree-grade ${go}" id="tg-${gk}">
+      <button class="tree-grade-btn ${go}" onclick="goG('${gk}','${gl}');switchTab('files')">
+        <span style="font-size:12px">📁</span>${gl}<span class="tree-count">${cntG(gk)}</span><span class="tree-arrow">›</span>
+      </button><div class="tree-sections">`;
+    if(ss&&typeof ss==='object'){for(const[sk,ms]of Object.entries(ss)){
+      const sl=kl(sk),sa=V.grade===gl&&V.section===sl,so=sa?'open':'';
+      h+=`<div class="tree-section ${so}">
+        <button class="tree-section-btn${sa?' active':''}" onclick="goS('${gl}','${sl}');switchTab('files')">
+          <span style="font-size:11px">📂</span>${sl}<span class="tree-count">${cntS(gk,sk)}</span>
+        </button><div class="tree-months">`;
+      if(ms&&typeof ms==='object'){for(const mk of Object.keys(ms)){
+        const ml=kl(mk.replace('_',' ')),ma=V.month===ml?'active':'';
+        h+=`<button class="tree-month-btn ${ma}" onclick="goM('${gl}','${sl}','${ml}');switchTab('files')">
+          <span style="font-size:10px">📅</span>${ml}<span class="tree-count">${cntM(gk,sk,mk)}</span>
+        </button>`;
+      }}
+      h+=`</div></div>`;
+    }}
+    h+=`</div></div>`;
+  }
+  t.innerHTML=h;
+}
+
+/* ── File browser ── */
+function goG(gk,gl){V={grade:gl,section:null,month:null};buildTree();render()}
+function goS(gl,sl){V={grade:gl,section:sl,month:null};buildTree();render()}
+function goM(gl,sl,ml){V={grade:gl,section:sl,month:ml};buildTree();render()}
+function showRoot(){V={grade:null,section:null,month:null};buildTree();render()}
+function applySearch(q){SQ=q.toLowerCase();render()}
+function applySearch2(q){SQ2=q.toLowerCase();renderByMonth()}
+
+function render(){
+  bc();
+  const mc=document.getElementById('main-content');
+  if(!V.grade){
+    document.getElementById('page-title').textContent='SF2 Records';
+    document.getElementById('page-subtitle').textContent='All grades — tap a folder to browse';
+    document.getElementById('panel-icon').textContent='📁';
+    document.getElementById('panel-title-text').textContent='All Grades';
+    if(!Object.keys(SF2).length){mc.innerHTML=empty('📭','No SF2 files received yet.','Files sent from the attendance system appear here.');return}
+    let c='<div class="folder-grid">';
+    for(const[gk,ss]of Object.entries(SF2)){
+      const gl=kl(gk),cnt=cntG(gk),sn=Object.keys(ss||{}).length;
+      c+=`<div class="folder-card" onclick="goG('${gk}','${gl}')"><div class="f-icon-wrap">📁</div><div><div class="f-name">${gl}</div><div class="f-count">${sn} section${sn!==1?'s':''} · ${cnt} file${cnt!==1?'s':''}</div></div></div>`;
+    }
+    mc.innerHTML=c+'</div>';return;
+  }
+  if(!V.section){
+    document.getElementById('page-title').textContent=V.grade;
+    document.getElementById('page-subtitle').textContent='Select a section';
+    document.getElementById('panel-icon').textContent='📁';
+    document.getElementById('panel-title-text').textContent=V.grade;
+    const gk=Object.keys(SF2).find(k=>kl(k)===V.grade)||'',ss=SF2[gk]||{};
+    if(!Object.keys(ss).length){mc.innerHTML=empty('📭','No sections found.','');return}
+    let c='<div class="folder-grid">';
+    for(const[sk,ms]of Object.entries(ss)){
+      const sl=kl(sk),cnt=cntS(gk,sk),mo=Object.keys(ms||{}).length;
+      c+=`<div class="folder-card" onclick="goS('${V.grade}','${sl}')"><div class="f-icon-wrap">📂</div><div><div class="f-name">${sl}</div><div class="f-count">${mo} month${mo!==1?'s':''} · ${cnt} file${cnt!==1?'s':''}</div></div></div>`;
+    }
+    mc.innerHTML=c+'</div>';return;
+  }
+  let files=ALL.filter(f=>f.grade===V.grade&&f.section===V.section);
+  if(V.month)files=files.filter(f=>f.month===V.month);
+  if(SQ)files=files.filter(f=>(f.name||'').toLowerCase().includes(SQ));
+  document.getElementById('page-title').textContent=`${V.grade} — ${V.section}`;
+  document.getElementById('page-subtitle').textContent=(V.month?V.month+' · ':'')+`${files.length} file${files.length!==1?'s':''}`;
+  document.getElementById('panel-icon').textContent='📂';
+  document.getElementById('panel-title-text').textContent=`${V.grade} / ${V.section}${V.month?' / '+V.month:''}`;
+  if(!files.length){mc.innerHTML=empty('🗂️','No files here.',SQ?'Try a different search.':'No SF2s submitted yet.');return}
+  let rows=`<div class="file-row hdr"><div>File Name</div><div>Grade</div><div>Month</div><div>Size</div><div>Status</div><div>View</div><div>Download</div></div>`;
+  for(const f of files){
+    const isN=isSinceVisit(f.uploaded_at);
+    const b=isN?'<span class="badge new">🔵 New</span>':'<span class="badge ok">✓ Received</span>';
+    const dl=f.url?`<a class="dl-btn" href="${f.url}" target="_blank">⬇ Save</a>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
+    const vw=f.url?`<button class="view-btn" onclick="openViewer('${f.url}','${(f.name||'').replace(/'/g,"\\'")}','${f.url}')">👁 View</button>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
+    rows+=`<div class="file-row" title="Uploaded: ${fmtD(f.uploaded_at)}"><div class="file-name"><div class="file-name-icon">📄</div>${f.name||'—'}</div><div class="file-meta">${f.grade}</div><div class="file-meta amber">${f.month||''}${f.year?' '+f.year:''}</div><div class="file-size">${fmtB(f.size)}</div><div>${b}</div><div>${vw}</div><div>${dl}</div></div>`;
+  }
+  mc.innerHTML=rows;
+}
+
+function empty(icon,t,s){return`<div class="empty"><div class="e-icon">${icon}</div><p><strong>${t}</strong>${s?'<br/><span style="font-size:11.5px;color:var(--txt3);margin-top:4px;display:block">'+s+'</span>':''}</p></div>`}
+
+function bc(){
+  const el=document.getElementById('breadcrumb');
+  let h=`<span onclick="showRoot()" ${!V.grade?'class="active"':''}>🏫 All Grades</span>`;
+  if(V.grade)h+=`<span class="bc-sep">›</span><span onclick="goG('','${V.grade}')" ${!V.section?'class="active"':''}>${V.grade}</span>`;
+  if(V.section)h+=`<span class="bc-sep">›</span><span onclick="goS('${V.grade}','${V.section}')" ${!V.month?'class="active"':''}>${V.section}</span>`;
+  if(V.month)h+=`<span class="bc-sep">›</span><span class="active">${V.month}</span>`;
+  el.innerHTML=h;
+}
+
+/* ══════════════════════════════════════
+   SUBMISSION TRACKER
+══════════════════════════════════════ */
+function populateTrackerMonths(){
+  const sel=document.getElementById('tracker-month');
+  const months=[...new Set(ALL.map(f=>f.month).filter(Boolean))];
+  months.sort((a,b)=>MONTHS_ORDER.indexOf(a)-MONTHS_ORDER.indexOf(b));
+  if(!months.length)months.push(TM);
+  sel.innerHTML=months.map(m=>`<option value="${m}"${m===TM?'selected':''}>${m}</option>`).join('');
+  // Add current month if not in data
+  if(!months.includes(TM)){sel.innerHTML+=`<option value="${TM}" selected>${TM} (current)</option>`;}
+}
+
+function renderTracker(){
+  const selEl=document.getElementById('tracker-month');
+  const month=selEl?selEl.value:TM;
+  document.getElementById('tracker-panel-title').textContent=`Submission Tracker — ${month}`;
+  const tc=document.getElementById('tracker-content');
+  if(!Object.keys(SF2).length){tc.innerHTML=empty('📭','No data yet.','');return}
+
+  // Build list of all known grade/section pairs
+  const pairs=[];
+  for(const[gk,ss]of Object.entries(SF2)){
+    if(!ss||typeof ss!=='object')continue;
+    for(const sk of Object.keys(ss)){pairs.push({gk,sk,grade:kl(gk),section:kl(sk)});}
+  }
+  if(!pairs.length){tc.innerHTML=empty('📭','No sections found.','');return}
+
+  // For each pair, check if there's a file for this month
+  let submitted=0;
+  let rows='<table class="tracker-table"><thead><tr><th>Grade</th><th>Section</th><th>Status</th><th>File</th><th>Submitted</th></tr></thead><tbody>';
+  const sorted=pairs.sort((a,b)=>a.grade.localeCompare(b.grade)||a.section.localeCompare(b.section));
+  for(const p of sorted){
+    const files=ALL.filter(f=>f._gk===p.gk&&f._sk===p.sk&&f.month===month);
+    const hasFile=files.length>0;
+    if(hasFile)submitted++;
+    const latest=files[0];
+    const statusDot=`<div class="tc-dot ${hasFile?'ok':'miss'}"></div>`;
+    const statusLabel=`<span class="tc-label ${hasFile?'ok':'miss'}">${hasFile?'Submitted':'Missing'}</span>`;
+    const fileInfo=hasFile?`<a class="tc-link" href="${latest.url||'#'}" target="_blank">${(latest.name||'—').slice(0,28)}…</a>`:'<span style="color:var(--txt3);font-size:11px">—</span>';
+    const timeInfo=hasFile?`<span class="tc-time">${fmtD(latest.uploaded_at)}</span>`:'<span class="tc-time">—</span>';
+    rows+=`<tr>
+      <td><span class="grade-cell">${p.grade}</span></td>
+      <td><span class="section-cell">${p.section}</span></td>
+      <td><div class="tracker-cell">${statusDot}${statusLabel}</div></td>
+      <td>${fileInfo}</td>
+      <td>${timeInfo}</td>
+    </tr>`;
+  }
+  rows+='</tbody></table>';
+  tc.innerHTML=rows;
+
+  // Summary bar
+  const total=pairs.length;
+  const pct=total>0?Math.round((submitted/total)*100):0;
+  document.getElementById('tracker-summary-txt').textContent=`${submitted} of ${total} sections submitted`;
+  document.getElementById('tracker-bar').style.width=pct+'%';
+  document.getElementById('tracker-pct').textContent=pct+'%';
+}
+
+/* ══════════════════════════════════════
+   BY MONTH VIEW
+══════════════════════════════════════ */
+function populateMonthPills(){
+  const months=[...new Set(ALL.map(f=>f.month).filter(Boolean))];
+  months.sort((a,b)=>MONTHS_ORDER.indexOf(a)-MONTHS_ORDER.indexOf(b));
+  const wrap=document.getElementById('month-pills');
+  let h=`<button class="month-pill ${!FILTER_MONTH?'active':''}" onclick="setMonthFilter('')">All</button>`;
+  for(const m of months)h+=`<button class="month-pill ${FILTER_MONTH===m?'active':''}" onclick="setMonthFilter('${m}')">${m}</button>`;
+  wrap.innerHTML=h;
+}
+
+function setMonthFilter(m){FILTER_MONTH=m;populateMonthPills();renderByMonth()}
+
+function renderByMonth(){
+  const container=document.getElementById('bymonth-content');
+  const titleEl=document.getElementById('bymonth-title');
+  titleEl.textContent=FILTER_MONTH?`${FILTER_MONTH} — All Grades`:'All Months';
+
+  let files=FILTER_MONTH?ALL.filter(f=>f.month===FILTER_MONTH):[...ALL];
+  if(SQ2)files=files.filter(f=>(f.name||'').toLowerCase().includes(SQ2)||f.grade.toLowerCase().includes(SQ2)||f.section.toLowerCase().includes(SQ2));
+  if(!files.length){container.innerHTML=empty('🗂️','No files found.',FILTER_MONTH?`No submissions for ${FILTER_MONTH} yet.`:'No files yet.');return}
+
+  // Group by grade
+  const byGrade={};
+  for(const f of files){if(!byGrade[f.grade])byGrade[f.grade]=[];byGrade[f.grade].push(f);}
+
+  let html='';
+  for(const[grade,gfiles]of Object.entries(byGrade).sort()){
+    html+=`<div class="mf-grade-group">
+      <div class="mf-grade-hdr">📁 ${grade} <span>· ${gfiles.length} file${gfiles.length!==1?'s':''}</span></div>
+      <div class="file-row hdr" style="grid-template-columns:2fr 0.8fr 0.9fr 65px 90px 60px 95px">
+        <div>File Name</div><div>Grade</div><div>Month</div><div>Size</div><div>Status</div><div>View</div><div>Download</div>
+      </div>`;
+    for(const f of gfiles){
+      const isN=isSinceVisit(f.uploaded_at);
+      const b=isN?'<span class="badge new">🔵 New</span>':'<span class="badge ok">✓ Received</span>';
+      const dl=f.url?`<a class="dl-btn" href="${f.url}" target="_blank">⬇ Save</a>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
+      const vw=f.url?`<button class="view-btn" onclick="openViewer('${f.url}','${(f.name||'').replace(/'/g,"\\'")}','${f.url}')">👁 View</button>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
+      html+=`<div class="file-row" title="Uploaded: ${fmtD(f.uploaded_at)}"><div class="file-name"><div class="file-name-icon">📄</div>${f.name||'—'}</div><div class="file-meta">${f.grade}</div><div class="file-meta amber">${f.month||''}${f.year?' '+f.year:''}</div><div class="file-size">${fmtB(f.size)}</div><div>${b}</div><div>${vw}</div><div>${dl}</div></div>`;
+    }
+    html+=`</div>`;
+  }
+  container.innerHTML=html;
+}
+
+/* ── Modal ── */
+function openViewer(url,name,dlUrl){
+  document.getElementById('viewer-title').textContent=name;
+  document.getElementById('viewer-dl').href=dlUrl;
+  document.getElementById('viewer-frame').src='https://docs.google.com/viewer?url='+encodeURIComponent(url)+'&embedded=true';
+  document.getElementById('viewer-modal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closeViewerBtn(){document.getElementById('viewer-modal').classList.add('hidden');document.getElementById('viewer-frame').src='';document.body.style.overflow='';}
+function closeViewer(e){if(e.target===document.getElementById('viewer-modal'))closeViewerBtn()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewerBtn()});
+
+/* ── Toast ── */
+function showToast(m,ms=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms)}
+
+/* ── Clock ── */
+function tick(){const d=new Date(),s=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;document.getElementById('main-clock').textContent=s;document.getElementById('sb-clock').textContent=s}
+tick();setInterval(tick,1000);
+
+/* ── Init ── */
+loadLastVisit();
+saveVisit(); // mark current visit time for NEXT session's badge count
+refreshAll();
+</script>
+</body>
+</html>
