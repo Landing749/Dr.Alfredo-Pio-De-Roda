@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SF2 Admin Portal — Dr. Alfredo Pio De Roda ES</title>
+<title>SF2 Records — Dr. Alfredo Pio De Roda ES</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -297,7 +297,7 @@ main{margin-left:var(--sb-w);width:calc(100% - var(--sb-w));display:flex;flex-di
       <div class="logo-mark">📋</div>
       <div class="logo-text">
         <div class="logo-name">Dr. APDR ES</div>
-        <div class="logo-sub">SF2 Admin Portal</div>
+        <div class="logo-sub">SF2 Records</div>
       </div>
       <button class="sb-close" onclick="closeSidebar()">✕</button>
     </div>
@@ -319,7 +319,7 @@ main{margin-left:var(--sb-w);width:calc(100% - var(--sb-w));display:flex;flex-di
 
     <div style="flex:1"></div>
     <div class="sidebar-footer">
-      <div class="sb-status"><div class="sb-dot"></div><span class="sb-status-txt">Firebase · Cloudinary</span></div>
+      <div class="sb-status"><div class="sb-dot"></div><span class="sb-status-txt">Live</span></div>
       <div class="sb-clock" id="sb-clock"></div>
     </div>
   </aside>
@@ -333,7 +333,7 @@ main{margin-left:var(--sb-w);width:calc(100% - var(--sb-w));display:flex;flex-di
         </button>
         <div class="topbar-titles">
           <h1 id="page-title">SF2 Records</h1>
-          <p id="page-subtitle">Connecting to Firebase…</p>
+          <p id="page-subtitle">Connecting…</p>
         </div>
       </div>
       <div class="topbar-right">
@@ -450,7 +450,7 @@ main{margin-left:var(--sb-w);width:calc(100% - var(--sb-w));display:flex;flex-di
     <div class="modal-hdr">
       <div class="modal-title"><span>📄</span><span id="viewer-title">Loading…</span></div>
       <div class="modal-actions">
-        <a id="viewer-dl" class="dl-btn" href="#" target="_blank">⬇ Download</a>
+        <button id="viewer-dl" class="dl-btn" onclick="dlFile(this.dataset.url,this.dataset.name)">⬇ Download</button>
         <button class="modal-close" onclick="closeViewerBtn()">✕</button>
       </div>
     </div>
@@ -519,7 +519,7 @@ function switchTab(tab){
 
 /* ── Data ── */
 function refreshAll(){
-  showToast('⟳ Fetching from Firebase…');
+  showToast('⟳ Fetching records…');
   db.ref('/sf2_records').on('value',snap=>{
     SF2=snap.val()||{};ALL=flatten(SF2);
     updateStats();buildTree();
@@ -647,7 +647,7 @@ function render(){
   for(const f of files){
     const isN=isSinceVisit(f.uploaded_at);
     const b=isN?'<span class="badge new">🔵 New</span>':'<span class="badge ok">✓ Received</span>';
-    const dl=f.url?`<a class="dl-btn" href="${f.url}" target="_blank">⬇ Save</a>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
+    const dl=f.url?`<button class="dl-btn" onclick="dlFile('${f.url}','${(f.name||'').replace(/'/g,"\\'")}')">⬇ Save</button>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
     const vw=f.url?`<button class="view-btn" onclick="openViewer('${f.url}','${(f.name||'').replace(/'/g,"\\'")}','${f.url}')">👁 View</button>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
     rows+=`<div class="file-row" title="Uploaded: ${fmtD(f.uploaded_at)}"><div class="file-name"><div class="file-name-icon">📄</div>${f.name||'—'}</div><div class="file-meta">${f.grade}</div><div class="file-meta amber">${f.month||''}${f.year?' '+f.year:''}</div><div class="file-size">${fmtB(f.size)}</div><div>${b}</div><div>${vw}</div><div>${dl}</div></div>`;
   }
@@ -762,7 +762,7 @@ function renderByMonth(){
     for(const f of gfiles){
       const isN=isSinceVisit(f.uploaded_at);
       const b=isN?'<span class="badge new">🔵 New</span>':'<span class="badge ok">✓ Received</span>';
-      const dl=f.url?`<a class="dl-btn" href="${f.url}" target="_blank">⬇ Save</a>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
+      const dl=f.url?`<button class="dl-btn" onclick="dlFile('${f.url}','${(f.name||'').replace(/'/g,"\\'")}')">⬇ Save</button>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
       const vw=f.url?`<button class="view-btn" onclick="openViewer('${f.url}','${(f.name||'').replace(/'/g,"\\'")}','${f.url}')">👁 View</button>`:'<span style="font-size:10px;color:var(--txt3)">—</span>';
       html+=`<div class="file-row" title="Uploaded: ${fmtD(f.uploaded_at)}"><div class="file-name"><div class="file-name-icon">📄</div>${f.name||'—'}</div><div class="file-meta">${f.grade}</div><div class="file-meta amber">${f.month||''}${f.year?' '+f.year:''}</div><div class="file-size">${fmtB(f.size)}</div><div>${b}</div><div>${vw}</div><div>${dl}</div></div>`;
     }
@@ -774,7 +774,9 @@ function renderByMonth(){
 /* ── Modal ── */
 function openViewer(url,name,dlUrl){
   document.getElementById('viewer-title').textContent=name;
-  document.getElementById('viewer-dl').href=dlUrl;
+  const dlBtn=document.getElementById('viewer-dl');
+  dlBtn.dataset.url=dlUrl;
+  dlBtn.dataset.name=name;
   document.getElementById('viewer-frame').src='https://docs.google.com/viewer?url='+encodeURIComponent(url)+'&embedded=true';
   document.getElementById('viewer-modal').classList.remove('hidden');
   document.body.style.overflow='hidden';
@@ -785,6 +787,31 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewerBtn()});
 
 /* ── Toast ── */
 function showToast(m,ms=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms)}
+
+/* ── Download with correct filename ── */
+async function dlFile(url,name){
+  if(!url)return;
+  // Ensure filename has .xlsx extension
+  let fname=name||'SF2_file';
+  if(!/\.(xlsx|xls|pdf|docx|doc|csv)$/i.test(fname))fname+='.xlsx';
+  showToast('⬇ Preparing download…');
+  try{
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('Fetch failed');
+    const blob=await res.blob();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=fname;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+    showToast('✅ Downloaded: '+fname);
+  }catch(e){
+    // Fallback: open in new tab if fetch is blocked
+    showToast('↗ Opening file…');
+    window.open(url,'_blank');
+  }
+}
 
 /* ── Clock ── */
 function tick(){const d=new Date(),s=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;document.getElementById('main-clock').textContent=s;document.getElementById('sb-clock').textContent=s}
