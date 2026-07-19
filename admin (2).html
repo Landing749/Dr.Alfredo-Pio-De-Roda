@@ -123,25 +123,26 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
   import {
-    getFirestore, collection, addDoc, updateDoc, deleteDoc, doc,
-    onSnapshot, query, orderBy, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    getDatabase, ref, push, set, update, remove, onValue, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
   import {
     getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
   } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
   // ── Paste your Firebase project config here (same one used in index.html and installer.html) ──
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBf9r4B3JRpHneJt1OaxkD9E5arzLA2OfM",
+    authDomain: "dr-alfredo-pio-de-roda.firebaseapp.com",
+    databaseURL: "https://dr-alfredo-pio-de-roda-default-rtdb.firebaseio.com",
+    projectId: "dr-alfredo-pio-de-roda",
+    storageBucket: "dr-alfredo-pio-de-roda.firebasestorage.app",
+    messagingSenderId: "228553752118",
+    appId: "1:228553752118:web:9c7d81a3a7758e813ce297",
+    measurementId: "G-CYTESJ5E7H"
   };
 
   const app  = initializeApp(firebaseConfig);
-  const db   = getFirestore(app);
+  const db   = getDatabase(app);
   const auth = getAuth(app);
 
   // ── DOM refs ──
@@ -227,10 +228,11 @@
     saveBtn.disabled = true;
     try{
       if (editingId){
-        await updateDoc(doc(db, "schools", editingId), payload);
+        await update(ref(db, "schools/" + editingId), payload);
         showFormMsg("Saved changes to " + payload.name + ".", true);
       } else {
-        await addDoc(collection(db, "schools"), { ...payload, createdAt: serverTimestamp() });
+        const newRef = push(ref(db, "schools"));
+        await set(newRef, { ...payload, createdAt: serverTimestamp() });
         showFormMsg(payload.name + " added.", true);
       }
       resetForm();
@@ -293,7 +295,7 @@
     delBtn.textContent = "Delete";
     delBtn.addEventListener("click", async () => {
       if (!confirm(`Remove ${data.name} from the directory?`)) return;
-      try{ await deleteDoc(doc(db, "schools", id)); }
+      try{ await remove(ref(db, "schools/" + id)); }
       catch(err){ console.error(err); alert("Couldn't delete — check the console."); }
     });
 
@@ -304,20 +306,22 @@
 
   let unsubscribe = null;
   function startListening(){
-    const q = query(collection(db, "schools"), orderBy("name"));
-    unsubscribe = onSnapshot(q, (snap) => {
+    const schoolsRef = ref(db, "schools");
+    unsubscribe = onValue(schoolsRef, (snap) => {
       tableBody.innerHTML = "";
-      schoolCount.textContent = snap.size + (snap.size === 1 ? " school" : " schools");
-      if (snap.empty){
+      const entries = snap.exists() ? Object.entries(snap.val()) : [];
+      entries.sort((a, b) => (a[1].name || "").localeCompare(b[1].name || ""));
+      schoolCount.textContent = entries.length + (entries.length === 1 ? " school" : " schools");
+      if (entries.length === 0){
         const tr = document.createElement("tr");
         tr.innerHTML = `<td colspan="4" style="text-align:center; color:var(--ink-soft); padding:26px;">No schools yet — add the first one above.</td>`;
         tableBody.appendChild(tr);
         return;
       }
-      snap.forEach(d => tableBody.appendChild(rowFor(d.id, d.data())));
+      entries.forEach(([id, data]) => tableBody.appendChild(rowFor(id, data)));
     }, (err) => {
       console.error(err);
-      tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#a5321f; padding:26px;">Couldn't load schools — check Firestore rules / config.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#a5321f; padding:26px;">Couldn't load schools — check Realtime Database rules / config.</td></tr>`;
     });
   }
 
