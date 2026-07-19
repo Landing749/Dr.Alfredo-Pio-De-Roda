@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATSYS — Admin | ATH Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="dotfield"></div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <img src="athstudios_logo.png" alt="ATH Studios logo">
+      <span class="brand-name">ATH Studios — Admin</span>
+    </div>
+    <nav class="topnav" id="loggedInNav" style="display:none;">
+      <a href="index.html">View directory</a>
+      <a href="#" id="logoutBtn">Log out</a>
+    </nav>
+  </div>
+</div>
+
+<!-- ── Login gate ─────────────────────────────────────────── -->
+<div class="auth-wrap" id="authWrap">
+  <div class="lock-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+  </div>
+  <h2 style="font-size:22px; margin-bottom:6px;">Admin sign-in</h2>
+  <p style="color:var(--ink-soft); font-size:13.5px; margin:0 0 22px;">Sign in with the admin account created in Firebase Authentication.</p>
+  <div class="form-card">
+    <div class="field full" style="margin-bottom:14px;">
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" placeholder="admin@athstudios.dpdns.org" autocomplete="username">
+    </div>
+    <div class="field full">
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary" id="loginBtn" style="width:100%;">Sign in</button>
+    </div>
+    <div class="form-msg err" id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- ── Admin content (shown after sign-in) ──────────────────── -->
+<div id="adminContent" style="display:none;">
+
+  <header class="hero" style="padding-bottom:12px;">
+    <span class="eyebrow">School directory</span>
+    <h1 style="font-size:32px;">Manage schools</h1>
+    <p class="hero-desc">Add a school once and it immediately appears in the public directory with its own installer page — logo, name, and download link all in one place.</p>
+  </header>
+
+  <section style="padding-top:8px;">
+    <div class="section-head">
+      <h2 id="formTitle" style="font-size:20px;">Add a school</h2>
+      <p>Logo is just a filename (e.g. <span class="mono">dr-alfredo-logo.png</span>) — upload the matching image file next to <span class="mono">index.html</span> / <span class="mono">installer.html</span> and it'll show up automatically.</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="fName">School name</label>
+          <input id="fName" type="text" placeholder="Dr. Alfredo Pio De Roda Elementary School">
+        </div>
+        <div class="field">
+          <label for="fSlug">Slug <span class="hint">— used in the link, auto-filled</span></label>
+          <input id="fSlug" class="mono" type="text" placeholder="dr-alfredo-pio-de-roda">
+        </div>
+        <div class="field">
+          <label for="fVersion">ATSYS version</label>
+          <input id="fVersion" class="mono" type="text" placeholder="4.5.4">
+        </div>
+        <div class="field">
+          <label for="fLogo">Logo file name <span class="hint">— just the filename, no path</span></label>
+          <input id="fLogo" class="mono" type="text" placeholder="dr-alfredo-logo.png">
+        </div>
+        <div class="field">
+          <label for="fUrl">Installer download link</label>
+          <input id="fUrl" type="text" placeholder="https://github.com/.../Setup_v4.5.4.exe">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" id="saveBtn">Add school</button>
+        <button class="btn-ghost" id="cancelEditBtn" style="display:none;" type="button">Cancel edit</button>
+      </div>
+      <div class="form-msg" id="formMsg"></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="section-head" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h2 style="font-size:20px;">All schools</h2>
+        <p style="margin-top:4px;">Click a row's link icon to copy its public installer page URL.</p>
+      </div>
+      <span class="pill-count" id="schoolCount">0 schools</span>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>School</th>
+          <th>Version</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="schoolTableBody">
+        <tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:26px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div><!-- /adminContent -->
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, updateDoc, deleteDoc, doc,
+    onSnapshot, query, orderBy, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  import {
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+  // ── Paste your Firebase project config here (same one used in index.html and installer.html) ──
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const db   = getFirestore(app);
+  const auth = getAuth(app);
+
+  // ── DOM refs ──
+  const authWrap      = document.getElementById("authWrap");
+  const adminContent  = document.getElementById("adminContent");
+  const loggedInNav   = document.getElementById("loggedInNav");
+  const loginEmail    = document.getElementById("loginEmail");
+  const loginPassword = document.getElementById("loginPassword");
+  const loginBtn      = document.getElementById("loginBtn");
+  const loginMsg      = document.getElementById("loginMsg");
+  const logoutBtn     = document.getElementById("logoutBtn");
+
+  const fName    = document.getElementById("fName");
+  const fSlug    = document.getElementById("fSlug");
+  const fVersion = document.getElementById("fVersion");
+  const fLogo    = document.getElementById("fLogo");
+  const fUrl     = document.getElementById("fUrl");
+  const saveBtn        = document.getElementById("saveBtn");
+  const cancelEditBtn  = document.getElementById("cancelEditBtn");
+  const formMsg        = document.getElementById("formMsg");
+  const formTitle      = document.getElementById("formTitle");
+  const tableBody      = document.getElementById("schoolTableBody");
+  const schoolCount    = document.getElementById("schoolCount");
+
+  let editingId = null;
+  let slugTouchedByUser = false;
+
+  function slugify(str){
+    return str.toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  fName.addEventListener("input", () => {
+    if (!slugTouchedByUser) fSlug.value = slugify(fName.value);
+  });
+  fSlug.addEventListener("input", () => { slugTouchedByUser = true; });
+
+  function showFormMsg(text, ok){
+    formMsg.textContent = text;
+    formMsg.className = "form-msg show " + (ok ? "ok" : "err");
+    setTimeout(() => formMsg.classList.remove("show"), 3500);
+  }
+
+  function resetForm(){
+    fName.value = ""; fSlug.value = ""; fVersion.value = "4.5.4";
+    fLogo.value = ""; fUrl.value = "";
+    slugTouchedByUser = false;
+    editingId = null;
+    formTitle.textContent = "Add a school";
+    saveBtn.textContent = "Add school";
+    cancelEditBtn.style.display = "none";
+  }
+
+  function startEdit(id, data){
+    editingId = id;
+    fName.value = data.name || "";
+    fSlug.value = data.slug || "";
+    fVersion.value = data.version || "4.5.4";
+    fLogo.value = data.logo || "";
+    fUrl.value = data.installerUrl || "";
+    slugTouchedByUser = true;
+    formTitle.textContent = "Edit " + (data.name || "school");
+    saveBtn.textContent = "Save changes";
+    cancelEditBtn.style.display = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  cancelEditBtn.addEventListener("click", resetForm);
+
+  saveBtn.addEventListener("click", async () => {
+    const payload = {
+      name: fName.value.trim(),
+      slug: slugify(fSlug.value || fName.value),
+      version: fVersion.value.trim() || "4.5.4",
+      logo: fLogo.value.trim(),
+      installerUrl: fUrl.value.trim(),
+    };
+    if (!payload.name || !payload.slug || !payload.installerUrl){
+      showFormMsg("School name, slug, and installer link are required.", false);
+      return;
+    }
+    saveBtn.disabled = true;
+    try{
+      if (editingId){
+        await updateDoc(doc(db, "schools", editingId), payload);
+        showFormMsg("Saved changes to " + payload.name + ".", true);
+      } else {
+        await addDoc(collection(db, "schools"), { ...payload, createdAt: serverTimestamp() });
+        showFormMsg(payload.name + " added.", true);
+      }
+      resetForm();
+    }catch(err){
+      console.error(err);
+      showFormMsg("Something went wrong saving — check the console.", false);
+    }finally{
+      saveBtn.disabled = false;
+    }
+  });
+
+  function rowFor(id, data){
+    const tr = document.createElement("tr");
+
+    const tdLogo = document.createElement("td");
+    tdLogo.className = "row-logo";
+    const img = document.createElement("img");
+    img.src = data.logo || "athstudios_logo.png";
+    img.alt = "";
+    img.onerror = () => { img.src = "athstudios_logo.png"; };
+    tdLogo.appendChild(img);
+
+    const tdName = document.createElement("td");
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "row-name";
+    nameDiv.textContent = data.name || "(untitled)";
+    const slugDiv = document.createElement("div");
+    slugDiv.className = "row-slug";
+    slugDiv.textContent = "/installer.html?school=" + (data.slug || "");
+    tdName.append(nameDiv, slugDiv);
+
+    const tdVersion = document.createElement("td");
+    tdVersion.className = "mono";
+    tdVersion.textContent = "v" + (data.version || "4.5.4");
+
+    const tdActions = document.createElement("td");
+    tdActions.className = "row-actions";
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "btn-small";
+    copyBtn.type = "button";
+    copyBtn.textContent = "Copy link";
+    copyBtn.addEventListener("click", () => {
+      const url = `${location.origin}${location.pathname.replace(/admin\.html$/, "")}installer.html?school=${encodeURIComponent(data.slug || "")}`;
+      navigator.clipboard.writeText(url).then(() => {
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => (copyBtn.textContent = "Copy link"), 1400);
+      });
+    });
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn-small";
+    editBtn.type = "button";
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", () => startEdit(id, data));
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-danger";
+    delBtn.type = "button";
+    delBtn.textContent = "Delete";
+    delBtn.addEventListener("click", async () => {
+      if (!confirm(`Remove ${data.name} from the directory?`)) return;
+      try{ await deleteDoc(doc(db, "schools", id)); }
+      catch(err){ console.error(err); alert("Couldn't delete — check the console."); }
+    });
+
+    tdActions.append(copyBtn, editBtn, delBtn);
+    tr.append(tdLogo, tdName, tdVersion, tdActions);
+    return tr;
+  }
+
+  let unsubscribe = null;
+  function startListening(){
+    const q = query(collection(db, "schools"), orderBy("name"));
+    unsubscribe = onSnapshot(q, (snap) => {
+      tableBody.innerHTML = "";
+      schoolCount.textContent = snap.size + (snap.size === 1 ? " school" : " schools");
+      if (snap.empty){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="4" style="text-align:center; color:var(--ink-soft); padding:26px;">No schools yet — add the first one above.</td>`;
+        tableBody.appendChild(tr);
+        return;
+      }
+      snap.forEach(d => tableBody.appendChild(rowFor(d.id, d.data())));
+    }, (err) => {
+      console.error(err);
+      tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#a5321f; padding:26px;">Couldn't load schools — check Firestore rules / config.</td></tr>`;
+    });
+  }
+
+  // ── Auth ──
+  loginBtn.addEventListener("click", async () => {
+    loginMsg.classList.remove("show");
+    try{
+      await signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPassword.value);
+    }catch(err){
+      loginMsg.textContent = "Sign-in failed — check the email and password.";
+      loginMsg.classList.add("show");
+    }
+  });
+  loginPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") loginBtn.click(); });
+
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    await signOut(auth);
+  });
+
+  onAuthStateChanged(auth, (user) => {
+    if (user){
+      authWrap.style.display = "none";
+      adminContent.style.display = "";
+      loggedInNav.style.display = "";
+      resetForm();
+      startListening();
+    } else {
+      authWrap.style.display = "";
+      adminContent.style.display = "none";
+      loggedInNav.style.display = "none";
+      if (unsubscribe) unsubscribe();
+    }
+  });
+</script>
+
+</body>
+</html>
