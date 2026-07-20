@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="athstudios_logo.png">
 <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -19,7 +20,7 @@
       <span class="brand-name">ATH Studios</span>
     </div>
     <nav class="topnav">
-      <a href="index.html">All schools</a>
+      <a href="installer-directory.html">All schools</a>
       <a href="#download">Download</a>
       <a href="#requirements">Requirements</a>
       <a href="#after-download">Warnings</a>
@@ -34,7 +35,7 @@
   <div class="state-msg">
     <strong>We couldn't find that school</strong>
     This link is missing or points to a school that isn't in the directory yet.
-    <div style="margin-top:16px;"><a class="btn-primary" href="index.html" style="text-decoration:none; display:inline-block;">Go to the school directory</a></div>
+    <div style="margin-top:16px;"><a class="btn-primary" href="installer-directory.htm" style="text-decoration:none; display:inline-block;">Go to the school directory</a></div>
   </div>
 </div>
 
@@ -405,23 +406,26 @@
      ═══════════════════════════════════════════════════════════ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-  import { getFirestore, collection, query, where, limit, getDocs }
-    from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  import { getDatabase, ref, query, orderByChild, equalTo, get, update, increment, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
   // ── Paste your Firebase project config here (Firebase Console → Project settings → General → Your apps) ──
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBf9r4B3JRpHneJt1OaxkD9E5arzLA2OfM",
+    authDomain: "dr-alfredo-pio-de-roda.firebaseapp.com",
+    databaseURL: "https://dr-alfredo-pio-de-roda-default-rtdb.firebaseio.com",
+    projectId: "dr-alfredo-pio-de-roda",
+    storageBucket: "dr-alfredo-pio-de-roda.firebasestorage.app",
+    messagingSenderId: "228553752118",
+    appId: "1:228553752118:web:9c7d81a3a7758e813ce297",
+    measurementId: "G-CYTESJ5E7H"
   };
 
   const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
+  const db  = getDatabase(app);
 
   const slug = new URLSearchParams(location.search).get("school");
+  let schoolKey = null;
 
   function showNotFound(){
     document.getElementById("notFoundState").style.display = "";
@@ -452,15 +456,26 @@
   (async () => {
     if (!slug){ showNotFound(); return; }
     try{
-      const q = query(collection(db, "schools"), where("slug", "==", slug), limit(1));
-      const snap = await getDocs(q);
-      if (snap.empty){ showNotFound(); return; }
-      applySchool(snap.docs[0].data());
+      const q = query(ref(db, "schools"), orderByChild("slug"), equalTo(slug));
+      const snap = await get(q);
+      if (!snap.exists()){ showNotFound(); return; }
+      const [id, firstMatch] = Object.entries(snap.val())[0];
+      schoolKey = id;
+      applySchool(firstMatch);
     }catch(err){
       console.error("Failed to load school data:", err);
       showNotFound();
     }
   })();
+
+  // Called from the download-modal script (below) when a real download is triggered.
+  window.trackDownload = function(){
+    if (!schoolKey) return;
+    update(ref(db, "schools/" + schoolKey), {
+      downloadCount: increment(1),
+      lastDownloadedAt: serverTimestamp()
+    }).catch(err => console.error("Failed to log download:", err));
+  };
 </script>
 
 <!-- ── Download help modal behavior ─────────────────────── -->
@@ -493,6 +508,7 @@
   goBtn.addEventListener('click', function(){
     status.classList.add('show');
     goBtn.textContent = 'Downloading…';
+    if (window.trackDownload) window.trackDownload();
     setTimeout(function(){
       goBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg> Download again';
     }, 600);
