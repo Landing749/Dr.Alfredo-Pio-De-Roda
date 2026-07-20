@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="pageTitle">ATSYS — Download &amp; Setup Guide | ATH Studios</title>
+<title>ATSYS — School Directory | ATH Studios</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -20,318 +20,35 @@
       <span class="brand-name">ATH Studios</span>
     </div>
     <nav class="topnav">
-      <a href="installer-directory.html">All schools</a>
-      <a href="#download">Download</a>
-      <a href="#requirements">Requirements</a>
-      <a href="#after-download">Warnings</a>
-      <a href="#install">Install</a>
-      <a href="#faq">FAQ</a>
+      <a href="https://athstudios.dpdns.org">athstudios.dpdns.org</a>
     </nav>
   </div>
 </div>
 
-<!-- ── Not-found / no-school-selected state ─────────────────── -->
-<div class="hero" id="notFoundState" style="display:none;">
-  <div class="state-msg">
-    <strong>We couldn't find that school</strong>
-    This link is missing or points to a school that isn't in the directory yet.
-    <div style="margin-top:16px;"><a class="btn-primary" href="installer-directory.htm" style="text-decoration:none; display:inline-block;">Go to the school directory</a></div>
-  </div>
-</div>
-
-<!-- ── Main content (hidden until school data loads) ────────── -->
-<div id="mainContent" style="display:none;">
-
 <header class="hero">
-  <div class="hero-top">
-    <img id="schoolLogo" src="" alt="School logo">
-    <div class="school-tag">
-      <strong class="school-name">Loading school…</strong>
-      Official QR attendance software for classroom use
-    </div>
-  </div>
-
-  <div class="hero-grid">
-    <div>
-      <span class="eyebrow">Installer &amp; setup guide</span>
-      <h1>ATSYS <em class="dl-version">4.5.4</em></h1>
-      <div class="hero-sub">QR Attendance System</div>
-      <p class="hero-desc">Point a camera at a student's QR card and ATSYS marks them present in the DepEd SF2 — automatically, offline‑safe, and built to survive slow school hardware.</p>
-
-      <div class="badge-row">
-        <span class="badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
-          Windows 10 / 11 · 64-bit
-        </span>
-        <span class="badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>
-          License key required on first run
-        </span>
-        <span class="badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Publisher: ATH Studios
-        </span>
-      </div>
-
-      <div class="cta-row">
-        <a class="btn-download" id="downloadTrigger" href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
-          Download <span class="dl-filename">installer.exe</span>
-        </a>
-      </div>
-      <div class="cta-meta">Single installer for fresh installs, updates, repairs and uninstalls · v<span class="dl-version">4.5.4</span></div>
-      <div class="cta-meta" style="margin-top:4px;">Click the button for a step-by-step walkthrough of what happens next.</div>
-    </div>
-
-    <div class="stamp-wrap">
-      <div class="viewfinder">
-        <div class="vf-corner vf-tl"></div>
-        <div class="vf-corner vf-tr"></div>
-        <div class="vf-corner vf-bl"></div>
-        <div class="vf-corner vf-br"></div>
-        <div class="vf-inner">
-          <div class="v">SETUP · WINDOWS x64</div>
-          <div class="num dl-version">4.5.4</div>
-          <div class="name">ATSYS Installer</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <span class="eyebrow">Software directory</span>
+  <h1>Find your school's <em>ATSYS</em> installer</h1>
+  <p class="hero-desc" style="max-width:56ch;">Every school running ATSYS has its own download page with the correct logo, license setup, and support info. Pick your school below.</p>
 </header>
 
-<hr class="rule">
-
-<!-- ── What you're downloading ─────────────────────────── -->
-<section id="download">
-  <div class="section-head">
-    <span class="eyebrow">In the installer</span>
-    <h2>What you're downloading</h2>
-    <p>One setup file installs everything below. File names are exact — useful if you're checking a download against what your antivirus or IT admin sees.</p>
+<section id="directory" style="padding-top:8px;">
+  <div id="loadingState" class="school-grid">
+    <div class="skeleton" style="height:168px;"></div>
+    <div class="skeleton" style="height:168px;"></div>
+    <div class="skeleton" style="height:168px;"></div>
   </div>
 
-  <div class="filelist">
-    <div class="filerow">
-      <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg></div>
-      <div>
-        <div class="fname dl-filename">ATStudios_QRAttendance_Setup_v4.5.4.exe</div>
-        <div class="fdesc">The installer itself. This is the file you run.</div>
-      </div>
-      <div class="ftag">Run this</div>
-    </div>
-    <div class="filerow">
-      <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></svg></div>
-      <div>
-        <div class="fname">ATSYS-PV-4.5.4.exe</div>
-        <div class="fdesc">The main application. Installed to your Program Files and launched from the Start Menu or desktop icon.</div>
-      </div>
-      <div class="ftag">Main app</div>
-    </div>
-    <div class="filerow">
-      <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3M4 6v5h5M20 18v-5h-5"/></svg></div>
-      <div>
-        <div class="fname">atsys_sync.exe</div>
-        <div class="fdesc">Background helper that syncs attendance records to cloud storage.</div>
-      </div>
-      <div class="ftag">Sync helper</div>
-    </div>
-    <div class="filerow">
-      <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M9 13h6M9 17h6"/></svg></div>
-      <div>
-        <div class="fname">EULA.txt</div>
-        <div class="fdesc">The End User License Agreement, shown and must be accepted during setup.</div>
-      </div>
-      <div class="ftag">License</div>
-    </div>
-    <div class="filerow">
-      <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
-      <div>
-        <div class="fname">post_install.html</div>
-        <div class="fdesc">Welcome &amp; Policy Guide, opened automatically right after setup finishes.</div>
-      </div>
-      <div class="ftag">Opens after install</div>
-    </div>
-  </div>
-</section>
-
-<hr class="rule">
-
-<!-- ── Requirements ─────────────────────────────────────── -->
-<section id="requirements">
-  <div class="section-head">
-    <span class="eyebrow">Before you install</span>
-    <h2>System requirements</h2>
-    <p>ATSYS is designed for low-resource classroom hardware — most school-issued laptops and desktops from the last several years will run it comfortably.</p>
+  <div id="emptyState" class="state-msg" style="display:none;">
+    <strong>No schools added yet</strong>
+    Once a school is added in the admin panel, it will show up here automatically.
   </div>
 
-  <table class="req-table">
-    <thead>
-      <tr><th>Item</th><th>Minimum</th><th>Recommended</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Operating system</td><td>Windows 10 (64-bit)</td><td class="rec">Windows 10 / 11 (64-bit)</td></tr>
-      <tr><td>RAM</td><td>2 GB free</td><td class="rec">4 GB free</td></tr>
-      <tr><td>Disk space</td><td>500 MB free</td><td class="rec">1 GB free</td></tr>
-      <tr><td>Webcam</td><td>Any USB or built-in</td><td class="rec">720p or higher</td></tr>
-      <tr><td>Internet</td><td>Optional (licensing &amp; sync only)</td><td class="rec">Stable Wi-Fi</td></tr>
-      <tr><td>Display</td><td>1366 × 768</td><td class="rec">1920 × 1080</td></tr>
-    </tbody>
-  </table>
-
-  <div class="platform-note">
-    <strong>Windows only.</strong> A few features — screen-lock prevention, camera privacy checks, thermal/power diagnostics, and toast notifications — rely on Windows APIs and don't work on macOS, Linux, or Chromebooks.
-  </div>
-</section>
-
-<hr class="rule">
-
-<!-- ── After you click download ─────────────────────────── -->
-<section id="after-download">
-  <div class="section-head">
-    <span class="eyebrow">Right after you click the button</span>
-    <h2>Two warnings you'll probably see</h2>
-    <p>Neither of these means anything is wrong — they show up because the file is a fresh <span class="mono">.exe</span> that Windows hasn't seen before. Here's exactly what to click.</p>
+  <div id="errorState" class="state-msg" style="display:none;">
+    <strong>Couldn't load the directory</strong>
+    Check your internet connection, or the Firebase configuration in this page's source.
   </div>
 
-  <div class="maint-grid" style="grid-template-columns:1fr 1fr;">
-    <div class="maint-card update">
-      <span class="mtag">Step 1 · in your browser</span>
-      <h4>Browser download warning</h4>
-      <p>Edge or Chrome may flag the download with a message like <em>"This file isn't commonly downloaded"</em> or show it greyed out at the bottom of the window.</p>
-      <p>Click the <strong>⋯</strong> or arrow next to the file, then choose <strong>Keep</strong> (Chrome) or <strong>Keep anyway</strong> (Edge).</p>
-    </div>
-    <div class="maint-card repair">
-      <span class="mtag">Step 2 · when you run it</span>
-      <h4>Windows SmartScreen</h4>
-      <p>A blue box titled <em>"Windows protected your PC"</em> appears when you open the installer. This is normal for new, less-common apps.</p>
-      <p>Click <strong>More info</strong> — a new line appears — then click the <strong>Run anyway</strong> button that shows up underneath it.</p>
-    </div>
-  </div>
-
-  <div class="callout">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
-    <div>If you don't see "More info" right away, make sure you're clicking directly on the SmartScreen popup — it can briefly appear behind the browser window after a download finishes.</div>
-  </div>
-</section>
-
-<hr class="rule">
-
-<!-- ── Install ───────────────────────────────────────────── -->
-<section id="install">
-  <div class="section-head">
-    <span class="eyebrow">Setup walkthrough</span>
-    <h2>Installing ATSYS</h2>
-    <p>The same installer handles a first-time install and a machine that already has ATSYS on it — it detects which situation you're in automatically.</p>
-  </div>
-
-  <h3 style="font-size:17px; margin-bottom:18px;">First time on this computer</h3>
-  <ol class="steps">
-    <li>
-      <h4>Download the installer</h4>
-      <p>Save the <span class="dl-filename mono">installer.exe</span> file anywhere on your computer, e.g. your Downloads folder.</p>
-    </li>
-    <li>
-      <h4>Run it</h4>
-      <p>Double-click the file. No administrator rights are required. If Windows SmartScreen appears, click <span class="mono">More info → Run anyway</span> — see <a href="#after-download" style="color:var(--forest); font-weight:600;">above</a> for details.</p>
-    </li>
-    <li>
-      <h4>Accept the license agreement</h4>
-      <p>Read the EULA and select <span class="mono">I accept the agreement</span> to continue.</p>
-    </li>
-    <li>
-      <h4>Choose a desktop icon (optional)</h4>
-      <p>Tick the box if you'd like a shortcut on your desktop, then click through to install.</p>
-    </li>
-    <li>
-      <h4>Finish and open the Welcome guide</h4>
-      <p>When setup completes, it can immediately open the <span class="mono">post_install.html</span> guide and launch ATSYS for you.</p>
-    </li>
-    <li>
-      <h4>Enter your license key</h4>
-      <p>On first launch, ATSYS asks for a license key — enter it exactly as your school was given it. It's validated once and remembered after that.</p>
-    </li>
-  </ol>
-
-  <h3 style="font-size:17px; margin:44px 0 18px;">ATSYS is already installed</h3>
-  <p style="margin:-10px 0 18px; font-size:14.5px; color:var(--ink-soft);">Run the same installer file again (with SmartScreen → <strong>More info → Run anyway</strong>, same as above). It recognizes the existing install and opens a small panel titled <em>"ATSYS is already installed"</em> with three buttons instead of the full setup wizard — <strong>click the top one, "Update"</strong>, unless you have a specific reason to repair or remove:</p>
-
-  <div class="maint-grid">
-    <div class="maint-card update">
-      <span class="mtag">Recommended</span>
-      <h4>Update</h4>
-      <p>Replaces the program files with the new version only. Skips the EULA, folder, and options pages entirely. Your settings, data files and license are untouched.</p>
-    </div>
-    <div class="maint-card repair">
-      <span class="mtag">If something's broken</span>
-      <h4>Repair / Reinstall</h4>
-      <p>Reinstalls all program files and restores shortcuts. Use this if a shortcut is missing or the app won't open properly.</p>
-    </div>
-    <div class="maint-card remove">
-      <span class="mtag">Remove</span>
-      <h4>Uninstall</h4>
-      <p>Removes ATSYS completely after a confirmation prompt. Your SF2 files and saved data are kept — only the program itself is removed.</p>
-    </div>
-  </div>
-
-  <div class="callout">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
-    <div>Close ATSYS before running the installer. If it's still open, setup will ask to close it automatically so it can safely replace files that Windows locks while the app is running.</div>
-  </div>
-</section>
-
-<hr class="rule">
-
-<!-- ── FAQ ──────────────────────────────────────────────── -->
-<section id="faq" class="faq">
-  <div class="section-head">
-    <span class="eyebrow">Common questions</span>
-    <h2>FAQ &amp; troubleshooting</h2>
-    <p>The most common issues teachers run into, straight from the ATSYS support documentation.</p>
-  </div>
-
-  <details>
-    <summary>Do I need to uninstall the old version first?<span class="plus">+</span></summary>
-    <div class="faq-body">No. Just run the new installer over the old install — it detects ATSYS is already present and offers <strong>Update</strong>, <strong>Repair</strong>, or <strong>Uninstall</strong> instead of the full setup wizard. Update is the option most people want.</div>
-  </details>
-
-  <details>
-    <summary>Where do I get a license key?<span class="plus">+</span></summary>
-    <div class="faq-body">Your school is issued a license key by ATH Studios. Enter it exactly as provided on first launch — it's case-sensitive. If you see "License already in use on another device," the key is locked to a different computer; contact ATH Studios to move it.</div>
-  </details>
-
-  <details>
-    <summary>ATSYS says "No SF2 file found in Active folder"<span class="plus">+</span></summary>
-    <div class="faq-body">ATSYS looks for one <code>.xlsx</code> file in <code>~/SF2_Files/Active/</code>. Copy your SF2 Excel file into that folder, or use <strong>Import File</strong> from the Dashboard. Only keep one file in that folder at a time.</div>
-  </details>
-
-  <details>
-    <summary>"Camera not found" or the QR code never scans<span class="plus">+</span></summary>
-    <div class="faq-body">First check Windows camera privacy: <strong>Settings → Privacy → Camera</strong>, and make sure both "Allow apps to access your camera" and the desktop-apps toggle are on — this is the most common cause on school-managed machines. Also close Teams, Zoom, or any other app that might be holding the camera. If the camera opens but nothing scans, check lighting and hold the QR card 15–40 cm from the lens.</div>
-  </details>
-
-  <details>
-    <summary>Antivirus is blocking or quarantining files<span class="plus">+</span></summary>
-    <div class="faq-body">Some antivirus tools flag Python's native camera/QR components as suspicious. Add the ATSYS install folder and <code>~/SF2_Files/</code> to your antivirus exclusions (on Windows Defender: <strong>Virus &amp; Threat Protection → Manage Settings → Exclusions</strong>).</div>
-  </details>
-
-  <details>
-    <summary>The EULA screen keeps reappearing every time I open the app<span class="plus">+</span></summary>
-    <div class="faq-body">The acceptance marker file couldn't be saved, usually because <code>~/.attendance_system/</code> sits on a network drive or a OneDrive-synced folder that isn't always available. Make sure that folder is on your computer's local disk.</div>
-  </details>
-
-  <details>
-    <summary>Is my attendance data backed up?<span class="plus">+</span></summary>
-    <div class="faq-body">Yes. Every scan is written to a Scan Journal CSV before ATSYS even attempts to save the Excel file, so a scan is never lost even if the SF2 save fails. Timestamped backups are also kept in <code>~/SF2_Files/Backups/</code>.</div>
-  </details>
-
-  <details>
-    <summary>Can I install this on a Mac or Chromebook?<span class="plus">+</span></summary>
-    <div class="faq-body">No — ATSYS is Windows-only. Several features depend directly on Windows system APIs and have no equivalent on macOS, Linux, or ChromeOS.</div>
-  </details>
-
-  <details>
-    <summary>The installer won't run, or Windows blocks it<span class="plus">+</span></summary>
-    <div class="faq-body">Confirm you're on Windows 10 or later, 64-bit — the installer refuses to run on anything older. On IT-managed machines, AppLocker or a Software Restriction Policy may need an exception added by your IT admin for the ATSYS executable path.</div>
-  </details>
+  <div id="schoolGrid" class="school-grid" style="display:none;"></div>
 </section>
 
 <footer>
@@ -340,76 +57,22 @@
       <img src="athstudios_logo.png" alt="ATH Studios logo">
       <div>
         <strong>ATH Studios</strong>
-        ATSYS v<span class="dl-version">4.5.4</span> · built for <span class="school-name">your school</span>
+        QR Attendance System — installers for every partner school
       </div>
     </div>
     <div class="footer-links">
-      <a href="index.html">All schools</a>
+      <a href="admin.html">Admin</a>
       <a href="https://athstudios.dpdns.org">athstudios.dpdns.org</a>
-      <a href="#faq">Troubleshooting</a>
     </div>
   </div>
 </footer>
 
-</div><!-- /mainContent -->
-
-<!-- ── Download help modal ─────────────────────────────── -->
-<div class="modal-overlay" id="downloadModal" aria-hidden="true">
-  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="modal-close" id="modalClose" aria-label="Close">×</button>
-    <div class="modal-head">
-      <span class="eyebrow">Before the file lands</span>
-      <h3 id="modalTitle">What to click, in order</h3>
-      <p>Windows hasn't seen this installer many times yet, so it shows two normal safety prompts. Here's exactly what happens after you press Start Download.</p>
-    </div>
-
-    <ol class="modal-steps">
-      <li>
-        <div class="ms-num">1</div>
-        <div>
-          <h4>Your browser may pause the download</h4>
-          <p>Chrome or Edge might flag it as unusual. Click the <strong>⋯</strong> next to the file and choose <kbd>Keep</kbd> (Chrome) or <kbd>Keep anyway</kbd> (Edge).</p>
-        </div>
-      </li>
-      <li>
-        <div class="ms-num">2</div>
-        <div>
-          <h4>Windows SmartScreen appears</h4>
-          <p>When you open the file, a blue box says <em>"Windows protected your PC."</em> Click <kbd>More info</kbd>, then click <kbd>Run anyway</kbd> underneath it.</p>
-        </div>
-      </li>
-      <li>
-        <div class="ms-num">3</div>
-        <div>
-          <h4>Already have ATSYS installed?</h4>
-          <p>A small panel appears instead of the full wizard. Click the top button, <kbd>Update</kbd>, and you're done.</p>
-        </div>
-      </li>
-    </ol>
-
-    <div class="modal-actions">
-      <a class="btn-download" id="modalDownloadBtn" href="#">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
-        Start Download
-      </a>
-      <button class="btn-secondary" id="modalCancel" type="button">Maybe later</button>
-      <div class="modal-status" id="modalStatus">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-        <span>Download started — check your browser's downloads bar, then follow steps 1–3 above.</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════
-     Firebase — loads this school's name / logo / installer link
-     ═══════════════════════════════════════════════════════════ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-  import { getDatabase, ref, query, orderByChild, equalTo, get, update, increment, serverTimestamp }
+  import { getDatabase, ref, get }
     from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
-  // ── Paste your Firebase project config here (Firebase Console → Project settings → General → Your apps) ──
+  // ── Paste your Firebase project config here (same one used in installer.html and admin.html) ──
   const firebaseConfig = {
     apiKey: "AIzaSyBf9r4B3JRpHneJt1OaxkD9E5arzLA2OfM",
     authDomain: "dr-alfredo-pio-de-roda.firebaseapp.com",
@@ -424,96 +87,99 @@
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
-  const slug = new URLSearchParams(location.search).get("school");
-  let schoolKey = null;
+  const loadingState = document.getElementById("loadingState");
+  const emptyState   = document.getElementById("emptyState");
+  const errorState   = document.getElementById("errorState");
+  const grid         = document.getElementById("schoolGrid");
 
-  function showNotFound(){
-    document.getElementById("notFoundState").style.display = "";
-    document.getElementById("mainContent").style.display = "none";
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+  function badgeRowFor(data){
+    const wrap = document.createElement("div");
+    wrap.className = "badge-row";
+    const now = Date.now();
+
+    const isNew = data.createdAt && (now - data.createdAt) < THREE_DAYS_MS;
+    const isUpdated = !isNew && data.updatedAt && (now - data.updatedAt) < THREE_DAYS_MS;
+
+    if (isNew){
+      const b = document.createElement("span");
+      b.className = "badge badge-new";
+      b.textContent = "New";
+      wrap.appendChild(b);
+    } else if (isUpdated){
+      const b = document.createElement("span");
+      b.className = "badge badge-updated";
+      b.textContent = "Updated";
+      wrap.appendChild(b);
+    }
+
+    const stage = data.stage || "production";
+    if (stage !== "production"){
+      const stageLabels = { alpha: "Alpha", beta: "Beta" };
+      const sb = document.createElement("span");
+      sb.className = "badge badge-" + stage;
+      sb.textContent = stageLabels[stage] || stage;
+      wrap.appendChild(sb);
+    }
+
+    return wrap;
   }
 
-  function applySchool(data){
-    document.getElementById("pageTitle").textContent = `ATSYS — ${data.name} | ATH Studios`;
-    document.querySelectorAll(".school-name").forEach(el => el.textContent = data.name);
+  function cardFor(school){
+    const a = document.createElement("a");
+    a.className = "school-card";
+    a.href = `installer.html?school=${encodeURIComponent(school.slug)}`;
+    a.appendChild(badgeRowFor(school));
 
-    const logo = document.getElementById("schoolLogo");
-    logo.src = data.logo || "";
-    logo.alt = data.name + " logo";
+    const img = document.createElement("img");
+    img.src = school.logo || "athstudios_logo.png";
+    img.alt = school.name + " logo";
+    img.onerror = () => { img.src = "athstudios_logo.png"; };
 
-    const version = data.version || "4.5.4";
-    document.querySelectorAll(".dl-version").forEach(el => el.textContent = version);
+    const name = document.createElement("div");
+    name.className = "sc-name";
+    name.textContent = school.name;
 
-    const url = data.installerUrl || "#";
-    const filename = url !== "#" ? url.split("/").pop() : "installer.exe";
-    document.querySelectorAll(".dl-filename").forEach(el => el.textContent = filename);
+    const meta = document.createElement("div");
+    meta.className = "sc-meta";
+    meta.textContent = "ATSYS v" + (school.version || "4.5.4");
 
-    document.getElementById("downloadTrigger").href = url;
-    document.getElementById("modalDownloadBtn").href = url;
+    const cta = document.createElement("div");
+    cta.className = "sc-cta";
+    cta.innerHTML = 'Get the installer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
-    document.getElementById("mainContent").style.display = "";
+    a.append(img, name, meta, cta);
+    return a;
   }
 
   (async () => {
-    if (!slug){ showNotFound(); return; }
     try{
-      const q = query(ref(db, "schools"), orderByChild("slug"), equalTo(slug));
-      const snap = await get(q);
-      if (!snap.exists()){ showNotFound(); return; }
-      const [id, firstMatch] = Object.entries(snap.val())[0];
-      schoolKey = id;
-      applySchool(firstMatch);
+      const snap = await get(ref(db, "schools"));
+      loadingState.style.display = "none";
+
+      if (!snap.exists()){
+        emptyState.style.display = "";
+        return;
+      }
+
+      const schools = Object.values(snap.val())
+        .filter(school => !!school.slug)
+        .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+      if (!schools.length){
+        emptyState.style.display = "";
+        return;
+      }
+
+      schools.forEach(school => grid.appendChild(cardFor(school)));
+      grid.style.display = "";
     }catch(err){
-      console.error("Failed to load school data:", err);
-      showNotFound();
+      console.error("Failed to load school directory:", err);
+      loadingState.style.display = "none";
+      errorState.style.display = "";
     }
   })();
-
-  // Called from the download-modal script (below) when a real download is triggered.
-  window.trackDownload = function(){
-    if (!schoolKey) return;
-    update(ref(db, "schools/" + schoolKey), {
-      downloadCount: increment(1),
-      lastDownloadedAt: serverTimestamp()
-    }).catch(err => console.error("Failed to log download:", err));
-  };
-</script>
-
-<!-- ── Download help modal behavior ─────────────────────── -->
-<script>
-(function(){
-  var modal   = document.getElementById('downloadModal');
-  var opener  = document.getElementById('downloadTrigger');
-  var closeBtn  = document.getElementById('modalClose');
-  var cancelBtn = document.getElementById('modalCancel');
-  var goBtn     = document.getElementById('modalDownloadBtn');
-  var status    = document.getElementById('modalStatus');
-
-  function openModal(e){
-    if(e) e.preventDefault();
-    status.classList.remove('show');
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden','false');
-  }
-  function closeModal(){
-    modal.classList.remove('open');
-    modal.setAttribute('aria-hidden','true');
-  }
-
-  if(opener) opener.addEventListener('click', openModal);
-  closeBtn.addEventListener('click', closeModal);
-  cancelBtn.addEventListener('click', closeModal);
-  modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
-
-  goBtn.addEventListener('click', function(){
-    status.classList.add('show');
-    goBtn.textContent = 'Downloading…';
-    if (window.trackDownload) window.trackDownload();
-    setTimeout(function(){
-      goBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg> Download again';
-    }, 600);
-  });
-})();
 </script>
 
 </body>
