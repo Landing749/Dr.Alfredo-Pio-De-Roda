@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3B2FC0">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<title>ATSYS Parent - your child's attendance</title>
+<meta name="description" content="See your child's attendance and send excuse letters from your phone.">
+<meta property="og:title" content="ATSYS Parent">
+<meta property="og:description" content="See your child's attendance and send excuse letters from your phone.">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --bg:#F5F4FF; --surface:#FFFFFF; --line:#E4E1F8; --text:#15133A; --muted:#5B5883;
+  --brand:#4A3FD0; --brand2:#7B5CFF; --sky:#2FB4FF; --ok:#14935F; --chip:#EFEDFF;
+  --P:#1FA971; --L:#F2A417; --A:#E5484D; --E:#3E7BFA; --H:#B8B5D6;
+  --shadow:0 1px 2px rgba(40,30,120,.06),0 14px 34px -14px rgba(60,40,200,.30);
+  --r:24px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0C0B1F;--surface:#16143A;--line:#2B2863;--text:#F3F2FF;--muted:#AAA7D8;--chip:#1F1C4C;
+        --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 38px -16px rgba(0,0,0,.75);--ok:#35D49A}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--text);background:var(--bg);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.5;overflow-x:hidden}
+.wrap{max-width:460px;margin:0 auto;padding:0 18px;position:relative}
+
+/* ================= STAGE (hero) ================= */
+.stage{position:relative;overflow:hidden;color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 0 70px;
+  background:
+    radial-gradient(120% 70% at 85% -10%,rgba(47,180,255,.55),transparent 60%),
+    radial-gradient(90% 60% at -10% 20%,rgba(255,120,220,.40),transparent 60%),
+    linear-gradient(165deg,#2A1FA6 0%,#4A3FD0 45%,#7B5CFF 100%)}
+@media (prefers-color-scheme:dark){.stage{background:
+    radial-gradient(120% 70% at 85% -10%,rgba(47,180,255,.35),transparent 60%),
+    radial-gradient(90% 60% at -10% 20%,rgba(255,120,220,.25),transparent 60%),
+    linear-gradient(165deg,#150F6B 0%,#3328B5 50%,#5B3FE0 100%)}}
+.stage:before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.22) 1.2px,transparent 1.3px);background-size:22px 22px;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 75%);mask-image:linear-gradient(180deg,#000 0%,transparent 75%)}
+.orb{position:absolute;border-radius:50%;filter:blur(40px);pointer-events:none;opacity:.7}
+.o1{width:220px;height:220px;right:-70px;top:150px;background:#7DE3FF;animation:drift 14s ease-in-out infinite alternate;opacity:.35}
+.o2{width:200px;height:200px;left:-80px;top:420px;background:#FF8AD8;animation:drift 18s ease-in-out infinite alternate-reverse;opacity:.3}
+@keyframes drift{to{transform:translate3d(30px,40px,0) scale(1.15)}}
+
+.top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2;margin:4px 0 22px}
+.brand{display:flex;align-items:center;font-weight:800;font-size:17px;letter-spacing:.2px}
+.brand svg{margin-right:10px;filter:drop-shadow(0 8px 14px rgba(10,5,70,.45))}
+.lang{display:flex;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:3px}
+.lang button{border:0;background:transparent;color:rgba(255,255,255,.85);font:inherit;font-size:13px;font-weight:800;padding:6px 13px;border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:#fff;color:#3B2FC0;box-shadow:0 6px 14px -6px rgba(10,5,70,.6)}
+
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:999px}
+.pill i{width:7px;height:7px;border-radius:50%;background:#7CFFC4;margin-right:8px;box-shadow:0 0 0 0 rgba(124,255,196,.7);animation:ping 2s ease-out infinite}
+@keyframes ping{to{box-shadow:0 0 0 9px rgba(124,255,196,0)}}
+h1{font-size:32px;font-size:clamp(31px,9.2vw,42px);line-height:1.06;letter-spacing:-.03em;margin:16px 0 12px;font-weight:900;position:relative;z-index:2}
+h1 em{font-style:normal;background:linear-gradient(100deg,#FFE9A8,#FFB8EA 55%,#CDBBFF);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.sub{margin:0;font-size:16.5px;color:rgba(255,255,255,.86);position:relative;z-index:2;max-width:38ch}
+
+/* ================= PHONE MOCKUP ================= */
+.mock{position:relative;width:100%;max-width:340px;margin:34px auto 0;height:430px;z-index:2}
+.phone{position:absolute;left:50%;top:0;width:236px;margin-left:-118px;border-radius:40px;padding:9px;
+  background:linear-gradient(145deg,#26225A,#0A0920);box-shadow:0 50px 70px -26px rgba(8,4,60,.85),inset 0 0 0 1px rgba(255,255,255,.14);
+  transform:rotate(-3deg);animation:float 7s ease-in-out infinite}
+.phone:before{content:"";position:absolute;left:50%;top:15px;width:62px;height:16px;margin-left:-31px;border-radius:10px;background:#0A0920;z-index:3}
+@keyframes float{50%{transform:rotate(-3deg) translateY(-9px)}}
+.screen{border-radius:32px;background:#F6F5FF;color:#15133A;padding:34px 13px 14px;overflow:hidden}
+.s-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.s-name{font-weight:850;font-size:15px;line-height:1.15}
+.s-sub{font-size:11px;color:#6A6794}
+.avatar{width:32px;height:32px;border-radius:11px;background:linear-gradient(135deg,#4A3FD0,#7B5CFF);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
+.s-row{display:flex;align-items:center;margin:4px 0 12px}
+.ring{position:relative;width:84px;height:84px;flex:none;margin-right:12px}
+.ring svg{display:block;transform:rotate(-90deg)}
+.ring .bg{stroke:#E4E1F8}
+.ring .fg{stroke:url(#rg);stroke-dasharray:213.6;stroke-dashoffset:213.6;animation:fill 1.8s .5s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes fill{to{stroke-dashoffset:22.4}}
+.ring b{position:absolute;left:0;right:0;top:50%;margin-top:-17px;text-align:center;font-size:21px;font-weight:900;line-height:1}
+.ring small{display:block;font-size:8.5px;font-weight:700;color:#6A6794;letter-spacing:.3px;margin-top:3px;text-transform:uppercase}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:1}
+.chips span{font-size:10.5px;font-weight:800;border-radius:9px;padding:5px 7px;color:#fff;display:flex;justify-content:space-between}
+.chips .p{background:var(--P)}.chips .l{background:var(--L)}.chips .a{background:var(--A)}.chips .e{background:var(--E)}
+.cal{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cal i{font-style:normal;aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;
+  opacity:0;transform:scale(.6);animation:pop .4s cubic-bezier(.3,1.5,.5,1) forwards}
+.cal .P{background:var(--P)}.cal .L{background:var(--L)}.cal .A{background:var(--A)}.cal .E{background:var(--E)}.cal .H{background:var(--H)}
+@keyframes pop{to{opacity:1;transform:none}}
+.cal i:nth-child(1){animation-delay:.9s}.cal i:nth-child(2){animation-delay:.95s}.cal i:nth-child(3){animation-delay:1s}.cal i:nth-child(4){animation-delay:1.05s}.cal i:nth-child(5){animation-delay:1.1s}
+.cal i:nth-child(6){animation-delay:1.15s}.cal i:nth-child(7){animation-delay:1.2s}.cal i:nth-child(8){animation-delay:1.25s}.cal i:nth-child(9){animation-delay:1.3s}.cal i:nth-child(10){animation-delay:1.35s}
+.cal i:nth-child(11){animation-delay:1.4s}.cal i:nth-child(12){animation-delay:1.45s}.cal i:nth-child(13){animation-delay:1.5s}.cal i:nth-child(14){animation-delay:1.55s}.cal i:nth-child(15){animation-delay:1.6s}
+.cal i:nth-child(16){animation-delay:1.65s}.cal i:nth-child(17){animation-delay:1.7s}.cal i:nth-child(18){animation-delay:1.75s}.cal i:nth-child(19){animation-delay:1.8s}.cal i:nth-child(20){animation-delay:1.85s}
+.s-cap{text-align:center;font-size:9.5px;color:#8F8CB5;margin-top:9px;letter-spacing:.3px}
+
+.fl{position:absolute;z-index:4;background:rgba(255,255,255,.96);color:#15133A;border-radius:18px;box-shadow:0 22px 40px -16px rgba(8,4,60,.65);
+  opacity:0;animation:flin .7s cubic-bezier(.2,.9,.3,1.2) forwards}
+.fl1{right:-4px;bottom:34px;width:196px;padding:11px 12px;display:flex;align-items:center;animation-delay:2.1s}
+.fl1 .ic{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#1FA971,#46D69A);display:flex;align-items:center;justify-content:center;flex:none;margin-right:10px}
+.fl1 b{display:block;font-size:12px;line-height:1.25}
+.fl1 span{font-size:10.5px;color:#6A6794}
+.fl2{left:-6px;top:92px;padding:8px 12px;font-size:12px;font-weight:850;display:flex;align-items:center;animation-delay:2.5s}
+.fl2 i{width:9px;height:9px;border-radius:50%;background:var(--P);margin-right:8px;box-shadow:0 0 0 4px rgba(31,169,113,.2)}
+@keyframes flin{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:none}}
+.fl1{animation-name:flin,bob;animation-duration:.7s,5s;animation-delay:2.1s,2.8s;animation-iteration-count:1,infinite;animation-fill-mode:forwards,none;animation-timing-function:cubic-bezier(.2,.9,.3,1.2),ease-in-out}
+@keyframes bob{50%{transform:translateY(-7px)}}
+
+/* ================= SHEET ================= */
+.sheet{position:relative;z-index:3;background:var(--bg);margin-top:-34px;border-radius:32px 32px 0 0;padding:26px 0 44px;
+  box-shadow:0 -18px 40px -20px rgba(30,20,130,.45)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.code-card{position:relative;overflow:hidden}
+.code-card:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,var(--brand),var(--brand2),var(--sky))}
+.label{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin:4px 0 12px}
+.lock{display:inline-flex;align-items:center;color:var(--ok);font-size:12px;text-transform:none;letter-spacing:0}
+.lock svg{margin-right:5px}
+.code{display:flex;justify-content:space-between;align-items:stretch;margin:0 -3px}
+.code span{flex:1 1 0;margin:0 3px;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Roboto Mono",monospace;
+  font-weight:800;font-size:22px;font-size:clamp(20px,6.4vw,27px);letter-spacing:.06em;padding:15px 0 15px .06em;border-radius:15px;
+  background:var(--chip);border:1px solid var(--line);color:var(--text);user-select:all;-webkit-user-select:all}
+.code.bad span{color:var(--muted);font-weight:600}
+.copy{margin-top:14px;width:100%;border:1.5px dashed var(--line);background:transparent;color:var(--text);font:inherit;font-weight:800;font-size:15px;
+  padding:12px;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s}
+.copy svg{margin-right:8px}
+.copy:active{background:var(--chip)}
+.copy.done{border-style:solid;border-color:var(--ok);color:var(--ok)}
+.warn{margin:12px 2px 0;font-size:13px;color:var(--muted)}
+
+.btns{display:grid;gap:12px;margin:18px 0 6px}
+.btn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;text-decoration:none;font-weight:850;font-size:17px;padding:17px 18px;
+  border-radius:19px;min-height:58px;border:0;cursor:pointer;transition:transform .12s ease,box-shadow .2s ease}
+.btn svg{margin-right:10px;flex:none}
+.btn:active{transform:scale(.98)}
+.primary{color:#fff;background:linear-gradient(135deg,#4A3FD0,#7B5CFF 60%,#8F6CFF);box-shadow:0 16px 28px -12px rgba(74,63,208,.85),inset 0 1px 0 rgba(255,255,255,.35)}
+.primary:after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:skewX(-20deg);animation:sweep 3.8s 1.2s ease-in-out infinite}
+@keyframes sweep{0%{left:-60%}55%,100%{left:130%}}
+.secondary{color:var(--text);background:var(--surface);border:1.5px solid var(--line);box-shadow:var(--shadow)}
+.btn.attn{animation:pulse 1.6s ease-out 2}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(123,92,255,.6)}100%{box-shadow:0 0 0 20px rgba(123,92,255,0)}}
+.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.btn[aria-disabled="true"]:after{display:none}
+.note{display:none;margin:6px 2px 0;font-size:14px;padding:12px 14px;border-radius:14px;background:var(--chip);border:1px solid var(--line);color:var(--text)}
+.note.show{display:block}
+
+.trust{display:flex;flex-wrap:wrap;justify-content:center;margin:14px -4px 0}
+.trust span{display:inline-flex;align-items:center;font-size:12.5px;font-weight:700;color:var(--muted);margin:4px;padding:6px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.trust svg{margin-right:6px;color:var(--ok)}
+
+h2{font-size:13px;font-weight:850;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin:34px 2px 14px}
+ol{list-style:none;margin:0;padding:0;counter-reset:s}
+li{counter-increment:s;position:relative;padding:2px 0 20px 58px;min-height:46px}
+li:before{content:counter(s);position:absolute;left:0;top:0;width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:17px;color:#fff;background:linear-gradient(135deg,#4A3FD0,#7B5CFF);box-shadow:0 10px 18px -8px rgba(74,63,208,.85)}
+li:after{content:"";position:absolute;left:20px;top:48px;bottom:4px;width:2px;background:repeating-linear-gradient(180deg,var(--line) 0 6px,transparent 6px 11px)}
+li:last-child:after{display:none}
+li strong{display:block;font-size:16.5px;margin-bottom:3px}
+li span{color:var(--muted);font-size:14.5px}
+
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.feat div{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 14px;font-size:13.5px;color:var(--muted);box-shadow:var(--shadow)}
+.feat b{display:block;color:var(--text);font-size:15px;margin:10px 0 3px}
+.tile{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:#fff}
+.t1{background:linear-gradient(135deg,#4A3FD0,#7B5CFF)}.t2{background:linear-gradient(135deg,#1FA971,#46D69A)}
+.t3{background:linear-gradient(135deg,#F2A417,#FFC95C)}.t4{background:linear-gradient(135deg,#2FB4FF,#5C8BFF)}
+
+.foot{margin-top:34px;text-align:center;color:var(--muted);font-size:12.5px}
+.foot b{color:var(--text)}
+
+.in{opacity:0;transform:translateY(14px);animation:up .65s cubic-bezier(.2,.8,.2,1) forwards}
+.d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}.d5{animation-delay:.45s}
+@keyframes up{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .in,.fl,.cal i{opacity:1;transform:none;animation:none}
+  .ring .fg{animation:none;stroke-dashoffset:22.4}
+  .orb,.phone,.primary:after,.btn.attn,.pill i,.fl1{animation:none}
+  .fl1{opacity:1}
+}
+a:focus-visible,button:focus-visible{outline:3px solid #A99BFF;outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="wrap">
+    <header class="top in">
+      <div class="brand">
+        <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCD5FF"/></linearGradient></defs>
+          <rect width="48" height="48" rx="14" fill="url(#lg)"/>
+          <path d="M24 9.5 36 14v10.5c0 7.2-5 12.6-12 15-7-2.4-12-7.8-12-15V14z" fill="#4A3FD0"/>
+          <path d="m18.2 24.6 4.3 4.4 7.8-9" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>ATSYS Parent</span>
+      </div>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" id="l-en" aria-pressed="true">EN</button>
+        <button type="button" id="l-fil" aria-pressed="false">FIL</button>
+      </div>
+    </header>
+
+    <section class="in d1">
+      <span class="pill"><i></i><span data-i="pill">Parent app</span></span>
+      <h1 data-i="h1" data-html="1">Your child's attendance, <em>in your pocket</em></h1>
+      <p class="sub" data-i="sub">See every school day and send an excuse letter without paper. No account, no password.</p>
+    </section>
+
+    <div class="mock in d2" aria-hidden="true">
+      <div class="phone">
+        <div class="screen">
+          <div class="s-top">
+            <div><div class="s-name">Maria Santos</div><div class="s-sub">Grade 5 - Sampaguita</div></div>
+            <div class="avatar">M</div>
+          </div>
+          <div class="s-row">
+            <div class="ring">
+              <svg width="84" height="84" viewBox="0 0 84 84">
+                <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A3FD0"/><stop offset="1" stop-color="#2FB4FF"/></linearGradient></defs>
+                <circle class="bg" cx="42" cy="42" r="34" fill="none" stroke-width="9"/>
+                <circle class="fg" cx="42" cy="42" r="34" fill="none" stroke-width="9" stroke-linecap="round"/>
+              </svg>
+              <b>89%<small data-i="mAtt">attendance</small></b>
+            </div>
+            <div class="chips">
+              <span class="p"><em style="font-style:normal" data-i="mP">Present</em><em style="font-style:normal">15</em></span>
+              <span class="l"><em style="font-style:normal" data-i="mL">Late</em><em style="font-style:normal">2</em></span>
+              <span class="a"><em style="font-style:normal" data-i="mA">Absent</em><em style="font-style:normal">1</em></span>
+              <span class="e"><em style="font-style:normal" data-i="mE">Excused</em><em style="font-style:normal">1</em></span>
+            </div>
+          </div>
+          <div class="cal">
+            <i class="P">P</i><i class="P">P</i><i class="P">P</i><i class="L">L</i><i class="P">P</i>
+            <i class="P">P</i><i class="P">P</i><i class="A">A</i><i class="E">E</i><i class="P">P</i>
+            <i class="P">P</i><i class="L">L</i><i class="P">P</i><i class="P">P</i><i class="P">P</i>
+            <i class="H">H</i><i class="P">P</i><i class="P">P</i><i class="P">P</i><i class="P">P</i>
+          </div>
+          <div class="s-cap" data-i="mSample">SAMPLE DATA</div>
+        </div>
+      </div>
+      <div class="fl fl2"><i></i><span data-i="mToday">Present today</span></div>
+      <div class="fl fl1">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></div>
+        <div><b data-i="mNotif">Maria's excuse letter was approved.</b><span>ATSYS Parent</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="sheet">
+  <div class="wrap">
+
+    <section class="card code-card in d3" aria-labelledby="codeLabel">
+      <div class="label"><span id="codeLabel" data-i="codeLabel">Your child's code</span>
+        <span class="lock"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span data-i="private">Private</span></span></div>
+      <div class="code" id="code" role="text" aria-live="polite"><span>----</span><span>----</span><span>----</span></div>
+      <button class="copy" id="copy" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="3"/><path d="M5 15V6a3 3 0 0 1 3-3h9"/></svg>
+        <span id="copyTxt" data-i="copy">Copy code</span>
+      </button>
+      <p class="warn" id="warn">Don't share this code. If it leaks, ask the teacher for a new one.</p>
+    </section>
+
+    <div class="btns in d4">
+      <a class="btn primary" id="open" href="#">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>
+        <span data-i="open">Open in ATSYS Parent (Curretnly Unavailable)</span>
+      </a>
+      <a class="btn secondary" id="dl" href="APK_URL_HERE" download>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+        <span data-i="install">Install the app</span>
+      </a>
+    </div>
+    <div class="note" id="n-ios" data-i="nIos">ATSYS Parent is for Android phones for now. Please open this link on an Android phone.</div>
+    <div class="note" id="n-desk" data-i="nDesk">Open this link on your phone to install the app and see your child's attendance.</div>
+    <div class="note" id="n-noapp" data-i="nNoapp">Nothing happened? The app is probably not installed yet. Tap <b>Install the app</b>, then come back here.</div>
+    <div class="note" id="n-noapk" data-i="nNoapk">The download link is not ready yet. Please ask the school.</div>
+
+    <div class="trust in d4">
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg><span data-i="tr1">No account</span></span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg><span data-i="tr2">No password</span></span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg><span data-i="tr3">Works offline</span></span>
+    </div>
+
+    <section class="in d5">
+      <h2 data-i="how">How to get started</h2>
+      <ol>
+        <li><strong data-i="s1t">Download the app</strong><span data-i="s1d">Tap Install the app. A file called ATSYS-Parent.apk downloads to your phone.</span></li>
+        <li><strong data-i="s2t">Allow the install</strong><span data-i="s2d">Android may ask you to allow installs from your browser. Tap Settings, switch Allow on, then go back. This is normal for apps outside Play Store. Only install from the link your child's teacher sent.</span></li>
+        <li><strong data-i="s3t">Open it. You're in.</strong><span data-i="s3d">Come back to this page and tap Open in ATSYS Parent. Your code is filled in for you.</span></li>
+      </ol>
+
+      <h2 data-i="whatH">What you'll see</h2>
+      <div class="feat">
+        <div><div class="tile t1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div><b data-i="f1t">Every school day</b><span data-i="f1d">Present, late, absent and excused, by month.</span></div>
+        <div><div class="tile t2"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4 3 11l7 3 3 7z"/><path d="m10 14 11-10"/></svg></div><b data-i="f2t">Excuse letters</b><span data-i="f2d">Send a reason and a photo. See the answer.</span></div>
+        <div><div class="tile t3"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></div><b data-i="f3t">Alerts</b><span data-i="f3d">Know when your child is marked absent.</span></div>
+        <div><div class="tile t4"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9a15 15 0 0 1 19 0M5.5 12.5a10.5 10.5 0 0 1 13 0M9 16a5.5 5.5 0 0 1 6 0"/><path d="M12 19.5h.01"/><path d="m3 3 18 18"/></svg></div><b data-i="f4t">Works offline</b><span data-i="f4d">Your last update is always saved on the phone.</span></div>
+      </div>
+      <p class="foot"><span data-i="foot">Your child's data is handled under the Data Privacy Act of 2012 (RA 10173).</span><br>Made by <b>ATH Studios</b></p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var T = {
+    en: {
+      pill: "Parent app", h1: "Your child's attendance, <em>in your pocket</em>",
+      sub: "See every school day and send an excuse letter without paper. No account, no password.",
+      mAtt: "attendance", mP: "Present", mL: "Late", mA: "Absent", mE: "Excused", mSample: "SAMPLE DATA",
+      mToday: "Present today", mNotif: "Maria's excuse letter was approved.",
+      codeLabel: "Your child's code", "private": "Private", copy: "Copy code", copied: "Copied!",
+      warn: "Don't share this code. If it leaks, ask the teacher for a new one.",
+      bad: "This link has no valid code. Ask the teacher to send it again, or type the code in the app.",
+      open: "Open in ATSYS Parent", install: "Install the app",
+      nIos: "ATSYS Parent is for Android phones for now. Please open this link on an Android phone.",
+      nDesk: "Open this link on your phone to install the app and see your child's attendance.",
+      nNoapp: "Nothing happened? The app is probably not installed yet. Tap <b>Install the app</b>, then come back here.",
+      nNoapk: "The download link is not ready yet. Please ask the school.",
+      tr1: "No account", tr2: "No password", tr3: "Works offline",
+      how: "How to get started",
+      s1t: "Download the app", s1d: "Tap Install the app. A file called ATSYS-Parent.apk downloads to your phone.",
+      s2t: "Allow the install", s2d: "Android may ask you to allow installs from your browser. Tap Settings, switch Allow on, then go back. This is normal for apps outside Play Store. Only install from the link your child's teacher sent.",
+      s3t: "Open it. You're in.", s3d: "Come back to this page and tap Open in ATSYS Parent. Your code is filled in for you.",
+      whatH: "What you'll see",
+      f1t: "Every school day", f1d: "Present, late, absent and excused, by month.",
+      f2t: "Excuse letters", f2d: "Send a reason and a photo. See the answer.",
+      f3t: "Alerts", f3d: "Know when your child is marked absent.",
+      f4t: "Works offline", f4d: "Your last update is always saved on the phone.",
+      foot: "Your child's data is handled under the Data Privacy Act of 2012 (RA 10173)."
+    },
+    fil: {
+      pill: "Parent app", h1: "Ang attendance ng anak mo, <em>nasa palad mo</em>",
+      sub: "Tingnan ang bawat araw sa paaralan at magpadala ng excuse letter nang walang papel. Walang account, walang password.",
+      mAtt: "attendance", mP: "Present", mL: "Huli", mA: "Absent", mE: "Excused", mSample: "HALIMBAWANG DATA",
+      mToday: "Present ngayon", mNotif: "Naaprubahan ang excuse letter ni Maria.",
+      codeLabel: "Code ng anak mo", "private": "Pribado", copy: "Kopyahin ang code", copied: "Nakopya!",
+      warn: "Huwag ibahagi ang code na ito. Kapag nalaman ng iba, humingi ng bago sa guro.",
+      bad: "Walang wastong code ang link na ito. Humingi sa guro ng bagong text, o i-type ang code sa app.",
+      open: "Buksan sa ATSYS Parent", install: "I-install ang app",
+      nIos: "Para sa Android phone lang muna ang ATSYS Parent. Buksan ang link na ito sa Android phone.",
+      nDesk: "Buksan ang link na ito sa phone mo para ma-install ang app at makita ang attendance ng anak mo.",
+      nNoapp: "Walang nangyari? Malamang hindi pa naka-install ang app. Pindutin ang <b>I-install ang app</b>, tapos bumalik dito.",
+      nNoapk: "Hindi pa handa ang download link. Magtanong sa paaralan.",
+      tr1: "Walang account", tr2: "Walang password", tr3: "Gumagana offline",
+      how: "Paano magsimula",
+      s1t: "I-download ang app", s1d: "Pindutin ang I-install ang app. Made-download sa phone mo ang file na ATSYS-Parent.apk.",
+      s2t: "Payagan ang install", s2d: "Maaaring hingin ng Android na payagan ang install mula sa browser mo. Pindutin ang Settings, i-on ang Allow, tapos bumalik. Normal ito sa mga app na hindi galing sa Play Store. Mag-install lang mula sa link na ipinadala ng guro.",
+      s3t: "Buksan. Tapos na.", s3d: "Bumalik sa page na ito at pindutin ang Buksan sa ATSYS Parent. Nakalagay na ang code mo.",
+      whatH: "Ito ang makikita mo",
+      f1t: "Bawat araw ng klase", f1d: "Present, huli, absent at excused, bawat buwan.",
+      f2t: "Excuse letter", f2d: "Magpadala ng dahilan at litrato. Makita ang sagot.",
+      f3t: "Mga alerto", f3d: "Malaman kapag na-mark na absent ang anak mo.",
+      f4t: "Gumagana kahit offline", f4d: "Laging naka-save sa phone ang huling update.",
+      foot: "Sumusunod ang data ng anak mo sa Data Privacy Act of 2012 (RA 10173)."
+    }
+  };
+
+  /* the code from the SMS link ?code=XXXX-XXXX-XXXX, cleaned like the app does it (O->0, I/L->1) */
+  function normalize(raw) {
+    var s = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/O/g, "0").replace(/[IL]/g, "1");
+    return s.length === 12 ? s : "";
+  }
+  var params = new URLSearchParams(location.search);
+  var norm = normalize(params.get("code"));
+  var pretty = norm ? norm.slice(0, 4) + "-" + norm.slice(4, 8) + "-" + norm.slice(8) : "";
+  var deep = "atsysparent://link?code=" + encodeURIComponent(pretty);
+
+  var ua = navigator.userAgent || "";
+  var isAndroid = /Android/i.test(ua);
+  var isIos = /iPhone|iPad|iPod/i.test(ua);
+  var apkOk = /^https?:\/\//i.test($("dl").getAttribute("href") || "");
+  var lang = "en";
+
+  function paintCode() {
+    var spans = $("code").getElementsByTagName("span");
+    var parts = pretty ? pretty.split("-") : ["----", "----", "----"];
+    for (var i = 0; i < 3; i++) spans[i].textContent = parts[i];
+    $("code").className = pretty ? "code" : "code bad";
+    $("copy").style.display = pretty ? "" : "none";
+    $("warn").textContent = pretty ? T[lang].warn : T[lang].bad;
+  }
+
+  function setLang(l) {
+    lang = l;
+    document.documentElement.lang = l === "fil" ? "fil" : "en";
+    var nodes = document.querySelectorAll("[data-i]");
+    for (var i = 0; i < nodes.length; i++) {
+      var k = nodes[i].getAttribute("data-i");
+      if (T[l][k] == null) continue;
+      if (nodes[i].getAttribute("data-html") || /^n[A-Z]/.test(k)) nodes[i].innerHTML = T[l][k]; else nodes[i].textContent = T[l][k];
+    }
+    $("l-en").setAttribute("aria-pressed", l === "en");
+    $("l-fil").setAttribute("aria-pressed", l === "fil");
+    paintCode();
+    try { localStorage.setItem("atsys_lang", l); } catch (e) {}
+  }
+  $("l-en").onclick = function () { setLang("en"); };
+  $("l-fil").onclick = function () { setLang("fil"); };
+
+  $("open").href = pretty ? deep : "#";
+  if (!pretty) $("open").setAttribute("aria-disabled", "true");
+  if (!apkOk) { $("dl").setAttribute("aria-disabled", "true"); $("dl").removeAttribute("download"); $("n-noapk").className = "note show"; }
+  if (isIos) $("n-ios").className = "note show";
+  else if (!isAndroid) $("n-desk").className = "note show";
+
+  $("copy").onclick = function () {
+    var done = function () {
+      var b = $("copy"); b.className = "copy done"; $("copyTxt").textContent = T[lang].copied;
+      setTimeout(function () { b.className = "copy"; $("copyTxt").textContent = T[lang].copy; }, 1800);
+    };
+    function fallback() {
+      var ta = document.createElement("textarea"); ta.value = pretty; ta.setAttribute("readonly", "");
+      ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(pretty).then(done, fallback);
+    else fallback();
+  };
+
+  var saved = ""; try { saved = localStorage.getItem("atsys_lang") || ""; } catch (e) {}
+  setLang(saved === "fil" ? "fil" : "en");
+
+  /* Android + valid code: open the app straight away. Still on this page a moment later = app probably not installed. */
+  if (pretty && isAndroid) {
+    var left = false;
+    document.addEventListener("visibilitychange", function () { if (document.hidden) left = true; });
+    setTimeout(function () { location.href = deep; }, 350);
+    setTimeout(function () {
+      if (!left && !document.hidden) {
+        $("n-noapp").className = "note show";
+        if (apkOk) $("dl").className = "btn secondary attn";
+      }
+    }, 2200);
+  }
+})();
+</script>
+</body>
+</html>
