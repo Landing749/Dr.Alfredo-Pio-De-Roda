@@ -205,13 +205,21 @@ main{margin-left:var(--sb-w);width:calc(100% - var(--sb-w));display:flex;flex-di
 #viewer-frame{flex:1}
 #xl-view{display:none;flex:1;min-height:0;flex-direction:column;background:#fff;color:#111}
 #xl-view.show{display:flex}
-#xl-tabs{display:flex;gap:4px;padding:6px 8px;background:#e5e7eb;overflow-x:auto;flex-shrink:0;border-bottom:1px solid #cbd5e1}
+#xl-bar{display:flex;align-items:center;gap:10px;padding:6px 8px;background:#e5e7eb;border-bottom:1px solid #cbd5e1;flex-shrink:0}
+#xl-tabs{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:0}
 #xl-tabs button{border:1px solid #cbd5e1;background:#f8fafc;color:#334155;font:600 11px var(--font-ui);padding:5px 12px;border-radius:6px;cursor:pointer;white-space:nowrap}
 #xl-tabs button.on{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+#xl-zoom{display:flex;align-items:center;gap:4px;flex-shrink:0;font:600 11px var(--font-ui);color:#334155}
+#xl-zoom button{border:1px solid #cbd5e1;background:#f8fafc;color:#334155;font:700 12px var(--font-ui);padding:3px 9px;border-radius:6px;cursor:pointer}
+#xl-zv{min-width:38px;text-align:center}
+#xl-wrap{position:relative;margin:8px;background:#fff}
+#xl-wrap img{position:absolute;pointer-events:none}
+#xl-wrap table{border-collapse:collapse;table-layout:fixed;margin:0;font-family:Calibri,Arial,sans-serif}
+#xl-wrap td{overflow:hidden;padding:0 3px;font-size:11pt;line-height:1.2;color:#000}
 #xl-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
-#xl-scroll table{border-collapse:collapse;font:11.5px/1.35 Arial,sans-serif;margin:8px}
-#xl-scroll td,#xl-scroll th{border:1px solid #cbd5e1;padding:2px 6px;white-space:nowrap;text-align:left;vertical-align:middle;min-width:18px;max-width:320px;overflow:hidden;text-overflow:ellipsis}
-#xl-scroll tr:nth-child(even) td{background:#f8fafc}
+#xl-scroll>table{border-collapse:collapse;font:11.5px/1.35 Arial,sans-serif;margin:8px}
+#xl-scroll>table td,#xl-scroll>table th{border:1px solid #cbd5e1;padding:2px 6px;white-space:nowrap;text-align:left;vertical-align:middle;min-width:18px;max-width:320px;overflow:hidden;text-overflow:ellipsis}
+#xl-scroll>table tr:nth-child(even) td{background:#f8fafc}
 #xl-msg{display:none;flex:1;align-items:center;justify-content:center;color:#475569;font:600 13px var(--font-ui);text-align:center;padding:20px}
 #xl-msg.show{display:flex}
 
@@ -466,20 +474,22 @@ main{margin-left:var(--sb-w);width:calc(100% - var(--sb-w));display:flex;flex-di
     <div class="modal-hdr">
       <div class="modal-title"><span>📄</span><span id="viewer-title">Loading…</span></div>
       <div class="modal-actions">
-        <div class="vm-toggle"><button id="vm-orig" class="on" onclick="setViewMode('orig')" title="Exactly as in Excel (logo, colors, fonts)">Original</button><button id="vm-quick" onclick="setViewMode('quick')" title="Plain fast table">Quick</button></div>
+        <div class="vm-toggle"><button id="vm-orig" class="on" onclick="setViewMode('orig')" title="Looks like the Excel file: logo, colors, fonts, borders">Original</button><button id="vm-office" onclick="setViewMode('office')" title="Microsoft's viewer (only works for file links ending in .xlsx)">Excel Online</button><button id="vm-quick" onclick="setViewMode('quick')" title="Plain fast table">Quick</button></div>
         <button id="viewer-dl" class="dl-btn" onclick="dlFile(this.dataset.url,this.dataset.name)">⬇ Download</button>
         <button class="modal-close" onclick="closeViewerBtn()">✕</button>
       </div>
     </div>
     <div class="modal-body">
       <div id="xl-msg" class="show">⏳ Loading spreadsheet…</div>
-      <div id="xl-view"><div id="xl-tabs"></div><div id="xl-scroll"></div></div>
+      <div id="xl-view"><div id="xl-bar"><div id="xl-tabs"></div><div id="xl-zoom"><button onclick="xlZoom(-0.1)">−</button><span id="xl-zv">100%</span><button onclick="xlZoom(0.1)">+</button><button onclick="xlFit()">Fit</button></div></div><div id="xl-scroll"></div></div>
       <iframe id="viewer-frame" src="" allowfullscreen style="display:none"></iframe>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script>
@@ -794,64 +804,277 @@ function renderByMonth(){
 }
 
 /* ── Modal — renders the Excel file right in the page (SheetJS) ── */
-let XL_TOKEN=0,VW={url:'',mode:'orig'};
+let XL_TOKEN=0,VW={url:'',mode:'orig',buf:null,zoom:1},XL_IMGS=[];
 function xlShow(mode,msg){
   document.getElementById('xl-msg').classList.toggle('show',mode==='msg');
   if(msg)document.getElementById('xl-msg').textContent=msg;
   document.getElementById('xl-view').classList.toggle('show',mode==='sheet');
   document.getElementById('viewer-frame').style.display=mode==='frame'?'block':'none';
 }
-function xlRenderSheet(wb,name){
-  document.getElementById('xl-scroll').innerHTML=XLSX.utils.sheet_to_html(wb.Sheets[name],{editable:false});
-  document.querySelectorAll('#xl-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.sheet===name));
-  document.getElementById('xl-scroll').scrollTo(0,0);
+function xlFreeImgs(){XL_IMGS.forEach(u=>URL.revokeObjectURL(u));XL_IMGS=[]}
+
+/* ── zoom ── */
+function xlApplyZoom(){
+  const el=document.getElementById('xl-scroll').firstElementChild;
+  if(el)el.style.zoom=VW.zoom;
+  document.getElementById('xl-zv').textContent=Math.round(VW.zoom*100)+'%';
 }
+function xlZoom(d){VW.zoom=Math.min(3,Math.max(.25,+(VW.zoom+d).toFixed(2)));xlApplyZoom()}
+function xlFit(){
+  const sc=document.getElementById('xl-scroll'),el=sc.firstElementChild;if(!el)return;
+  el.style.zoom=1;
+  const w=el.scrollWidth+16;
+  VW.zoom=w>sc.clientWidth?Math.max(.25,+(sc.clientWidth/w).toFixed(2)):1;
+  xlApplyZoom();
+}
+
+/* ── Excel → styled HTML (keeps fills, fonts, borders, merges, column widths, logo/images) ── */
+const XL_THEME=['FFFFFF','000000','E7E6E6','44546A','4472C4','ED7D31','A5A5A5','FFC000','5B9BD5','70AD47'];
+function xlTint(hex,t){
+  let r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+  const f=c=>Math.round(t<0?c*(1+t):c+(255-c)*t);
+  return [f(r),f(g),f(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function xlColor(c){
+  if(!c)return null;
+  if(c.argb){const a=String(c.argb);return '#'+(a.length===8?a.slice(2):a)}
+  if(c.theme!=null){let h=XL_THEME[c.theme]||'000000';if(c.tint)h=xlTint(h,c.tint);return '#'+h}
+  return null;
+}
+const XL_BORDER={thin:'1px solid',hair:'1px solid',medium:'2px solid',thick:'3px solid',dashed:'1px dashed',mediumDashed:'2px dashed',dotted:'1px dotted',double:'3px double',dashDot:'1px dashed',dashDotDot:'1px dashed',slantDashDot:'1px dashed',mediumDashDot:'2px dashed',mediumDashDotDot:'2px dashed'};
+function xlBorder(b){return b&&b.style?(XL_BORDER[b.style]||'1px solid')+' '+(xlColor(b.color)||'#000'):''}
+function xlEsc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function xlCellText(cell){
+  const v=cell.value;
+  if(v==null)return '';
+  if(v instanceof Date)return v.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'});
+  try{return cell.text==null?'':String(cell.text)}catch(e){return ''}
+}
+function xlStyledHtml(wb,ws,images){
+  xlFreeImgs();
+  const MAXR=600,MAXC=80;
+  const nR=Math.min(ws.rowCount||0,MAXR),nC=Math.min(ws.columnCount||0,MAXC);
+  if(!nR||!nC)return '<div style="padding:30px;color:#64748b;font:600 13px sans-serif">This sheet is empty.</div>';
+  const dflW=(ws.properties&&ws.properties.defaultColWidth)||8.43;
+  const colW=[];for(let c=1;c<=nC;c++){
+    const col=ws.getColumn(c);
+    colW.push(col.hidden?0:Math.round((col.width||dflW)*7+5));
+  }
+  const dflH=(ws.properties&&ws.properties.defaultRowHeight)||15;
+  const rowH=[];for(let r=1;r<=nR;r++){
+    const row=ws.getRow(r);
+    rowH.push(row.hidden?0:Math.round((row.height||dflH)*4/3));
+  }
+  /* merges */
+  const span={},skip={};
+  (ws.model.merges||[]).forEach(m=>{
+    const p=m.split(':');if(p.length!==2)return;
+    const a=ws.getCell(p[0]),b=ws.getCell(p[1]);
+    const r1=+a.row,c1=+a.col,r2=+b.row,c2=+b.col;
+    span[r1+','+c1]=[r2-r1+1,c2-c1+1];
+    for(let r=r1;r<=r2;r++)for(let c=c1;c<=c2;c++)if(r!==r1||c!==c1)skip[r+','+c]=1;
+  });
+  const grid=!(ws.views&&ws.views[0]&&ws.views[0].showGridLines===false);
+  const gridCss=grid?'1px solid #e2e8f0':'none';
+  let h='<table style="width:'+colW.reduce((x,y)=>x+y,0)+'px"><colgroup>'+colW.map(w=>'<col style="width:'+w+'px">').join('')+'</colgroup>';
+  for(let r=1;r<=nR;r++){
+    if(!rowH[r-1])continue;
+    h+='<tr style="height:'+rowH[r-1]+'px">';
+    for(let c=1;c<=nC;c++){
+      const k=r+','+c;if(skip[k]||!colW[c-1])continue;
+      const cell=ws.getCell(r,c),st=cell.style||{},f=st.font||{},al=st.alignment||{},bd=st.border||{};
+      let css='';
+      const fill=st.fill&&st.fill.type==='pattern'&&st.fill.pattern==='solid'?xlColor(st.fill.fgColor):null;
+      if(fill)css+='background:'+fill+';';
+      const fc=xlColor(f.color);if(fc)css+='color:'+fc+';';
+      if(f.name)css+='font-family:\''+String(f.name).replace(/'/g,'')+'\',Calibri,Arial,sans-serif;';
+      if(f.size)css+='font-size:'+f.size+'pt;';
+      if(f.bold)css+='font-weight:700;';
+      if(f.italic)css+='font-style:italic;';
+      if(f.underline)css+='text-decoration:underline;';
+      if(f.strike)css+='text-decoration:line-through;';
+      const ha=al.horizontal;
+      css+='text-align:'+(ha==='center'||ha==='centerContinuous'?'center':ha==='right'?'right':ha==='left'?'left':(typeof cell.value==='number'?'right':'left'))+';';
+      css+='vertical-align:'+(al.vertical==='top'?'top':al.vertical==='middle'||al.vertical==='center'?'middle':'bottom')+';';
+      css+=al.wrapText?'white-space:pre-wrap;word-break:break-word;':'white-space:nowrap;';
+      ['top','left','bottom','right'].forEach(s=>{
+        const bs=xlBorder(bd[s]);css+='border-'+s+':'+(bs||gridCss)+';';
+      });
+      const sp=span[k];
+      h+='<td'+(sp&&sp[0]>1?' rowspan="'+sp[0]+'"':'')+(sp&&sp[1]>1?' colspan="'+sp[1]+'"':'')+' style="'+css+'">'+xlEsc(xlCellText(cell)).replace(/\n/g,'<br>')+'</td>';
+    }
+    h+='</tr>';
+  }
+  h+='</table>';
+  /* images (school logo etc.) positioned from their cell anchors */
+  const xs=[0];colW.forEach(w=>xs.push(xs[xs.length-1]+w));
+  const ys=[0];rowH.forEach(v=>ys.push(ys[ys.length-1]+v));
+  const px=(arr,pos)=>{const i=Math.max(0,Math.floor(pos)),f=pos-i;return (arr[Math.min(i,arr.length-1)]||0)+f*((arr[Math.min(i+1,arr.length-1)]||0)-(arr[Math.min(i,arr.length-1)]||0))};
+  let imgs='';
+  (images||[]).forEach(im=>{
+    try{
+      const url=URL.createObjectURL(new Blob([im.data],{type:'image/'+im.type}));XL_IMGS.push(url);
+      const E=9525;                                   // EMU per pixel
+      const left=(xs[Math.min(im.from.col,xs.length-1)]||0)+im.from.colOff/E;
+      const top=(ys[Math.min(im.from.row,ys.length-1)]||0)+im.from.rowOff/E;
+      let w,hh;
+      if(im.cx&&im.cy){w=im.cx/E;hh=im.cy/E}
+      else if(im.to){w=(xs[Math.min(im.to.col,xs.length-1)]||0)+im.to.colOff/E-left;hh=(ys[Math.min(im.to.row,ys.length-1)]||0)+im.to.rowOff/E-top}
+      else{w=80;hh=80}
+      imgs+='<img src="'+url+'" style="left:'+Math.round(left)+'px;top:'+Math.round(top)+'px;width:'+Math.round(w)+'px;height:'+Math.round(hh)+'px">';
+    }catch(e){console.warn('image skipped',e)}
+  });
+  return '<div id="xl-wrap">'+h+imgs+'</div>';
+}
+
+/* Reads the logo/images straight from the .xlsx package (works for files saved by Excel AND by
+   openpyxl, which ExcelJS can't parse), then strips the drawing parts so ExcelJS loads the rest. */
+async function xlPrepare(buf){
+  const res={buf,images:{}};
+  if(typeof JSZip==='undefined')return res;
+  try{
+    const z=await JSZip.loadAsync(buf);
+    const dp=new DOMParser();
+    const txt=async p=>z.file(p)?await z.file(p).async('string'):null;
+    const xml=s=>dp.parseFromString(s,'application/xml');
+    const resolve=(owner,t)=>{
+      if(t.charAt(0)==='/')return t.slice(1);
+      const parts=owner.split('/');parts.pop();
+      t.split('/').forEach(g=>{if(g==='..')parts.pop();else if(g!=='.')parts.push(g)});
+      return parts.join('/');
+    };
+    const relsOf=async owner=>{
+      const i=owner.lastIndexOf('/');
+      const x=await txt(owner.slice(0,i+1)+'_rels/'+owner.slice(i+1)+'.rels');
+      const m={};if(!x)return m;
+      Array.from(xml(x).getElementsByTagName('Relationship')).forEach(r=>{
+        m[r.getAttribute('Id')]={type:r.getAttribute('Type')||'',path:resolve(owner,r.getAttribute('Target')||'')};
+      });
+      return m;
+    };
+    const kid=(el,name)=>Array.from(el.getElementsByTagName('*')).find(n=>n.localName===name);
+    const num=(el,name)=>{const n=el&&kid(el,name);return n?parseFloat(n.textContent)||0:0};
+    const pos=el=>el?{col:num(el,'col'),row:num(el,'row'),colOff:num(el,'colOff'),rowOff:num(el,'rowOff')}:null;
+    const wbx=xml(await txt('xl/workbook.xml'));
+    const wrels=await relsOf('xl/workbook.xml');
+    let changed=false;
+    for(const sh of Array.from(wbx.getElementsByTagName('sheet'))){
+      const rid=sh.getAttribute('r:id')||Array.from(sh.attributes).find(a=>/:id$/.test(a.name)||a.name==='id').value;
+      const rel=wrels[rid];if(!rel)continue;
+      const srels=await relsOf(rel.path);
+      const dEntry=Object.values(srels).find(r=>/\/drawing$/.test(r.type));
+      if(!dEntry)continue;
+      const dx=await txt(dEntry.path);
+      const drels=await relsOf(dEntry.path);
+      const list=[];
+      if(dx){
+        const d=xml(dx);
+        for(const anc of Array.from(d.documentElement.children)){
+          const ln=anc.localName;
+          if(!/Anchor$/.test(ln))continue;
+          const blip=kid(anc,'blip');if(!blip)continue;
+          const emb=blip.getAttribute('r:embed')||(Array.from(blip.attributes).find(a=>/embed$/.test(a.name))||{}).value;
+          const mrel=drels[emb];if(!mrel||!z.file(mrel.path))continue;
+          const ext=kid(anc,'ext');
+          list.push({
+            data:await z.file(mrel.path).async('arraybuffer'),
+            type:(mrel.path.split('.').pop()||'png').toLowerCase().replace('jpg','jpeg'),
+            from:pos(kid(anc,'from')),to:pos(kid(anc,'to')),
+            cx:ext?+ext.getAttribute('cx')||0:0,cy:ext?+ext.getAttribute('cy')||0:0
+          });
+        }
+      }
+      res.images[sh.getAttribute('name')]=list;
+      /* strip the drawing so ExcelJS never trips on it */
+      const sp=rel.path,sx=await txt(sp);
+      if(sx){z.file(sp,sx.replace(/<drawing\b[^>]*\/>/,''));}
+      const ri=sp.lastIndexOf('/'),rp=sp.slice(0,ri+1)+'_rels/'+sp.slice(ri+1)+'.rels',rx=await txt(rp);
+      if(rx)z.file(rp,rx.replace(/<Relationship\b[^>]*\/drawing"[^>]*\/>/,'').replace(/<Relationship\b(?=[^>]*Type="[^"]*\/drawing")[^>]*\/>/,''));
+      /* drop the drawing part + its rels from the copy ExcelJS loads */
+      const di=dEntry.path.lastIndexOf('/');
+      z.remove(dEntry.path);z.remove(dEntry.path.slice(0,di+1)+'_rels/'+dEntry.path.slice(di+1)+'.rels');
+      changed=true;
+    }
+    if(changed)res.buf=await z.generateAsync({type:'arraybuffer'});
+  }catch(e){console.warn('image extraction skipped:',e)}
+  return res;
+}
+
+/* ── modes ── */
+async function xlGetBuf(){
+  if(VW.buf)return VW.buf;
+  const res=await fetch(VW.url);
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  VW.buf=await res.arrayBuffer();
+  return VW.buf;
+}
+function xlTabs(names,onPick){
+  const tabs=document.getElementById('xl-tabs');tabs.innerHTML='';
+  names.forEach(n=>{const b=document.createElement('button');b.textContent=n;b.dataset.sheet=n;b.onclick=()=>onPick(n);tabs.appendChild(b)});
+  tabs.style.display=names.length>1?'flex':'none';
+}
+function xlMark(n){document.querySelectorAll('#xl-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.sheet===n))}
 function openViewer(url,name,dlUrl){
   document.getElementById('viewer-title').textContent=name;
   const dlBtn=document.getElementById('viewer-dl');
   dlBtn.dataset.url=dlUrl;dlBtn.dataset.name=name;
-  VW.url=url;
+  VW.url=url;VW.buf=null;
   document.getElementById('viewer-modal').classList.remove('hidden');
   document.body.style.overflow='hidden';
   setViewMode('orig');
 }
-/* Original = Microsoft's Excel viewer: logo, colors, fonts, borders exactly as in Excel.
-   Quick   = plain table drawn in-page (works even if the Microsoft viewer can't reach the file). */
+/* Original    = redrawn in-page with the file's own logo, fills, fonts, borders (works for any link)
+   Excel Online= Microsoft's viewer (needs a public link that ends in .xlsx)
+   Quick       = plain table */
 async function setViewMode(mode){
   VW.mode=mode;
   const token=++XL_TOKEN;
-  document.getElementById('vm-orig').classList.toggle('on',mode==='orig');
-  document.getElementById('vm-quick').classList.toggle('on',mode==='quick');
+  ['orig','office','quick'].forEach(m=>document.getElementById('vm-'+m).classList.toggle('on',m===mode));
   const frame=document.getElementById('viewer-frame');
   frame.src='';
   document.getElementById('xl-tabs').innerHTML='';document.getElementById('xl-scroll').innerHTML='';
-  if(mode==='orig'){
+  xlFreeImgs();
+  if(mode==='office'){
     xlShow('frame');
     frame.src='https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(VW.url);
     return;
   }
   xlShow('msg','⏳ Loading spreadsheet…');
   try{
-    if(typeof XLSX==='undefined')throw new Error('Spreadsheet library not loaded');
-    const res=await fetch(VW.url);
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const buf=await res.arrayBuffer();
+    const buf=await xlGetBuf();
     if(token!==XL_TOKEN)return;
-    const wb=XLSX.read(buf,{type:'array'});
-    if(!wb.SheetNames.length)throw new Error('Workbook is empty');
-    const tabs=document.getElementById('xl-tabs');
-    wb.SheetNames.forEach(n=>{const b=document.createElement('button');b.textContent=n;b.dataset.sheet=n;b.onclick=()=>xlRenderSheet(wb,n);tabs.appendChild(b)});
-    tabs.style.display=wb.SheetNames.length>1?'flex':'none';
-    xlRenderSheet(wb,wb.SheetNames[0]);
-    xlShow('sheet');
+    if(mode==='orig'){
+      if(typeof ExcelJS==='undefined')throw new Error('ExcelJS not loaded');
+      const wb=new ExcelJS.Workbook();
+      const prep=await xlPrepare(buf);
+      await wb.xlsx.load(prep.buf);
+      if(token!==XL_TOKEN)return;
+      const names=wb.worksheets.map(w=>w.name);
+      if(!names.length)throw new Error('Workbook is empty');
+      const draw=n=>{
+        document.getElementById('xl-scroll').innerHTML=xlStyledHtml(wb,wb.getWorksheet(n),prep.images[n]);
+        xlMark(n);xlFit();document.getElementById('xl-scroll').scrollTo(0,0);
+      };
+      xlTabs(names,draw);xlShow('sheet');draw(names[0]);
+    }else{
+      if(typeof XLSX==='undefined')throw new Error('Spreadsheet library not loaded');
+      const wb=XLSX.read(buf,{type:'array'});
+      if(!wb.SheetNames.length)throw new Error('Workbook is empty');
+      const draw=n=>{
+        document.getElementById('xl-scroll').innerHTML=XLSX.utils.sheet_to_html(wb.Sheets[n],{editable:false});
+        xlMark(n);xlApplyZoom();document.getElementById('xl-scroll').scrollTo(0,0);
+      };
+      xlTabs(wb.SheetNames,draw);xlShow('sheet');draw(wb.SheetNames[0]);
+    }
   }catch(e){
     if(token!==XL_TOKEN)return;
-    console.warn('Quick view failed:',e);
+    console.warn('Viewer mode '+mode+' failed:',e);
+    if(mode==='orig'){showToast('Styled view unavailable — showing plain table');return setViewMode('quick')}
     frame.src='https://docs.google.com/viewer?url='+encodeURIComponent(VW.url)+'&embedded=true';
     xlShow('frame');
   }
 }
-function closeViewerBtn(){XL_TOKEN++;document.getElementById('viewer-modal').classList.add('hidden');document.getElementById('viewer-frame').src='';document.getElementById('xl-scroll').innerHTML='';document.body.style.overflow='';}
+function closeViewerBtn(){XL_TOKEN++;document.getElementById('viewer-modal').classList.add('hidden');document.getElementById('viewer-frame').src='';document.getElementById('xl-scroll').innerHTML='';xlFreeImgs();VW.buf=null;document.body.style.overflow='';}
 function closeViewer(e){if(e.target===document.getElementById('viewer-modal'))closeViewerBtn()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewerBtn()});
 
